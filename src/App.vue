@@ -19,14 +19,6 @@ export default {
     return {
       drawer: null
     }
-  },
-  methods: {
-    mnHome () {
-      //
-    },
-    mnCashier () {
-      //
-    }
   }
 }
 </script>

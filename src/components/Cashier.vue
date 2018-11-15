@@ -2,29 +2,29 @@
    <div>
     <v-container grid-list-md>
       <v-layout row wrap>
-        <v-flex xs6>
-          <div class="row">
-            <form @submit.prevent="enterProduct" class="col s12">
-              <div class="row">
-                <div class="input-field col s12">
-                  <label>Barcode</label>
-                  <br />
-                  <input type="text" v-model="barcode" required>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <label>Quantity</label>
-                  <br />
-                  <input type="text" v-model="quantity" required>
-                </div>
-              </div>
-              <button type="submit" class="btn">Add to Cart</button>
-              <button type="button" class="btn" @click="manualEntry">Manual Entry</button>
-            </form>
-          </div>
+        <v-flex xs5>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+              v-model="barcode"
+              ref="barcode"
+              label="Barcode"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="quantity"
+              label="Quantity"
+              required
+            ></v-text-field>
+            <v-btn
+              :disabled="!valid"
+              @click="submit"
+            >
+              Submit
+            </v-btn>
+            <v-btn @click="manualEntry">Manual Entry</v-btn>
+          </v-form>
         </v-flex>
-        <v-flex xs6>
+        <v-flex xs6 offset-xs1>
           <Cart />
         </v-flex>
       </v-layout>
@@ -38,27 +38,25 @@
           <span class="headline">Manual Entry</span>
         </v-card-title>
         <v-card-text>
-          <div class="row">
-              <div class="input-field col s6">
-                <label>Quantity</label>
-                <br />
-                <input type="text" v-model="manual_quantity" required>
-              </div>
-              <div class="input-field col s6">
-                <label>Purchase Price</label>
-                <br />
-                <input type="text" v-model="manual_purchase_price" required>
-              </div>
-          </div>
-          <div class="row">
-              <div class="input-field col s12">
-                <label>Item Name</label>
-                <br />
-                <input type="text" v-model="manual_name">
-              </div>
-          </div>
-          <v-btn color="blue darken-1" flat @click.native="dialog = false">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="dialog = false">Add</v-btn>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+              v-model="manual_quantity"
+              label="Quantity"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="manual_purchase_price"
+              label="Purchase Price"
+              required
+            ></v-text-field>
+             <v-text-field
+              v-model="manual_name"
+              label="Item Name"
+              required
+            ></v-text-field>
+          </v-form>
+          <v-btn @click.native="dialog = false">Cancel</v-btn>
+          <v-btn @click.native="addItemManually">Add</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -85,7 +83,8 @@ export default {
       manual_purchase_price: null,
       manual_name: null,
       manual_counter: 0,
-      dialog: false
+      dialog: false,
+      valid: true
     }
   },
   components: {
@@ -97,9 +96,10 @@ export default {
       this.manual_quantity = 1
       this.manual_purchase_price = 0
       this.manual_name = 'extra item'
-      this.$refs.modalManuel.show()
+      this.dialog = true
     },
-    addItemManually() {
+    addItemManually () {
+      this.dialog = false
       this.manual_counter = this.manual_counter + 1
       var data = {
         'product_id': this.manual_counter,
@@ -111,20 +111,26 @@ export default {
       }
       this.addToCart(data)
     },
-    enterProduct() {
+    submit () {
       var db = firebaseApp.firestore();
       db.collection('products').where('barcode', '==', this.barcode).get()
-           .then(querySnapshot => {
-             querySnapshot.forEach(doc => {
-               var data = {
-                   'product_id': doc.id,
-                   'price': doc.data().price,
-                   'quantity': this.quantity,
-                   'barcode': doc.data().barcode,
-                   'name': doc.data().name,
-                   'category': doc.data().category
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var data = {
+              'product_id': doc.id,
+              'price': doc.data().price,
+              'quantity': this.quantity,
+              'barcode': doc.data().barcode,
+              'name': doc.data().name,
+              'category': doc.data().category
           }
           this.addToCart(data)
+
+          console.log("now back")
+          // select and focus on barcode
+          this.barcode = ''
+          this.$refs.barcode.$el.focus()
+          this.quantity = 1
         })
       })
     }

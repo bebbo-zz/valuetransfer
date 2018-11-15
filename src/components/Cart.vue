@@ -5,29 +5,29 @@
     	<i>Your cart is empty!</i>
     	<router-link to="/">Go shopping</router-link>
     </p>
-    <table class="table is-striped" v-show="products.length">
-    	<thead>
-    		<tr>
-    			<td>Name</td>
-    			<td>Price</td>
-    			<td>Quantity</td>
-    		</tr>
-    	</thead>
-    	<tbody>
-    		<tr v-for="p in products" v-bind:key="p.product_id">
-        		<td>{{ p.name }}</td>
-        		<td>{{ p.price }} VND</td>
-        		<td>{{ p.quantity }}</td>
-            <td><button @click="removeFromCart(p)" class="btn" v-b-tooltip.hover title="Delete Entry"><i class="fa fa-trash"></i></button></td>
-        	</tr>
-        	<tr>
-        		<td><b>Total:</b></td>
-        		<td></td>
-        		<td><b>{{ total }} VND</b></td>
-        	</tr>
-    	</tbody>
-    </table>
-    <p><button v-show="products.length" class='btn' @click='checkout'>Checkout</button></p>
+    <v-data-table 
+      :headers="headers"
+      :items="products"
+      class="elevation-1"
+      >
+      <template slot="items" slot-scope="props">
+        <td>{{ props.item.name }}</td>
+        <td>{{ props.item.quantity }}</td>
+        <td>{{ formatPrice(props.item.price) }} VND</td>
+        <td><v-btn @click="removeFromCart(props.item)" title="Delete Entry"><v-icon>delete</v-icon></v-btn></td>
+      </template>
+    </v-data-table>
+    <v-container grid-list-md>
+      <v-layout row wrap>
+        <v-flex xs6>
+          <b>Total:</b>
+        </v-flex>
+        <v-flex xs6>
+          <b>{{ formatPrice(total) }} VND</b>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    <p><v-btn v-show="products.length" @click='checkout'>Checkout</v-btn></p>
   </div>
 </template>
 
@@ -36,6 +36,12 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   data() {
     return {
+      headers: [
+        { text: 'Name', value: 'name' },
+        { text: 'Quantity', value: 'quantity' },
+        { text: 'Price', value: 'price' },
+        { text: 'Remove', value: 'remove' }
+      ],
       totalSum: 0
     }
   },
@@ -51,15 +57,18 @@ export default {
   },
   methods: {
     ...mapActions(['removeFromCart', 'moveTotalSum']),
-  	checkout() {
+  	checkout () {
       this.totalSum = getTotalSum()
       moveTotalSum(this.totalSum)
     },
-    getTotalSum() {
+    getTotalSum () {
       return this.products.reduce((total, p) => {
         return total + p.price * p.quantity
       }, 0)
-    }
+    },
+    formatPrice ( value ) {
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    },
   }
 }
 </script>

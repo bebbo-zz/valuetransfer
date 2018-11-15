@@ -22,7 +22,7 @@
       app
     >
       <v-list dense>
-        <v-list-tile @click="mnHome">
+        <v-list-tile @click="home">
           <v-list-tile-action>
             <v-icon>home</v-icon>
           </v-list-tile-action>
@@ -30,9 +30,9 @@
             <v-list-tile-title>Home</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="mnCashier">
+        <v-list-tile @click="cashier">
           <v-list-tile-action>
-            <v-icon>contact_mail</v-icon>
+            <v-icon>add_to_queue</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Cashier</v-list-tile-title>
@@ -45,7 +45,7 @@
           <v-list dense>
             <v-list-tile v-for="cat in categories" v-bind:key="cat" @click="catOne(cat)">
               <v-list-tile-action>
-                <v-icon>home</v-icon>
+                <v-icon>link</v-icon>
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>{{cat}}</v-list-tile-title>
@@ -80,11 +80,15 @@ export default {
     }
   },
   methods: {
-    mnHome () {
-      //
+    home: function( e ) {
+      console.log('home')
+      this.$router.push('/')
+      e.preventDefault()
     },
-    mnCashier () {
-      //
+    cashier: function( e ) {
+      console.log('cashier')
+      this.$router.push('/cashier')
+      e.preventDefault()
     }
   }
 }
