@@ -1,6 +1,6 @@
 <template>
    <div>
-    <v-container grid-list-md>
+    <v-container>
       <v-layout row wrap>
         <v-flex xs5>
           <v-form ref="form" v-model="valid" lazy-validation>

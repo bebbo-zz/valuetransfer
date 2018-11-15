@@ -2,8 +2,8 @@
   <div class="cart">
     <h1 class="title">Your Cart</h1>
     <p v-show="!products.length">
-    	<i>Your cart is empty!</i>
-    	<router-link to="/">Go shopping</router-link>
+      <i>Your cart is empty!</i>
+      <router-link to="/">Go shopping</router-link>
     </p>
     <v-data-table 
       :headers="headers"
@@ -17,7 +17,7 @@
         <td><v-btn @click="removeFromCart(props.item)" title="Delete Entry"><v-icon>delete</v-icon></v-btn></td>
       </template>
     </v-data-table>
-    <v-container grid-list-md>
+    <v-container>
       <v-layout row wrap>
         <v-flex xs6>
           <b>Total:</b>
@@ -68,7 +68,7 @@ export default {
     },
     formatPrice ( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    },
+    }
   }
 }
 </script>
