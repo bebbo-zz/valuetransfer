@@ -16,11 +16,11 @@ export default new Vuex.Store({
        // console.log("p id: " + p.id)
         console.log("product id: " + product.product_id)
         console.log(product.name)
-            state.added.push(product)
-            if (product.quantity == undefined) {
-              Vue.set(product, 'quantity', 1)
-              Vue.set(product, 'totalPrice', product.price)
-            }
+          state.added.push(product)
+          if (product.quantity == undefined) {
+            Vue.set(product, 'quantity', 1)
+            Vue.set(product, 'totalPrice', product.price)
+          }
       } else {
             var additionalQuantity = 1
             if (product.quantity == undefined) {
@@ -31,6 +31,11 @@ export default new Vuex.Store({
             record.quantity = record.quantity + additionalQuantity
             record.totalPrice = record.quantity * record.price
       }
+      var tmpSum = 0
+      state.added.forEach(item => {
+        tmpSum = tmpSum + item.totalPrice
+      })
+      state.totalSum = tmpSum
     },
     removeFromCart(state, item) {
       let index = state.added.indexOf(item);
@@ -39,10 +44,11 @@ export default new Vuex.Store({
         // let product = state.added[index];
         state.added.splice(index, 1);
       }
-    },
-    moveTotalSum(state, totalSumIn) {
-      state.totalSum = totalSumIn
-      this.$router.push('/checkout')
+      var tmpSum = 0
+      state.sadded.forEach(item => {
+        tmpSum = tmpSum + item.totalPrice
+      })
+      state.totalSum = tmpSum
     }
   },
   actions: {
@@ -58,6 +64,7 @@ export default new Vuex.Store({
   },
   getters: {
     getNumberOfProducts: state => (state.added) ? state.added.length : 0,
-    cartProducts: state => state.added
+    cartProducts: state => state.added,
+    getTotalSum: state => state.totalSum
   }
 })

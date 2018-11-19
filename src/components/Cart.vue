@@ -27,7 +27,6 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <p><v-btn v-show="products.length" @click='checkout'>Checkout</v-btn></p>
   </div>
 </template>
 
@@ -56,11 +55,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['removeFromCart', 'moveTotalSum']),
-  	checkout () {
-      this.totalSum = getTotalSum()
-      moveTotalSum(this.totalSum)
-    },
+    ...mapActions(['removeFromCart']),
     getTotalSum () {
       return this.products.reduce((total, p) => {
         return total + p.price * p.quantity

@@ -26,5 +26,21 @@ npm run lint
 ```
 
 ### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+```
+- add product on return and focus barcode at the end again
+
+
+- follow six steps on installation guide
+- used printer cable to usb to connect
+- downloaded
+https://download.epson-biz.com/modules/pos/index.php?page=soft&scat=33
+- installing both driver and support library
+- example source mentioned in pdf which was downloaded
+
+- CA key and pfx key and both add to the trust store and as trusted
+
+
+```
+
 # valuetransfer
