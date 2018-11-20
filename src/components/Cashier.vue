@@ -125,10 +125,29 @@
             </v-layout>
             <v-layout row wrap>
               <v-flex xs2>
+                <p>&nbsp;</p>                
+              </v-flex>
+              <v-flex xs2>
                 <v-btn @click.native="typing(0)" color="info" large>0</v-btn>
               </v-flex>
               <v-flex xs2>
                 <v-btn @click.native="multiply(1000)" color="info" large>'000</v-btn>                
+              </v-flex>
+              <v-flex xs2 offset-xs2>
+               <v-btn @click.native="exact" color="warning" large>Exact</v-btn>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+              <v-flex xs12>
+               <p>&nbsp;</p>
+              </v-flex>
+            </v-layout>
+             <v-layout row wrap>
+              <v-flex xs2>
+               <v-btn @click.native="clear" color="error" large>Clear</v-btn>
+              </v-flex>
+              <v-flex xs2>
+               <p>&nbsp;</p>
               </v-flex>
               <v-flex xs2>
                 <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>                
@@ -228,6 +247,14 @@ export default {
     },
     multiply() {
       this.moneyPaid = (this.moneyPaid * 1000)
+      this.paidDisplay = this.formatPrice(this.moneyPaid)
+    },
+    clear() {
+      this.moneyPaid = 0
+      this.paidDisplay = this.formatPrice(this.moneyPaid)
+    },
+    exact() {
+      this.moneyPaid = this.totalSum
       this.paidDisplay = this.formatPrice(this.moneyPaid)
     },
     finishPayment() {
