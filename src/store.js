@@ -45,7 +45,7 @@ export default new Vuex.Store({
         state.added.splice(index, 1);
       }
       var tmpSum = 0
-      state.sadded.forEach(item => {
+      state.added.forEach(item => {
         tmpSum = tmpSum + item.totalPrice
       })
       state.totalSum = tmpSum

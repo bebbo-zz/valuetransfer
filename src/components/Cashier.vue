@@ -229,15 +229,19 @@ export default {
       Cart
   },
   computed() {
-    this.device = new escpos.Network('192.168.178.122')
-    var options = { encoding: "GB18030" /* default */ }
-    this.printer = new escpos.Printer(device, options)
+ //   this.initializePrinter    
   },
   methods: {
     ...mapActions(['addToCart']),
     ...mapGetters({
-      totalSum: 'getTotalSum'
+      totalSum: 'getTotalSum',
+      products: 'cartProducts'
     }),
+    initializePrinter() {
+      this.device = new escpos.Network('192.168.178.122')
+      var options = { encoding: "GB18030" /* default */ }
+      this.printer = new escpos.Printer(device, options)
+    },
     checkout () {
       this.modalPayment = true
     },
@@ -269,10 +273,49 @@ export default {
       this.modalPayment = false
       this.changeToGive = this.totalSum - this.moneyPaid
       this.modalReturn = true
-      this.printerReceipt
+   //   this.printerReceipt
+      this.storeReceipt
     },
     printerReceipt() {
-      
+      vm = this
+      this.device.open(function(){
+        vm.printer
+        .font('b')
+        .align('ct')
+        .style('bu')
+        .size(2, 2)
+        .text('Hanc Duc')
+        .text('The quick brown fox jumps over the lazy dog')
+        .cut()
+        .close()
+      })
+    },
+    storeReceipt() {
+      var db = firebaseApp.firestore()
+
+      var tmpProductArray = []
+      this.products.forEach(prod => {
+        // array: barcode, name, category, quantity, price
+        var productMap = {
+          'product_id': this.product_id,
+          'price': this.price,
+          'quantity': this.quantity,
+          'barcode': this.barcode,
+          'name': this.name,
+          'category': this.category
+        }
+        tmpProductArray.push(data)
+      })
+
+      var docData = {
+        totalPrice: 3.14159265,
+        receiptDate: new Date("December 10, 1815"),
+        products: tmpProductArray
+      }
+      db.collection("orders").add(docData).then(function() {
+          console.log("Document successfully written!");
+      })
+      .then(docRef => { console.log("Order was written with ID " + docRef.id) })
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
