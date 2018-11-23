@@ -197,6 +197,7 @@
 import Cart from '@/components/Cart'
 import firebaseApp from './firebaseInit'
 import { mapActions, mapGetters } from 'vuex'
+import escpos from 'escpos'
 
 // sample barcode 123123
 export default {
@@ -219,11 +220,18 @@ export default {
       valid: true,
       moneyPaid: 0,
       paidDisplay: null,
-      changeToGive: 0
+      changeToGive: 0,
+      device: null,
+      printer: null
     }
   },
   components: {
       Cart
+  },
+  computed() {
+    this.device = new escpos.Network('192.168.178.122')
+    var options = { encoding: "GB18030" /* default */ }
+    this.printer = new escpos.Printer(device, options)
   },
   methods: {
     ...mapActions(['addToCart']),
@@ -261,6 +269,10 @@ export default {
       this.modalPayment = false
       this.changeToGive = this.totalSum - this.moneyPaid
       this.modalReturn = true
+      this.printerReceipt
+    },
+    printerReceipt() {
+      
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
