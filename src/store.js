@@ -13,12 +13,8 @@ export default new Vuex.Store({
       const record = state.added.find(p => p.product_id === product.product_id)
       
       if (!record) {
-       // console.log("p id: " + p.id)
-        console.log("product id: " + product.product_id)
-        console.log(product.name)
           state.added.push(product)
-          if (product.quantity == undefined) {
-            Vue.set(product, 'quantity', 1)
+          if (product.quantity == 1) {
             Vue.set(product, 'totalPrice', product.price)
           }
       } else {
@@ -64,7 +60,9 @@ export default new Vuex.Store({
   },
   getters: {
     getNumberOfProducts: state => (state.added) ? state.added.length : 0,
-    cartProducts: state => state.added,
+    cartProducts: (state) => {
+      return state.added
+    }, //state => state.added,
     getTotalSum: state => state.totalSum
   }
 })

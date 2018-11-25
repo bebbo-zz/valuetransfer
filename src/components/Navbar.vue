@@ -81,12 +81,10 @@ export default {
   },
   methods: {
     home: function( e ) {
-      console.log('home')
       this.$router.push('/')
       e.preventDefault()
     },
     cashier: function( e ) {
-      console.log('cashier')
       this.$router.push('/cashier')
       e.preventDefault()
     }

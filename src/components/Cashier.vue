@@ -163,7 +163,7 @@
     <!-- Modal Return -->
     <v-dialog 
         v-model="modalReturn"
-        persistent max-width="600px">
+        persistent max-width="800px">
       <v-card>
         <v-card-title>
           <span class="headline">Give Change</span>
@@ -179,10 +179,10 @@
               <v-flex xs4>
                 <v-btn @click.native="closeDialog" color="info" large>Print Additional Receipt</v-btn>
               </v-flex>
-              <v-flex xs4>
+              <v-flex xs3 offset-xs1>
                 <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>                
               </v-flex>
-              <v-flex xs4>
+              <v-flex xs3 offset-xs1>
                 <v-btn @click.native="closeDialog" color="success" large>Next Customer</v-btn>                
               </v-flex>
             </v-layout>
@@ -227,15 +227,14 @@ export default {
   components: {
       Cart
   },
-  computed() {
-    //
-  },
-  methods: {
-    ...mapActions(['addToCart']),
+  computed: {
     ...mapGetters({
       totalSum: 'getTotalSum',
       products: 'cartProducts'
     }),
+  },
+  methods: {
+    ...mapActions(['addToCart']),
     checkout () {
       this.modalPayment = true
     },
@@ -266,13 +265,16 @@ export default {
     finishPayment() {
       this.modalPayment = false
       this.changeToGive = this.totalSum - this.moneyPaid
-      this.modalReturn = true
-      this.sendPrintRequest
-      this.storeReceipt
+    //  this.storeReceipt()
+      this.sendPrintRequest()
+   //   this.modalReturn = true
+    },
+    getitems() {
+      this.$store.getters.cartProducts
     },
     storeReceipt() {
+      console.log("store receipt")
       var db = firebaseApp.firestore()
-
       var tmpProductArray = []
       this.products.forEach(prod => {
         var productMap = {
@@ -307,21 +309,20 @@ export default {
         .newline()
         .encode()
 
-      console.log("receipt id: " + this.receiptId)
+      // this muss weg
       this.receiptId = 'ABCD1234'
 
       var docData = {
         receiptId: this.receiptId,
-        binaryPrintData: result,
-        created: firebase.firestore.FieldValue.serverTimestamp()
+        binaryPrintData: Object(result),
+        created: new Date()
       }
 
       var db = firebaseApp.firestore()
       db.collection("prints").add(docData)
-        .then(docRef => {
-          vm.receiptId = docRef.id
-          console.log("order stored successfully")
-      })
+        .then(
+          console.log("print request stored successfully")          
+        )
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -359,8 +360,6 @@ export default {
               'category': doc.data().category
           }
           this.addToCart(data)
-
-          console.log("now back")
           // select and focus on barcode
           this.barcode = ''
           this.$refs.barcode.$el.focus()
