@@ -197,7 +197,7 @@
 import Cart from '@/components/Cart'
 import firebaseApp from './firebaseInit'
 import { mapActions, mapGetters } from 'vuex'
-import escpos from 'escpos'
+import EscPosEncoder from 'esc-pos-encoder'
 
 // sample barcode 123123
 export default {
@@ -221,15 +221,14 @@ export default {
       moneyPaid: 0,
       paidDisplay: null,
       changeToGive: 0,
-      device: null,
-      printer: null
+      receiptId: null
     }
   },
   components: {
       Cart
   },
   computed() {
- //   this.initializePrinter    
+    //
   },
   methods: {
     ...mapActions(['addToCart']),
@@ -237,11 +236,6 @@ export default {
       totalSum: 'getTotalSum',
       products: 'cartProducts'
     }),
-    initializePrinter() {
-      this.device = new escpos.Network('192.168.178.122')
-      var options = { encoding: "GB18030" /* default */ }
-      this.printer = new escpos.Printer(device, options)
-    },
     checkout () {
       this.modalPayment = true
     },
@@ -273,49 +267,61 @@ export default {
       this.modalPayment = false
       this.changeToGive = this.totalSum - this.moneyPaid
       this.modalReturn = true
-   //   this.printerReceipt
+      this.sendPrintRequest
       this.storeReceipt
-    },
-    printerReceipt() {
-      vm = this
-      this.device.open(function(){
-        vm.printer
-        .font('b')
-        .align('ct')
-        .style('bu')
-        .size(2, 2)
-        .text('Hanc Duc')
-        .text('The quick brown fox jumps over the lazy dog')
-        .cut()
-        .close()
-      })
     },
     storeReceipt() {
       var db = firebaseApp.firestore()
 
       var tmpProductArray = []
       this.products.forEach(prod => {
-        // array: barcode, name, category, quantity, price
         var productMap = {
-          'product_id': this.product_id,
-          'price': this.price,
-          'quantity': this.quantity,
-          'barcode': this.barcode,
-          'name': this.name,
-          'category': this.category
+          'product_id': prod.product_id,
+          'price': prod.price,
+          'quantity': prod.quantity,
+          'barcode': prod.barcode,
+          'name': prod.name,
+          'category': prod.category
         }
-        tmpProductArray.push(data)
+        tmpProductArray.push(productMap)
       })
 
       var docData = {
-        totalPrice: 3.14159265,
-        receiptDate: new Date("December 10, 1815"),
+        totalPrice: this.totalSum,
+        receiptDate: new Date(),
         products: tmpProductArray
       }
-      db.collection("orders").add(docData).then(function() {
-          console.log("Document successfully written!");
+      var vm = this
+      db.collection("orders").add(docData)
+        .then(docRef => {
+          vm.receiptId = docRef.id
+          console.log("order stored successfully")
       })
-      .then(docRef => { console.log("Order was written with ID " + docRef.id) })
+    },
+    sendPrintRequest() {
+      var encoder = new EscPosEncoder();
+
+      var result = encoder
+        .initialize()
+        .text('The quick brown fox jumps over the lazy dog')
+        .newline()
+        .encode()
+
+      console.log("receipt id: " + this.receiptId)
+      this.receiptId = 'ABCD1234'
+
+      var docData = {
+        receiptId: this.receiptId,
+        binaryPrintData: result,
+        created: firebase.firestore.FieldValue.serverTimestamp()
+      }
+
+      var db = firebaseApp.firestore()
+      db.collection("prints").add(docData)
+        .then(docRef => {
+          vm.receiptId = docRef.id
+          console.log("order stored successfully")
+      })
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
