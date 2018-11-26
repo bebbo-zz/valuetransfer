@@ -197,7 +197,6 @@
 import Cart from '@/components/Cart'
 import firebaseApp from './firebaseInit'
 import { mapActions, mapGetters } from 'vuex'
-import EscPosEncoder from 'esc-pos-encoder'
 
 // sample barcode 123123
 export default {
@@ -265,9 +264,9 @@ export default {
     finishPayment() {
       this.modalPayment = false
       this.changeToGive = this.totalSum - this.moneyPaid
-    //  this.storeReceipt()
-      this.sendPrintRequest()
-   //   this.modalReturn = true
+      this.storeReceipt()
+    //  this.sendPrintRequest()
+      this.modalReturn = true
     },
     getitems() {
       this.$store.getters.cartProducts
@@ -299,30 +298,6 @@ export default {
           vm.receiptId = docRef.id
           console.log("order stored successfully")
       })
-    },
-    sendPrintRequest() {
-      var encoder = new EscPosEncoder();
-
-      var result = encoder
-        .initialize()
-        .text('The quick brown fox jumps over the lazy dog')
-        .newline()
-        .encode()
-
-      // this muss weg
-      this.receiptId = 'ABCD1234'
-
-      var docData = {
-        receiptId: this.receiptId,
-        binaryPrintData: Object(result),
-        created: new Date()
-      }
-
-      var db = firebaseApp.firestore()
-      db.collection("prints").add(docData)
-        .then(
-          console.log("print request stored successfully")          
-        )
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
