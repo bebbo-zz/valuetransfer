@@ -286,7 +286,8 @@ export default {
         }
         tmpProductArray.push(productMap)
       })
-
+      // 4000991030777
+      // 123123
       var docData = {
         totalPrice: this.totalSum,
         receiptDate: new Date(),
@@ -295,8 +296,18 @@ export default {
       var vm = this
       db.collection("orders").add(docData)
         .then(docRef => {
-          vm.receiptId = docRef.id
+          //vm.receiptId = docRef.id
           console.log("order stored successfully")
+
+          var printData = {
+            orderId: docRef.id,
+            totalPrice: vm.totalSum,
+            moneyPaid: vm.moneyPaid,
+            products: tmpProductArray,
+            created: new Date(),
+          }
+          db.collection("prints").add(printData)
+            .then(() => {console.log("print request sent")})
       })
     },
     formatPrice( value ) {
