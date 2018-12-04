@@ -78,7 +78,7 @@
           <v-container>
             <v-layout row wrap>
               <v-flex xs12>
-                <v-text-field placeholder="0" solo prefix="VND" v-model="paidDisplay"></v-text-field>
+                <v-text-field placeholder="0" solo prefix="VND" v-model="paidDisplay" disabled></v-text-field>
               </v-flex>
             </v-layout>
             <v-layout row wrap>
@@ -183,7 +183,7 @@
                 <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>                
               </v-flex>
               <v-flex xs3 offset-xs1>
-                <v-btn @click.native="closeDialog" color="success" large>Next Customer</v-btn>                
+                <v-btn @click.native="nextCustomer" color="success" large>Next Customer</v-btn>                
               </v-flex>
             </v-layout>
           </v-container>        
@@ -262,11 +262,15 @@ export default {
       this.paidDisplay = this.formatPrice(this.moneyPaid)
     },
     finishPayment() {
-      this.modalPayment = false
-      this.changeToGive = this.totalSum - this.moneyPaid
-      this.storeReceipt()
-    //  this.sendPrintRequest()
-      this.modalReturn = true
+      this.changeToGive = Math.floor(this.moneyPaid - this.totalSum)
+      if(this.changeToGive < 0) {
+        alert("Not enough money paid")
+      }else{
+        this.modalPayment = false
+        this.storeReceipt()
+        //  this.sendPrintRequest()
+        this.modalReturn = true
+      }
     },
     getitems() {
       this.$store.getters.cartProducts
@@ -276,18 +280,21 @@ export default {
       var db = firebaseApp.firestore()
       var tmpProductArray = []
       this.products.forEach(prod => {
+        var total = prod.quantity * prod.price
         var productMap = {
           'product_id': prod.product_id,
           'price': prod.price,
           'quantity': prod.quantity,
           'barcode': prod.barcode,
           'name': prod.name,
-          'category': prod.category
+          'category': prod.category,
+          'total': total
         }
         tmpProductArray.push(productMap)
       })
       // 4000991030777
       // 123123
+      console.log(this.totalSum)
       var docData = {
         totalPrice: this.totalSum,
         receiptDate: new Date(),
@@ -298,11 +305,11 @@ export default {
         .then(docRef => {
           //vm.receiptId = docRef.id
           console.log("order stored successfully")
-
           var printData = {
             orderId: docRef.id,
             totalPrice: vm.totalSum,
             moneyPaid: vm.moneyPaid,
+            moneyChange: vm.changeToGive,
             products: tmpProductArray,
             created: new Date(),
           }
@@ -340,7 +347,7 @@ export default {
             var data = {
               'product_id': doc.id,
               'price': doc.data().price,
-              'quantity': this.quantity,
+              'quantity': Math.floor(this.quantity),
               'barcode': doc.data().barcode,
               'name': doc.data().name,
               'category': doc.data().category
@@ -352,6 +359,26 @@ export default {
           this.quantity = 1
         })
       })
+    },
+    nextCustomer() {
+      this.product_id = null,
+      this.barcode = null,
+      this.ategory = null,
+      this.price = null,
+      this.name = null,
+      this.quantity = 1,
+      this.manual_quantity = null,
+      this.manual_purchase_price = null,
+      this.manual_name = null,
+      this.manual_counter = 0,
+      this.dialog = false,
+      this.modalPayment = false,
+      this.modalReturn = false,
+      this.valid = true,
+      this.moneyPaid = 0,
+      this.paidDisplay = null,
+      this.changeToGive = 0,
+      this.receiptId = null
     }
   }
 }

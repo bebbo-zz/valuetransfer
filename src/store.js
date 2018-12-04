@@ -16,22 +16,27 @@ export default new Vuex.Store({
           state.added.push(product)
           if (product.quantity == 1) {
             Vue.set(product, 'totalPrice', product.price)
+          }else{
+            var tempNumber = Math.floor(product.quantity * product.price)
+            Vue.set(product, 'totalPrice', tempNumber)
           }
       } else {
             var additionalQuantity = 1
             if (product.quantity == undefined) {
               additionalQuantity = 1
             } else {
-              additionalQuantity = product.quantity
+              additionalQuantity = Math.floor(1 * product.quantity)
             }
-            record.quantity = record.quantity + additionalQuantity
-            record.totalPrice = record.quantity * record.price
+            console.log("add" + additionalQuantity)
+            record.quantity = Math.floor(record.quantity + additionalQuantity * 1)
+            record.totalPrice = Math.floor(record.quantity * record.price)
       }
       var tmpSum = 0
       state.added.forEach(item => {
-        tmpSum = tmpSum + item.totalPrice
+        console.log(item.totalPrice)
+        tmpSum = Math.floor(tmpSum + item.totalPrice)
       })
-      state.totalSum = tmpSum
+      state.totalSum = Math.floor(tmpSum)
     },
     removeFromCart(state, item) {
       let index = state.added.indexOf(item);
