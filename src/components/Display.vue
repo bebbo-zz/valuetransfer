@@ -25,20 +25,12 @@
         <v-flex xs4>
           <div style="{display: block}">
             <input v-model="txtSearch" class="kleiner" type="text" placeholder="Search..." />
-            <b-btn variant="info" v-on:click="search">
-              <i class="fa fa-search"></i>
-            </b-btn>
+            <v-btn color="info" v-on:click="search">
+              <v-icon>search</v-icon>
+            </v-btn>
           </div>
         </v-flex>
         <v-flex xs4>
-          <!--b-input-group prepend="Display per page">
-            <b-dropdown v-bind:text="pageOne.itemsPerPage">
-              <b-dropdown-item @click="perPageChanged(10)">10</b-dropdown-item>
-              <b-dropdown-item @click="perPageChanged(50)">50</b-dropdown-item>
-              <b-dropdown-item @click="perPageChanged(100)">100</b-dropdown-item>
-              <b-dropdown-item @click="perPageChanged(1000)">1000</b-dropdown-item>
-            </b-dropdown>
-          </b-input-group-->
           <v-select
             :items="sclItemsPerPage"
             box
@@ -49,31 +41,44 @@
         </v-flex>
       </v-layout>
       <v-layout row wrap>
-        <pagination :current-page="pageOne.currentPage"
+        <v-pagination
+          v-model="pageOne.currentPage"
+          :length="pageOne.totalPages"
+          :total-visible="5"
+          @input="pageOneChanged"
+        ></v-pagination>
+        <!--pagination :current-page="pageOne.currentPage"
           :total-pages="pageOne.totalPages"
           @page-changed="pageOneChanged">
-        </pagination>
+        </pagination-->
+      </v-layout>
+      <v-layout align-start justify-center row wrap v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
+        <v-flex align-self-center xs-4 v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id">
+          <v-card tile>
+              <v-img
+                center
+                max-width="250px"
+                max-height="250px"
+                v-bind:src="product.thumbUrl"
+              ></v-img>
+            <v-card-title primary-title>
+              <v-container>
+                <small width="100%" class="text-muted"><b>{{ product.name }}</b><br />{{ formatPrice(product.price) }} VND</small>
+              </v-container>
+            </v-card-title>
+            <!--button @click='viewProduct(product.product_id)' class='button is-info'><i class="fa fa-eye"></i></button>
+            <button v-if="isEmployee" @click='editProduct(product.product_id)' class='button is-info'><i class="fa fa-pencil"></i></button>
+            <button @click='addToCart(product)' class='button is-info'><i class="fa fa-cart-arrow-down"></i></button-->
+            <v-card-actions>
+              <v-btn flat color="orange" @click='viewProduct(product.product_id)'><v-icon>zoom_in</v-icon></v-btn>
+              <!--v-if="isEmployee"-->
+              <v-btn flat color="orange" @click='editProduct(product.product_id)'><v-icon>build</v-icon></v-btn>
+              <v-btn flat color="orange" @click='addToCart(product)'><v-icon>add_shopping_cart</v-icon></v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
       </v-layout>
     </v-container>
-    <div class="row" v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
-      <div v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id" class="col-md-4 col-6 my-1">
-        <v-card>
-          <v-img
-            v-bind:src="product.thumbUrl"
-          ></v-img>
-          <div slot="footer">
-            <small class="text-muted">{{ product.name }}<br />{{ formatPrice(product.price) }} VND</small>   
-          </div>
-          <button @click='viewProduct(product.product_id)' class='button is-info'><i class="fa fa-eye"></i></button>
-          <button v-if="isEmployee" @click='editProduct(product.product_id)' class='button is-info'><i class="fa fa-pencil"></i></button>
-          <button @click='addToCart(product)' class='button is-info'><i class="fa fa-cart-arrow-down"></i></button>
-          <!--v-card-actions>
-            <v-btn flat color="orange">Share</v-btn>
-            <v-btn flat color="orange">Explore</v-btn>
-          </v-card-actions-->
-        </v-card>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -81,11 +86,11 @@
 // storage reference:   gs://vnshoptest.appspot.com          
 import firebaseApp from './firebaseInit'
 import { mapActions } from 'vuex'
-import Pagination from './Pagination.vue'
+// import Pagination from './Pagination.vue'
 
 export default {
   name: 'display',
-  components : { Pagination },
+ // components : { Pagination },
   data ( ) {
     return {
       txtSearch: null,
@@ -172,19 +177,11 @@ export default {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
     },
     search() {
-      console.log("simple search");
       // clear products
       this.productsAll = []
       // normally all combined with category
       var oneleft = ""
       var oneright = ""
-      var twoleft = "1"
-      var twomiddle = "=="
-      var tworight = "1"
-      var columnBarcode = "barcode"
-      var columnArticleNumber = "arctile_number"
-      var columnName = "name"
-      var columnThree = this.txtSearch
       if (this.currentCategory == "All") {
         oneleft = "1"
         oneright = "1"
@@ -193,9 +190,6 @@ export default {
         oneright = this.currentCategory
       }
       if ((this.txtSearch == "") || (this.txtSearch == null) || (this.txtSearch == undefined)) {
-        twoleft = "1"
-        twomiddle = "=="
-        tworight = "1"
         this.singleSearch(oneleft, oneright, "1", "==", "1")
       } else {
         this.singleSearch(oneleft, oneright, "barcode", "==", this.txtSearch)
@@ -205,8 +199,6 @@ export default {
       }               
     },
     singleSearch(oneleft, oneright, twoleft, twomiddle, tworight) {
-      console.log("col1 " + oneleft + " col2 " + oneright)
-      console.log("col3 " + twoleft + " col4 " + tworight)
       var db = firebaseApp.firestore();
 
       // 4008789-093905
@@ -246,7 +238,6 @@ export default {
             'size': doc.data().size,
             'thumbUrl': thumbPicture
           }
-          console.log("found data " + data)
           this.productsAll.push(data)
         })
       this.resetPagination()
@@ -271,13 +262,12 @@ export default {
       this.products = this.productsAll.slice((pageNum - 1) * this.pageOne.itemsPerPage, this.pageOne.itemsPerPage * pageNum)
     },
     perPageChanged( ) {
-      console.log("display" + newnumber)
-      this.pageOne.itemsPerPage = newnumber
+      //this.pageOne.itemsPerPage = newnumber
       this.resetPagination()
     },
     categoryChanged( ) {
-      console.log("category changed " + newcategory)
-      this.currentCategory = newcategory
+    //  console.log("category changed " + newcategory)
+    //  this.currentCategory = newcategory
       this.search()
     },
     viewProduct(productId) {
@@ -295,5 +285,12 @@ export default {
 <style>
 input.kleiner {
   width: 80% !important;
+}
+
+img.surrounded {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

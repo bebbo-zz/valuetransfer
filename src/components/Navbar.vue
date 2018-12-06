@@ -38,6 +38,14 @@
             <v-list-tile-title>Cashier</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+         <v-list-tile @click="selling">
+          <v-list-tile-action>
+            <v-icon>dashboard</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Products</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
       <v-expansion-panel>
         <v-expansion-panel-content>
@@ -86,6 +94,10 @@ export default {
     },
     cashier: function( e ) {
       this.$router.push('/cashier')
+      e.preventDefault()
+    },
+    selling: function( e ) {
+      this.$router.push('/display')
       e.preventDefault()
     }
   }

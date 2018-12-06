@@ -232,6 +232,10 @@ export default {
       products: 'cartProducts'
     }),
   },
+  updated: function() {
+    console.log("updated " + this.$refs.barcode)
+    this.$nextTick(() => this.$refs.barcode.focus())
+  },
   methods: {
     ...mapActions(['addToCart']),
     checkout () {
@@ -321,10 +325,13 @@ export default {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
     },
     manualEntry() {
+      console.log("write " + this.$refs.barcode.$el.children[0].text)
+      this.$nextTick(() => this.$refs.barcode.focus())
+      
       this.manual_quantity = 1
       this.manual_purchase_price = 0
       this.manual_name = 'extra item'
-      this.dialog = true
+   //   this.dialog = true
     },
     addItemManually () {
       this.dialog = false
@@ -338,6 +345,7 @@ export default {
         'category': 'manually added'
       }
       this.addToCart(data)
+      this.setToStart()
     },
     submit () {
       var db = firebaseApp.firestore();
@@ -354,31 +362,35 @@ export default {
           }
           this.addToCart(data)
           // select and focus on barcode
-          this.barcode = ''
-          this.$refs.barcode.$el.focus()
-          this.quantity = 1
+          this.setToStart()
         })
       })
     },
     nextCustomer() {
-      this.product_id = null,
-      this.barcode = null,
-      this.ategory = null,
-      this.price = null,
-      this.name = null,
-      this.quantity = 1,
-      this.manual_quantity = null,
-      this.manual_purchase_price = null,
-      this.manual_name = null,
-      this.manual_counter = 0,
-      this.dialog = false,
-      this.modalPayment = false,
-      this.modalReturn = false,
-      this.valid = true,
-      this.moneyPaid = 0,
-      this.paidDisplay = null,
-      this.changeToGive = 0,
+      this.product_id = null
+      this.barcode = null
+      this.ategory = null
+      this.price = null
+      this.name = null
+      this.quantity = 1
+      this.manual_quantity = null
+      this.manual_purchase_price = null
+      this.manual_name = null
+      this.manual_counter = 0
+      this.dialog = false
+      this.modalPayment = false
+      this.modalReturn = false
+      this.valid = true
+      this.moneyPaid = 0
+      this.paidDisplay = null
+      this.changeToGive = 0
       this.receiptId = null
+      this.setToStart()
+    },
+    setToStart() {
+      this.barcode = null
+      this.quantity = 1
+      this.$nextTick(() => this.$refs.barcode.focus())
     }
   }
 }

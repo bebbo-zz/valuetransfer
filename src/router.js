@@ -2,6 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Cashier from './components/Cashier.vue'
+import Display from './components/Display.vue'
+import EditProduct from './components/EditProduct.vue'
+import ViewProduct from './components/ViewProduct.vue'
 
 Vue.use(Router)
 
@@ -16,6 +19,21 @@ export default new Router({
       path: '/cashier',
       name: 'cashier',
       component: Cashier
+    },
+    {
+      path: '/display',
+      name: 'display',
+      component: Display
+    },
+    {
+      path: '/edit/:product_id',
+      name: 'edit-product',
+      component: EditProduct,
+    },
+    {
+      path: '/:product_id',
+      name: 'view-product',
+      component: ViewProduct
     },
     {
       path: '/about',

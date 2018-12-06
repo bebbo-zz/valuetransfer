@@ -27,13 +27,11 @@ export default new Vuex.Store({
             } else {
               additionalQuantity = Math.floor(1 * product.quantity)
             }
-            console.log("add" + additionalQuantity)
             record.quantity = Math.floor(record.quantity + additionalQuantity * 1)
             record.totalPrice = Math.floor(record.quantity * record.price)
       }
       var tmpSum = 0
       state.added.forEach(item => {
-        console.log(item.totalPrice)
         tmpSum = Math.floor(tmpSum + item.totalPrice)
       })
       state.totalSum = Math.floor(tmpSum)

@@ -235,7 +235,6 @@ export default {
       db.collection('intakes').where('product_id', '==', this.$route.params.product_id).get()
       .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-              var tempIntakes = []
               var data = {
                   'id': doc.id,
                   'purchase_price': doc.data().purchase_price,
@@ -330,7 +329,7 @@ export default {
         this.$router.push({name: 'edit-product', params: {product_id: this.product_id}}) 
       })
       .catch(error => {
-          console.log(err)
+          console.log(error)
       })
     },
     deletePicture(i) {
@@ -348,7 +347,7 @@ export default {
               // File deleted successfully
               console.log("delete successful")
             }).catch(function(error) {
-              // Uh-oh, an error occurred!
+              console.log(error)
             })
         }
     }, 
@@ -384,28 +383,27 @@ export default {
     onThumbFilePicked (e) {
 			const files = e.target.files
 			if(files[0] !== undefined) {
-				this.imageName = files[0].name
-				if(this.imageName.lastIndexOf('.') <= 0) {
-					return
-				}
+				this.thumbFile = files[0].name
+			//	if(this.imageName.lastIndexOf('.') <= 0) {
+			//		return
+		//		}
 				const fr = new FileReader ()
 				fr.readAsDataURL(files[0])
 				fr.addEventListener('load', () => {
-					this.imageUrl = fr.result
-					this.imageFile = files[0] // this is an image file that can be sent to server...
-				})
+			//		this.imageUrl = fr.result
+					this.thumbFile = files[0] // this is an image file that can be sent to server...
+        })
+        this.loadfileresized()
 			} else {
-				this.imageName = ''
-				this.imageFile = ''
-				this.imageUrl = ''
-			}
+				this.thumbFile = ''
+      }
 		},
     downloadPicture(i) {
       console.log("download: " + this.picsUrl[i])
       var downloadString = this.picsReference[i] + 'jpg'
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'blob';
-      xhr.onload = function(event) {
+      xhr.onload = function() {
         var returnedBlob = new Blob([xhr.response], {type: 'image/jpeg'});
         var link = document.createElement('a')
         link.href = window.URL.createObjectURL(returnedBlob)
@@ -449,7 +447,7 @@ export default {
         this.intakes.push(data)
       })
       .catch(error => {
-          console.log(err)
+          console.log(error)
       })
     },
     fileSelected(event) {
@@ -470,12 +468,12 @@ export default {
       var curReference = 1
       if ((this.picsMaxRef == undefined) || this.picsMaxRef == null) {
           console.log("nothing was there before")
-          var curReference = 1
+          curReference = 1
           this.picsUrl = []
           this.picsReference = []
           this.picsLength = 0
       } else {
-          var curReference = this.picsMaxRef + 1
+          curReference = this.picsMaxRef + 1
       }
       var vm = this
       if (curFile != null) {
@@ -520,10 +518,6 @@ export default {
         })
       }
     },
-    uploadThumbFile() {
-        // get blob which we want to upload
-        var runthrough = this.getResizedBlob()
-    },
     uploadBlob(curBlob, mime) {
       var curProductID = this.$route.params.product_id
       var vm = this
@@ -551,11 +545,11 @@ export default {
         // hier sollte das images ebenfalls in die Datenbank geschrieben werden
       })
     },
-    getResizedBlob: function() {
+    loadfileresized() {
       // Read in file
       var outputQuality = 1
       var file = this.thumbFile
-      var curBlob = null
+   //   var curBlob = null
       var vm = this
       // Load the image
       var reader = new FileReader()
@@ -564,6 +558,7 @@ export default {
         var image = new Image()
         image.onload = function (imageEvent) {
           // Resize the image
+          console.log(imageEvent)
           var newx = 0
           var newy = 0
           var canvas = document.createElement('canvas'),
@@ -583,23 +578,21 @@ export default {
                 height = max_size
             }
           }
-          canvas.width = max_size;
-          canvas.height = max_size;
-          canvas.getContext('2d').drawImage(image, newx, newy, width, height);
+          canvas.width = max_size
+          canvas.height = max_size
+          canvas.getContext('2d').drawImage(image, newx, newy, width, height)
           canvas.toBlob((blob) => {
-            console.log("twelve" + blob); //output image as a blob
-            curBlob = blob;
+            console.log("twelve" + blob) //output image as a blob
+          //  curBlob = blob
             //const file = new File([blob], this.thumbFile, {
             //    type: 'image/jpeg',
             //    lastModified: Date.now()
             // }); //output image as a file
             vm.uploadBlob(blob, 'image/jpeg')
-          }, 'image/jpeg', outputQuality);
+          }, 'image/jpeg', outputQuality)
         }
-        image.src = readerEvent.target.result;
+        image.src = readerEvent.target.result
       }
-      console.log("thirdteen: ")
-      return "done"
     }
   }
 }
