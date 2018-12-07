@@ -1,149 +1,198 @@
 <template>
   <div id="edit-product">
     <h3>Edit Product</h3>
-    <div class="row">
-      <!-- @submit.prevent="updateProduct" -->
-      <form class="col s12">
-        <div class="row">
-          <div class="input-field col s6">
-            <label>{{$t("barcode")}}</label>
-            <br />
-            <input type="text" v-model="barcode" required>
-          </div>
-          <div class="input-field col s6">
-            <label>Article Number</label>
-            <br />
-            <input type="text" v-model="article_number">
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <label>Name (German)</label>
-            <br />
-            <input type="text" v-model="name_ger" required>
-          </div>
-        </div>
-        <div class="row">
-            <div class="input-field col s12">
-                <label>Name (Display)</label>
+    <v-container>
+      <v-layout row wrap>
+        <!-- @submit.prevent="updateProduct" -->
+        <v-flex xs6>
+          <v-text-field
+            v-bind:label="$t('barcode')"
+            v-model="barcode"
+          >
+          </v-text-field>
+        </v-flex>
+        <v-flex xs6>
+          <v-text-field
+            label="Article Number"
+            v-model="article_number"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-text-field
+            label="Name (German)"
+            v-model="name_ger"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-text-field
+            label="Name (Display)"
+            v-model="name"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <!-- @submit.prevent="updateProduct" -->
+        <v-flex xs6>
+          <v-text-field
+            label="Price"
+            v-model="price"
+          >
+          </v-text-field>
+        </v-flex>
+        <v-flex xs6>
+          <v-text-field
+            label="Category"
+            v-model="category"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <editorContainer
+            v-model="description"
+          >
+          </editorContainer>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <ul class="collection with-header">
+            <li class="collection-header">
+              <h4>Thumb Image</h4>
+                <v-text-field label="Thumb Image" @click='pickThumbFile' v-model='thumbFile' prepend-icon='attach_file'></v-text-field>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="thumbimage"
+                  accept="image/*"
+                  @change="onThumbFilePicked"
+                >
+                <!--b-form-file @change="thumbFileSelected" v-model="thumbFile" :state="Boolean(thumbFile)" accept="image/jpeg, image/png, image/gif" placeholder="Choose a thumb picture..."></b-form-file-->
                 <br />
-                <input type="text" v-model="name" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="input-field col s6">
-                <label>Price</label>
-                <br />
-                <input type="text" v-model="price" required>
-            </div>
-            <div class="input-field col s6">
-                <label>Category</label>
-                <br />
-                <input type="text" v-model="category">
-            </div>
-        </div>
-        <div class="row">
-            <div class="input-field col s12">
-                <label>Description</label>
-                <br />
-                <b-form-textarea :rows="10" v-model="description"></b-form-textarea>
-            </div>
-        </div>
-        <ul class="collection with-header">
-          <li class="collection-header">
-            <h4>Thumb Image</h4>
-              <v-text-field label="Thumb Image" @click='pickThumbFile' v-model='thumbFile' prepend-icon='attach_file'></v-text-field>
+                <!--button @click="uploadThumbFile" class="btn blue"><i class="fa fa-plus-circle"></i></button-->
+            </li>
+          </ul>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <ul class="collection with-header">
+            <li class="collection-header">
+              <h4>Images</h4>
+              <v-text-field label="Thumb Image" @click='pickFile' v-model='file' prepend-icon='attach_file'></v-text-field>
               <input
                 type="file"
                 style="display: none"
-                ref="thumbimage"
+                ref="image"
                 accept="image/*"
-                @change="onThumbFilePicked"
+                @change="onFilePicked"
               >
-              <!--b-form-file @change="thumbFileSelected" v-model="thumbFile" :state="Boolean(thumbFile)" accept="image/jpeg, image/png, image/gif" placeholder="Choose a thumb picture..."></b-form-file-->
+              <!--b-form-file @change="fileSelected" v-model="file" :state="Boolean(file)" accept="image/jpeg, image/png, image/gif" placeholder="Choose a file..."></b-form-file-->
               <br />
-              <!--button @click="uploadThumbFile" class="btn blue"><i class="fa fa-plus-circle"></i></button-->
-          </li>
-        </ul>
-        <ul class="collection with-header">
-          <li class="collection-header">
-            <h4>Images</h4>
-            <v-text-field label="Thumb Image" @click='pickFile' v-model='file' prepend-icon='attach_file'></v-text-field>
-            <input
-              type="file"
-              style="display: none"
-              ref="image"
-              accept="image/*"
-              @change="onFilePicked"
-            >
-            <!--b-form-file @change="fileSelected" v-model="file" :state="Boolean(file)" accept="image/jpeg, image/png, image/gif" placeholder="Choose a file..."></b-form-file-->
-            <br />
-            <!--multiple="true" button @click="uploadFile" class="btn blue"><i class="fa fa-plus-circle"></i></button-->
-          </li>
-          <li v-for="i in picsLength" v-bind:key="i - 1" class="collection-item">
-            <img v-bind:src="picsUrl[i - 1]" width="150" height="150" />
-            <button @click="deletePicture(i - 1)" class="btn" title="Delete Image"><i class="fa fa-trash"></i></button>
-            <button @click="downloadPicture(i - 1)" class="btn" title="Download Image"><i class="fa fa-download"></i></button>
-          </li>
-        </ul>
-        <ul class="collection with-header">
-          <li class="collection-header">
-            <h4>Tags</h4>
-            <input-tag v-model="tags"></input-tag>
-          </li>
-        </ul>
-        <ul class="collection with-header">
-          <li class="collection-header">
-            <h4>Intakes</h4>
-            <button @click="showIntakeModal" class="btn" title="Add Intake">
-              <i class="fa fa-cart-arrow-down"></i>
-            </button>
-          </li>
-          <li v-for="intake in intakes" v-bind:key="intake.id" class="collection-item">
-            <div class="chip">{{intake.quantity}}</div>
-            {{intake.purchase_price}} from {{intake.supplier}}
-          </li>
-        </ul>
-
-        <v-tooltip top>
-          <button @click="updateProduct" class="btn" slot="activator"><i class="fa fa-save"></i></button>
-          <span>Save</span>
-        </v-tooltip>
-
-        <v-tooltip top>
-          <button @click="deleteProduct" class="btn" slot="activator"><i class="fa fa-trash"></i></button>
-          <span>Delete Product</span>
-        </v-tooltip>
-
-        <v-tooltip top>
-          <router-link to="/" class="btn" slot="activator"><i class="fa fa-ban"></i></router-link>
-          <span>Cancel</span>
-        </v-tooltip>
-      </form>
-    </div>
+              <!--multiple="true" button @click="uploadFile" class="btn blue"><i class="fa fa-plus-circle"></i></button-->
+            </li>
+            <li v-for="i in picsLength" v-bind:key="i - 1" class="collection-item">
+              <img v-bind:src="picsUrl[i - 1]" width="150" height="150" />
+              <button @click="deletePicture(i - 1)" class="btn" title="Delete Image"><i class="fa fa-trash"></i></button>
+              <button @click="downloadPicture(i - 1)" class="btn" title="Download Image"><i class="fa fa-download"></i></button>
+            </li>
+          </ul>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <ul class="collection with-header">
+            <li class="collection-header">
+              <h4>Tags</h4>
+              <input-tag v-model="tags"></input-tag>
+            </li>
+          </ul>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <ul class="collection with-header">
+            <li class="collection-header">
+              <h4>Intakes</h4>
+              <button @click="showIntakeModal" class="btn" title="Add Intake">
+                <i class="fa fa-cart-arrow-down"></i>
+              </button>
+            </li>
+            <li v-for="intake in intakes" v-bind:key="intake.id" class="collection-item">
+              <div class="chip">{{intake.quantity}}</div>
+              {{intake.purchase_price}} from {{intake.supplier}}
+            </li>
+          </ul>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-tooltip top>
+            <button @click="updateProduct" class="btn" slot="activator"><i class="fa fa-save"></i></button>
+            <span>Save</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <button @click="deleteProduct" class="btn" slot="activator"><i class="fa fa-trash"></i></button>
+            <span>Delete Product</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <router-link to="/" class="btn" slot="activator"><i class="fa fa-ban"></i></router-link>
+            <span>Cancel</span>
+          </v-tooltip>
+        </v-flex>
+      </v-layout>
+    </v-container>
     <!-- Modal Component -->
     <v-dialog 
-      ref="modal1" 
-      title="New Intake"
       v-model="modalAddIntake">
-      <div class="row">
-        <div class="input-field col s6">
-          <input type="text" v-model="newin_quantity" required>
-          <label>Quantity</label>
-        </div>
-        <div class="input-field col s6">
-          <input type="text" v-model="newin_purchase_price" required>
-          <label>Purchase Price</label>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <input type="text" v-model="newin_supplier" required>
-          <label>Supplier</label>
-        </div>
-      </div>
-      <v-btn @click.native="saveIntake" color="success" large>Save</v-btn> 
-      <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>    
+      <v-card>
+        <v-card-title>
+          <span class="headline">New Intake</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-layout row wrap>
+              <v-flex xs6>
+                <v-text-field
+                  label="Quantity"
+                  v-model="newin_quantity"
+                >
+                </v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="Purchase Price"
+                  v-model="newin_purchase_price"
+                >
+                </v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+              <v-flex xs12>
+                  <v-text-field
+                    label="Supplier"
+                    v-model="newin_supplier"
+                  >
+                  </v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+              <v-flex xs12>
+                <v-btn @click.native="saveIntake" color="success" large>Save</v-btn> 
+                <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>    
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+      </v-card>
     </v-dialog>
   </div>
 </template>
