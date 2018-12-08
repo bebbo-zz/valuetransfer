@@ -54,7 +54,7 @@
       </v-layout>
       <v-layout align-start justify-center row wrap v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
         <v-flex align-self-center xs-4 v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id">
-          <v-card tile>
+          <v-card tile elevation-8>
               <v-img
                 center
                 max-width="250px"

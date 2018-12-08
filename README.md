@@ -2,7 +2,13 @@
 
 ## Project setup
 ```
+install node
+npm install @vue/cli -g 
+vue create my-app
+cd my-app
+vue add vuetify
 npm install
+
 ```
 
 ### Compiles and hot-reloads for development

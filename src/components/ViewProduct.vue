@@ -1,16 +1,16 @@
 <template>
   <div id="view-product">
-    <b-container>
-      <b-row>
-        <b-col>
-          <carousel :perPage="1" width="400">
+    <v-container>
+      <v-layout row wrap>
+        <v-flex xs6>
+          <v-carousel :perPage="1" width="400">
             <slide v-for="picture in picturesRendered" v-bind:key="picture.url"  width="400">
               <img v-bind:src="picture.url" v-bind:width="picture.width" v-bind:height="picture.height"/>
             </slide>
-          </carousel>
-        </b-col>
-        <b-col>
-          <ul class="colection with-header">
+          </v-carousel>
+        </v-flex>
+        <v-flex>
+          <ul style="list-style-type: none;">
             <li class="collection-header"><h4>{{name}}</h4></li>
             <li class="collection-item">Price: {{ formatPrice(price) }}</li>
             <li class="collection-item">Barcode: {{barcode}}</li>
@@ -19,9 +19,9 @@
             <li class="collection-item">Category: {{category}}</li>
             <li class="collection-item">Description: <span v-for="line in description.split('\n')" v-bind:key="line">{{line}}<br /></span></li>
           </ul>
-        </b-col>
-      </b-row>    
-    </b-container>
+        </v-flex>
+      </v-layout>    
+    </v-container>
     <router-link to="/" class="btn grey"><i class="fa fa-ban"></i></router-link>
     <div class="fixed-action-btn">
       <router-link v-bind:to="{name: 'view-product', params: {product_id: product_id}}" class="btn-floating btn-large red">

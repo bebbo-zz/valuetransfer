@@ -1,7 +1,9 @@
 <template>
   <div id="edit-product">
-    <h3>Edit Product</h3>
     <v-container>
+      <v-layout row wrap>
+        <h3>Edit Product</h3>
+      </v-layout>
       <v-layout row wrap>
         <!-- @submit.prevent="updateProduct" -->
         <v-flex xs6>
@@ -56,17 +58,15 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <editorContainer
-            v-model="description"
-          >
-          </editorContainer>
+          <v-subheader>Product Description</v-subheader>
+          <quill-editor v-model="description"></quill-editor>
         </v-flex>
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <ul class="collection with-header">
-            <li class="collection-header">
-              <h4>Thumb Image</h4>
+          <v-subheader>Thumb Image</v-subheader>
+          <ul style="list-style-type: none;">
+            <li>
                 <v-text-field label="Thumb Image" @click='pickThumbFile' v-model='thumbFile' prepend-icon='attach_file'></v-text-field>
                 <input
                   type="file"
@@ -84,9 +84,9 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <ul class="collection with-header">
-            <li class="collection-header">
-              <h4>Images</h4>
+          <v-subheader>Images</v-subheader>
+          <ul style="list-style-type: none;">
+            <li>
               <v-text-field label="Thumb Image" @click='pickFile' v-model='file' prepend-icon='attach_file'></v-text-field>
               <input
                 type="file"
@@ -107,7 +107,7 @@
           </ul>
         </v-flex>
       </v-layout>
-      <v-layout row wrap>
+      <!--v-layout row wrap>
         <v-flex xs12>
           <ul class="collection with-header">
             <li class="collection-header">
@@ -116,16 +116,14 @@
             </li>
           </ul>
         </v-flex>
-      </v-layout>
+      </v-layout-->
       <v-layout row wrap>
         <v-flex xs12>
-          <ul class="collection with-header">
-            <li class="collection-header">
-              <h4>Intakes</h4>
-              <button @click="showIntakeModal" class="btn" title="Add Intake">
-                <i class="fa fa-cart-arrow-down"></i>
-              </button>
-            </li>
+          <v-subheader>Intakes</v-subheader>
+          <button @click="showIntakeModal" class="btn" title="Add Intake">
+            <v-icon>arrow-down</v-icon>
+          </button>
+          <ul>
             <li v-for="intake in intakes" v-bind:key="intake.id" class="collection-item">
               <div class="chip">{{intake.quantity}}</div>
               {{intake.purchase_price}} from {{intake.supplier}}
@@ -199,6 +197,11 @@
 
 <script>
 import firebaseApp from './firebaseInit'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+ 
+import { quillEditor } from 'vue-quill-editor'
 
 export default {
   name: 'edit-product',
@@ -277,6 +280,9 @@ export default {
   },
   watch: {
       '$route': 'fetchData'
+  },
+  components: {
+    quillEditor
   },
   methods: {
     fetchData () {
