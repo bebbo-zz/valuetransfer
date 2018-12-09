@@ -88,7 +88,8 @@ export default {
       currentUser: false,
       isEmployee: false,
       currentCategory: 'All',
-      categories: ["All", "Ăn dặm",
+      categories: ["All", 
+        "Ăn dặm",
         "bách hoá",
         "Chăm sóc sức khoẻ cho trẻ em",
         "đồ chơi",
@@ -124,41 +125,22 @@ export default {
       this.isLoggedIn = true
       this.currentUser = firebaseApp.auth().currentUser.email
       db.collection('users').where('email', '==', this.currentUser).get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            var role = doc.data().role
-            if (role === 'employee') {
-              this.isEmployee = true
-            }
-          })
-      })
-      db.collection('products').get().then(querySnapshot => {
+      .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          var thumbPicture = null
-          if ((doc.data().thumbUrl == undefined) || (doc.data().thumbUrl == '')) {
-              thumbPicture = "https://firebasestorage.googleapis.com/v0/b/vnshoptest.appspot.com/o/images%2Fno-image-icon-6.png?alt=media&token=4b4b8e91-6525-4607-b845-b2e8f0ce3b98"
-          } else {
-              thumbPicture = doc.data().thumbUrl
+          var role = doc.data().role
+          if (role === 'employee') {
+            this.isEmployee = true
           }
-          const data = {
-              'product_id': doc.id,
-              'article_number': doc.data().article_number,
-              'barcode': doc.data().barcode,
-              'category': doc.data().category,
-              'colour': doc.data().colour,
-              'description': doc.data().description,
-              'name': doc.data().name,
-              'name_ger': doc.data().name_ger,
-              'price': doc.data().price,
-              'size': doc.data().size,
-              'thumbUrl': thumbPicture,
-              'tags': null
-          }
-          this.productsAll.push(data)
         })
-        console.log("mounted done " + this.productsAll.length)
-        this.resetPagination()
-      }) 
+      })
+    }
+    console.log(this.$route.params.category_id)
+    if(this.$route.params.category_id == undefined) {
+      this.singleSearch("1", "1", "1", "==", "1")
+    }else{        
+      console.log(this.categories[this.$route.params.category_id])
+      this.currentCategory = this.categories[this.$route.params.category_id]
+      this.singleSearch("category", this.currentCategory, "1", "==", "1")
     }
   },
   methods: {

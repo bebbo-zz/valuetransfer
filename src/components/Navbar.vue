@@ -9,8 +9,14 @@
       <v-spacer></v-spacer>
       <v-btn
         flat
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
+        color="success"
+        @click="register"
+      >
+        <span class="mr-2">REGISTER</span>
+      </v-btn>
+      <v-btn
+        flat
+        @click="login"
       >
         <span class="mr-2">LOGIN</span>
       </v-btn>
@@ -51,12 +57,12 @@
         <v-expansion-panel-content>
           <div slot="header">Categories</div>
           <v-list dense>
-            <v-list-tile v-for="cat in categories" v-bind:key="cat" @click="catOne(cat)">
+            <v-list-tile v-for="cat in categories" v-bind:key="cat.value" @click="category(cat.value)">
               <v-list-tile-action>
                 <v-icon>link</v-icon>
               </v-list-tile-action>
               <v-list-tile-content>
-                <v-list-tile-title>{{cat}}</v-list-tile-title>
+                <v-list-tile-title>{{cat.text}}</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -72,19 +78,20 @@ export default {
   data () {
     return {
       drawer: null,
-      categories: ["Ăn dặm",
-        "bách hoá",
-        "Chăm sóc sức khoẻ cho trẻ em",
-        "đồ chơi",
-        "Đồ dùng gia đình",
-        "Đồ dùng nhà bếp",
-        "Làm đẹp- súc khoẻ",
-        "Làm đẹp- sức khoẻ",
-        "thời trang nam",
-        "thời trang nữ",
-        "thời trang trẻ em",
-        "thời trang unisex",
-        "Vệ sinh phụ nữ"]
+      categories: [{"text": "Ăn dặm", "value": 1},
+          {"text": "bách hoá", "value": 2},
+          {"text": "Chăm sóc sức khoẻ cho trẻ em", "value": 3},
+          {"text": "đồ chơi", "value": 4},
+          {"text": "Đồ dùng gia đình", "value": 5},
+          {"text": "Đồ dùng nhà bếp", "value": 6},
+          {"text": "Làm đẹp- súc khoẻ", "value": 7},
+          {"text": "Làm đẹp- sức khoẻ", "value": 8},
+          {"text": "thời trang nam", "value": 9},
+          {"text": "thời trang nữ", "value": 10},
+          {"text": "thời trang trẻ em", "value": 11},
+          {"text": "thời trang unisex", "value": 12},
+          {"text": "Vệ sinh phụ nữ", "value": 13}
+      ]
     }
   },
   methods: {
@@ -98,6 +105,18 @@ export default {
     },
     selling: function( e ) {
       this.$router.push('/display')
+      e.preventDefault()
+    },
+    login: function( e ) {
+      this.$router.push('/login')
+      e.preventDefault()
+    },
+    register: function( e ) {
+      this.$router.push('/register')
+      e.preventDefault()
+    },
+    category ( value ) {
+      this.$router.push('/categories/' + value)
       e.preventDefault()
     }
   }

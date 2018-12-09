@@ -6,6 +6,8 @@ import Display from './components/Display.vue'
 import EditProduct from './components/EditProduct.vue'
 import ViewProduct from './components/ViewProduct.vue'
 import ConfirmOrder from './components/ConfirmOrder.vue'
+import Login from './components/Login.vue'
+import Register from './components/Register.vue'
 
 Vue.use(Router)
 
@@ -15,6 +17,21 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
+    {
+      path: '/categories/:category_id',
+      name: 'categories',
+      component: Display
     },
     {
       path: '/cashier',

@@ -4,9 +4,10 @@
       <v-layout row wrap>
         <v-flex xs8>
           <v-carousel
-            height="400"
-            max="400"
-            cycle=false
+            v-if="picturesRendered.length > 0"
+            :height="400"
+            :max="400"
+            :cycle="false"
           >
             <v-carousel-item
               v-for="(picture,i) in picturesRendered"
@@ -105,7 +106,8 @@ export default {
             vm.name_ger = doc.data().name_ger
             vm.price = doc.data().price
             vm.size = doc.data().size
-            vm.pictures = doc.data().picsUrl
+            if(doc.data().picsUrl != undefined) {
+              vm.pictures = doc.data().picsUrl
             var rendered = []
             doc.data().picsUrl.forEach(pic => {
               var img = new Image();
@@ -134,6 +136,7 @@ export default {
               img.src = pic;
             })
             vm.picturesRendered = rendered
+            }
           })
       } else {
         console.log("No such document!");

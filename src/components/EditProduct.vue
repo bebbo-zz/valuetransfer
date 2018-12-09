@@ -101,8 +101,14 @@
             </li>
             <li v-for="i in picsLength" v-bind:key="i - 1">
               <img v-bind:src="picsUrl[i - 1]" width="150" height="150" />
-              <v-btn @click="deletePicture(i - 1)" color="info" title="Delete Image"><v-icon>trash></v-icon></v-btn>
-              <v-btn @click="downloadPicture(i - 1)" color="info" title="Download Image"><v-icon>download></v-icon></v-btn>
+              <v-tooltip top>
+                <v-btn @click="deletePicture(i - 1)"  slot="activator" color="info"><v-icon>delete</v-icon></v-btn>
+                <span>Delete Image</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <v-btn @click="downloadPicture(i - 1)"  slot="activator" color="info"><v-icon>save_alt</v-icon></v-btn>
+                <span>Download Image</span>
+              </v-tooltip>
             </li>
           </ul>
         </v-flex>
@@ -119,12 +125,14 @@
       </v-layout-->
       <v-layout row wrap>
         <v-flex xs12>
+          <v-divider></v-divider>
           <v-subheader>Intakes</v-subheader>
-          <button @click="showIntakeModal" class="btn" title="Add Intake">
-            <v-icon>arrow-down</v-icon>
-          </button>
+          <v-tooltip top>
+            <v-btn @click="showIntakeModal" slot="activator"><v-icon>save_alt</v-icon></v-btn>
+            <span>Add Intake</span>
+          </v-tooltip>
           <ul>
-            <li v-for="intake in intakes" v-bind:key="intake.id" class="collection-item">
+            <li v-for="intake in intakes" v-bind:key="intake.id">
               <div class="chip">{{intake.quantity}}</div>
               {{intake.purchase_price}} from {{intake.supplier}}
             </li>
@@ -133,16 +141,17 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
+          <v-divider></v-divider>
           <v-tooltip top>
-            <button @click="updateProduct" class="btn" slot="activator"><i class="fa fa-save"></i></button>
+            <v-btn @click="updateProduct" slot="activator"><v-icon>save</v-icon></v-btn>
             <span>Save</span>
           </v-tooltip>
           <v-tooltip top>
-            <button @click="deleteProduct" class="btn" slot="activator"><i class="fa fa-trash"></i></button>
+            <v-btn @click="deleteProduct" slot="activator"><v-icon>delete</v-icon></v-btn>
             <span>Delete Product</span>
           </v-tooltip>
           <v-tooltip top>
-            <router-link to="/" class="btn" slot="activator"><i class="fa fa-ban"></i></router-link>
+            <v-btn @click="abort" slot="activator"><v-icon>highlight_off</v-icon></v-btn>
             <span>Cancel</span>
           </v-tooltip>
         </v-flex>
@@ -599,6 +608,9 @@ export default {
         })
         // hier sollte das images ebenfalls in die Datenbank geschrieben werden
       })
+    },
+    abort() {
+      this.$router.push('/')
     },
     loadfileresized() {
       // Read in file
