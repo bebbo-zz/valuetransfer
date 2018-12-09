@@ -2,141 +2,115 @@
   <div id="confirm-order">
     <v-container>
       <v-layout row wrap>
+        <h3>Thank you for your purchase...</h3>
+        <v-spacer></v-spacer>
+      </v-layout>
+    <v-layout row wrap>
+        <h4>Order id: {{this.order_id}}</h4><br />
+        <h4>Total sum: {{this.totalPrice}}</h4>
+        <v-spacer></v-spacer>
+      </v-layout>
+      <v-layout row wrap v-for="item in items" v-bind:key="item.product_id">
         <v-flex xs8>
-          <v-carousel
-            height="400"
-            max="400"
-            cycle=false
-          >
-            <v-carousel-item
-              v-for="(picture,i) in picturesRendered"
-              :key="i"
-              :src="picture.url"
-            ></v-carousel-item>
-          </v-carousel>
-        </v-flex>
-        <v-flex xs4>
-          <ul style="list-style-type: none;">
-            <li><h4>{{name}}</h4></li>
-            <li>Price: {{ formatPrice(price) }} VND</li>
-            <li>Barcode: {{barcode}}</li>
-            <!--li>Article Number: {{article_number}}</li-->
-            <!--li>Name (German): {{name_ger}}</li-->
-            <li>Category: {{category}}</li>
-          </ul>
-          <v-btn
-            color="pink"
-            dark
-            absolute
-            bottom
-            right
-            fab
-          >
-            <v-icon>add_shopping_cart</v-icon>
-          </v-btn>
-        </v-flex>
-      </v-layout> 
-      <v-layout row wrap>
-        <v-flex xs12>
-          <p>&nbsp;</p>
           <v-divider></v-divider>
-          <v-subheader>Product Description</v-subheader>
-          <p>{{description}}</p>
+          {{item.name}} <br />
+          {{item.quantity}} X {{item.price}} = {{item.total}}
         </v-flex>
-      </v-layout> 
-      <v-layout row wrap>
-        <v-flex xs12>
-          <v-divider></v-divider>
-          <v-subheader>Product Reviews</v-subheader>
-          <p></p>
+        <v-flex xs2>
+          <v-btn color="warning" @click="sendreview(item.product_id)">Send Review</v-btn>
+          <v-btn color="warning" @click="ordermore(item.product_id)">Order More</v-btn>
         </v-flex>
-      </v-layout> 
+      </v-layout>
     </v-container>
-
-    <!--router-link to="/" class="btn grey"><i class="fa fa-ban"></i></router-link>
-    <div class="fixed-action-btn">
-      <router-link v-bind:to="{name: 'view-product', params: {product_id: product_id}}" class="btn-floating btn-large red">
-        <i class="fa fa-cart-plus"></i>
-      </router-link>
-      <p>&nbsp;</p>
-      <router-link v-bind:to="{name: 'edit-product', params: {product_id: product_id}}" class="btn-floating btn-large red">
-        <i class="fa fa-pencil"></i>
-      </router-link>
-    </div-->
+    <v-dialog 
+        v-model="reviewDialog"
+        persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Review Product</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form">
+            <v-rating
+              v-model="currentRating"
+              background-color="orange lighten-3"
+              color="orange"
+              x-large
+            ></v-rating>
+            <v-textarea
+              name="input-7-1"
+              label="Your comments"
+              v-model="currentComment"
+            ></v-textarea>
+          </v-form>
+          <v-btn @click.native="reviewDialog = false">Cancel</v-btn>
+          <v-btn @click.native="addReview">Add Review</v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import firebaseApp from './firebaseInit'
+import SHA256 from 'crypto-js/sha256'
 
 export default {
   name: 'confirm-order',
   data () {
     return {
-      product_id: null,
-      article_number: null,
-      barcode: null,
-      category: null,
-      colour: null,
-      description: null,
-      name: null,
-      name_ger: null,
-      price: null,
-      size: null,
-      tags: null,
-      pictures: [],
-      picturesRendered: []
+      totalPrice: null,
+      order_id: null,
+      reviewDialog: false,
+      currentProduct: null,
+      currentComment: null,
+      items: [],
+      currentRating: 3
     }
   },
   beforeRouteEnter(to, from, next) {
 
+    // product
     // 09H2BQPxACFfM2nqC8O7
-    console.log("here gehts")
-    var db = firebaseApp.firestore();
-    var docRef = db.collection("products").doc(to.params.product_id);
+
+    // order
+    //47IELoFEJRgHyQ3bYY0P
+    // 62c563a922085443392de39f26d6a71c08093012662e82b39121a4281608819c
+    // http://localhost:8080/order/47IELoFEJRgHyQ3bYY0P?pwd=62c563a922085443392de39f26d6a71c08093012662e82b39121a4281608819c
+    var db = firebaseApp.firestore()
+    var docRef = db.collection("orders").doc(to.params.order_id);
     docRef.get().then(function(doc) {
       if (doc.exists) {
-        next(vm => {
-            vm.product_id = doc.id
-            vm.article_number = doc.data().article_number
-            vm.barcode = doc.data().barcode
-            vm.category = doc.data().category
-            vm.colour = doc.data().colour
-            vm.description = doc.data().description
-            vm.name = doc.data().name
-            vm.name_ger = doc.data().name_ger
-            vm.price = doc.data().price
-            vm.size = doc.data().size
-            vm.pictures = doc.data().picsUrl
-            var rendered = []
-            doc.data().picsUrl.forEach(pic => {
-              var img = new Image();
-              img.onload = function( ) {
-                var width = this.width
-                var height = this.height
-                var max_size = 300
-                if (width > height) {
-                  if (width > max_size) {
-                      height *= max_size / width
-                      width = max_size
-                    }
-                } else {
-                  if (height > max_size) {
-                        width *= max_size / height
-                        height = max_size
-                    }
+        var pwd = to.params.token
+        var orderid = to.params.order_id
+        var internalpwd = '123'
+        var price = Math.floor(doc.data().totalPrice)
+        var forsha = orderid + internalpwd + price
+        var compare = SHA256(forsha).toString()
+        console.log(pwd)
+        console.log(compare)
+
+        if(pwd == compare) {
+          next(vm => {
+            vm.order_id = doc.id
+            vm.totalPrice = doc.data().totalPrice
+            var products = []
+            doc.data().products.forEach(item => {
+              const data = {
+                  'barcode': item.barcode,
+                  'name': item.name,
+                  'quantity': item.quantity,
+                  'price': item.price,
+                  'total': item.total,
+                  'product_id': item.product_id
                 }
-                const data = {
-                  'url': pic,
-                  'width': width,
-                  'height': height,
-                }
-                rendered.push(data)
-              }
-              img.src = pic;
+              products.push(data)
             })
-            vm.picturesRendered = rendered
+            vm.items = products
           })
+        }else{
+          // route somewhere else
+        }
       } else {
         console.log("No such document!");
       }
@@ -148,33 +122,18 @@ export default {
     '$route': 'fetchData'
   },
   methods: {
-    formatPrice( value ) {
-        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    },
     fetchData ( ) {
-      var db = firebaseApp.firestore();
-      console.log("fetchdata: " + this.$route.params.product_id)
-      var docRef = db.collection("products").doc(this.$route.params.product_id);
-      docRef.get().then(function(doc) {
-        if (doc.exists) {
-          this.product_id = doc.id
-          this.article_number = doc.data().article_number
-          this.barcode = doc.data().barcode
-          this.category = doc.data().category
-          this.colour = doc.data().colour
-          this.description = doc.data().description
-          this.name = doc.data().name
-          this.name_ger = doc.data().name_ger
-          this.price = doc.data().price
-          this.size = doc.data().size
-          this.pictures = doc.data().picsUrl
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      }).catch(function(error) {
-        console.log("Error getting document:", error);
-      })
+     //
+    },
+    sendreview (product_id) {
+      this.currentProduct = product_id
+      this.reviewDialog = true
+    },
+    addReview () {
+      //
+    },
+    ordermore (product_id) {
+      this.$router.push({name: 'view-product', params: {product_id: product_id}})
     }
   }
 }
