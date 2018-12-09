@@ -1,19 +1,13 @@
 <template>
   <div>
-    <div class="fixed-action-btn">
+    <!--div class="fixed-action-btn">
       <router-link v-if="isEmployee" to="/new" class="btn-floating btn-large red">
         <i class="fa fa-plus"></i>
       </router-link>
-    </div>
+    </div-->
     <v-container>
       <v-layout row wrap>
         <v-flex xs4>
-          <!--b-input-group prepend="Category">
-            <b-dropdown v-bind:text="currentCategory">
-              <b-dropdown-item @click="categroyChanged('All')">All</b-dropdown-item>
-              <b-dropdown-item v-for="c in categories" v-bind:key="c" @click="categoryChanged(c)">{{c}}</b-dropdown-item>
-            </b-dropdown>
-          </b-input-group-->
           <v-select
             :items="categories"
             box
@@ -47,10 +41,6 @@
           :total-visible="5"
           @input="pageOneChanged"
         ></v-pagination>
-        <!--pagination :current-page="pageOne.currentPage"
-          :total-pages="pageOne.totalPages"
-          @page-changed="pageOneChanged">
-        </pagination-->
       </v-layout>
       <v-layout align-start justify-center row wrap v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
         <v-flex align-self-center xs-4 v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id">

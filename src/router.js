@@ -5,6 +5,8 @@ import Cashier from './components/Cashier.vue'
 import Display from './components/Display.vue'
 import EditProduct from './components/EditProduct.vue'
 import ViewProduct from './components/ViewProduct.vue'
+import ReviewOrder from './components/ReviewOrder.vue'
+import ConfirmOrder from './components/ConfirmOrder.vue'
 
 Vue.use(Router)
 
@@ -34,6 +36,16 @@ export default new Router({
       path: '/:product_id',
       name: 'view-product',
       component: ViewProduct
+    },
+    {
+      path: '/order/:order_id',
+      name: 'review-order',
+      component: ReviewOrder
+    },
+    {
+      path: '/orders/:product_id',
+      name: 'confirm-order',
+      component: ConfirmOrder
     },
     {
       path: '/about',

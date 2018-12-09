@@ -99,10 +99,10 @@
               <br />
               <!--multiple="true" button @click="uploadFile" class="btn blue"><i class="fa fa-plus-circle"></i></button-->
             </li>
-            <li v-for="i in picsLength" v-bind:key="i - 1" class="collection-item">
+            <li v-for="i in picsLength" v-bind:key="i - 1">
               <img v-bind:src="picsUrl[i - 1]" width="150" height="150" />
-              <button @click="deletePicture(i - 1)" class="btn" title="Delete Image"><i class="fa fa-trash"></i></button>
-              <button @click="downloadPicture(i - 1)" class="btn" title="Download Image"><i class="fa fa-download"></i></button>
+              <v-btn @click="deletePicture(i - 1)" color="info" title="Delete Image"><v-icon>trash></v-icon></v-btn>
+              <v-btn @click="downloadPicture(i - 1)" color="info" title="Download Image"><v-icon>download></v-icon></v-btn>
             </li>
           </ul>
         </v-flex>

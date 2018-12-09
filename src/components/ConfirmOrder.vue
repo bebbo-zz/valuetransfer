@@ -1,5 +1,5 @@
 <template>
-  <div id="view-product">
+  <div id="confirm-order">
     <v-container>
       <v-layout row wrap>
         <v-flex xs8>
@@ -70,7 +70,7 @@
 import firebaseApp from './firebaseInit'
 
 export default {
-  name: 'view-product',
+  name: 'confirm-order',
   data () {
     return {
       product_id: null,
@@ -89,6 +89,8 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+
+    // 09H2BQPxACFfM2nqC8O7
     console.log("here gehts")
     var db = firebaseApp.firestore();
     var docRef = db.collection("products").doc(to.params.product_id);
