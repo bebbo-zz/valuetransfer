@@ -2,7 +2,7 @@
   <div id="edit-product">
     <v-container>
       <v-layout row wrap>
-        <h3>Edit Product</h3>
+        <h3>{{$t('editproduct')}}</h3>
       </v-layout>
       <v-layout row wrap>
         <!-- @submit.prevent="updateProduct" -->
@@ -15,7 +15,7 @@
         </v-flex>
         <v-flex xs6>
           <v-text-field
-            label="Article Number"
+            v-bind:label="$t('articlenumber')"
             v-model="article_number"
           >
           </v-text-field>
@@ -24,7 +24,7 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-text-field
-            label="Name (German)"
+            v-bind:label="$t('namegerman')"
             v-model="name_ger"
           >
           </v-text-field>
@@ -33,7 +33,7 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-text-field
-            label="Name (Display)"
+            v-bind:label="$t('namedisplay')"
             v-model="name"
           >
           </v-text-field>
@@ -43,14 +43,14 @@
         <!-- @submit.prevent="updateProduct" -->
         <v-flex xs6>
           <v-text-field
-            label="Price"
+            v-bind:label="$t('price')"
             v-model="price"
           >
           </v-text-field>
         </v-flex>
         <v-flex xs6>
           <v-text-field
-            label="Category"
+            v-bind:label="$t('category')"
             v-model="category"
           >
           </v-text-field>
@@ -58,16 +58,16 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-subheader>Product Description</v-subheader>
+          <v-subheader>{{$t('productdescription')}}</v-subheader>
           <quill-editor v-model="description"></quill-editor>
         </v-flex>
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-subheader>Thumb Image</v-subheader>
+          <v-subheader>{{$t('thumbimage')}}</v-subheader>
           <ul style="list-style-type: none;">
             <li>
-                <v-text-field label="Thumb Image" @click='pickThumbFile' v-model='thumbFile' prepend-icon='attach_file'></v-text-field>
+                <v-text-field v-bind:label="$t('thumbimage')" @click='pickThumbFile' v-model='thumbFile' prepend-icon='attach_file'></v-text-field>
                 <input
                   type="file"
                   style="display: none"
@@ -84,10 +84,10 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-subheader>Images</v-subheader>
+          <v-subheader>{{$t('images')}}</v-subheader>
           <ul style="list-style-type: none;">
             <li>
-              <v-text-field label="Thumb Image" @click='pickFile' v-model='file' prepend-icon='attach_file'></v-text-field>
+              <v-text-field v-bind:label="$t('images')" @click='pickFile' v-model='file' prepend-icon='attach_file'></v-text-field>
               <input
                 type="file"
                 style="display: none"
@@ -103,11 +103,11 @@
               <img v-bind:src="picsUrl[i - 1]" width="150" height="150" />
               <v-tooltip top>
                 <v-btn @click="deletePicture(i - 1)"  slot="activator" color="info"><v-icon>delete</v-icon></v-btn>
-                <span>Delete Image</span>
+                <span>{{$t('deleteimage')}}</span>
               </v-tooltip>
               <v-tooltip top>
                 <v-btn @click="downloadPicture(i - 1)"  slot="activator" color="info"><v-icon>save_alt</v-icon></v-btn>
-                <span>Download Image</span>
+                <span>{{$t('downloadimage')}}</span>
               </v-tooltip>
             </li>
           </ul>
@@ -126,15 +126,15 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-divider></v-divider>
-          <v-subheader>Intakes</v-subheader>
+          <v-subheader>{{$t('intakes')}}</v-subheader>
           <v-tooltip top>
             <v-btn @click="showIntakeModal" slot="activator"><v-icon>save_alt</v-icon></v-btn>
-            <span>Add Intake</span>
+            <span>{{$t('addintake')}}</span>
           </v-tooltip>
           <ul>
             <li v-for="intake in intakes" v-bind:key="intake.id">
               <div class="chip">{{intake.quantity}}</div>
-              {{intake.purchase_price}} from {{intake.supplier}}
+              {{intake.purchase_price}} {{$t('from')}} {{intake.supplier}}
             </li>
           </ul>
         </v-flex>
@@ -144,15 +144,15 @@
           <v-divider></v-divider>
           <v-tooltip top>
             <v-btn @click="updateProduct" slot="activator"><v-icon>save</v-icon></v-btn>
-            <span>Save</span>
+            <span>{{$t('save')}}</span>
           </v-tooltip>
           <v-tooltip top>
             <v-btn @click="deleteProduct" slot="activator"><v-icon>delete</v-icon></v-btn>
-            <span>Delete Product</span>
+            <span>{{$t('deleteproduct')}}</span>
           </v-tooltip>
           <v-tooltip top>
             <v-btn @click="abort" slot="activator"><v-icon>highlight_off</v-icon></v-btn>
-            <span>Cancel</span>
+            <span>{{$t('cancel')}}</span>
           </v-tooltip>
         </v-flex>
       </v-layout>
@@ -162,21 +162,21 @@
       v-model="modalAddIntake">
       <v-card>
         <v-card-title>
-          <span class="headline">New Intake</span>
+          <span class="headline">{{$t('newintake')}}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-layout row wrap>
               <v-flex xs6>
                 <v-text-field
-                  label="Quantity"
+                  v-bind:label="$t('quantity')"
                   v-model="newin_quantity"
                 >
                 </v-text-field>
               </v-flex>
               <v-flex xs6>
                 <v-text-field
-                  label="Purchase Price"
+                  v-bind:label="$t('purchaseprice')"
                   v-model="newin_purchase_price"
                 >
                 </v-text-field>
@@ -185,7 +185,7 @@
             <v-layout row wrap>
               <v-flex xs12>
                   <v-text-field
-                    label="Supplier"
+                    v-bind:label="$t('supplier')"
                     v-model="newin_supplier"
                   >
                   </v-text-field>
@@ -193,8 +193,14 @@
             </v-layout>
             <v-layout row wrap>
               <v-flex xs12>
-                <v-btn @click.native="saveIntake" color="success" large>Save</v-btn> 
-                <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>    
+                <v-tooltip top>
+                  <v-btn @click.native="saveIntake" slot="activator" color="success" large>Save</v-btn> 
+                  <span>{{$t('save')}}</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <v-btn @click.native="closeDialog" slot="activator" color="error" large>Cancel</v-btn>    
+                  <span>{{$t('cancel')}}</span>
+                </v-tooltip>
               </v-flex>
             </v-layout>
           </v-container>
@@ -474,8 +480,8 @@ export default {
         link.download = downloadString
         link.click()
       };
-      xhr.open('GET', this.picsUrl[i]);
-      xhr.send();    
+      xhr.open('GET', this.picsUrl[i])
+      xhr.send();   
     },
     deleteProduct() {
       if (confirm('Are you sure?')) {

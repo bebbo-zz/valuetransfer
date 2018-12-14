@@ -1,55 +1,74 @@
 <template>
   <div id="new-product">
-    <h3>New Product</h3>
-    <div class="row">
-      <form @submit.prevent="saveProduct" class="col s12">
-        <div class="row">
-          <div class="input-field col s6">
-            <input type="text" v-model="barcode" required>
-            <label>Barcode</label>
-          </div>
-          <div class="input-field col s6">
-            <input type="text" v-model="article_number" required>
-            <label>Article Number</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input type="text" v-model="name_ger" required>
-            <label>Name (German)</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input type="text" v-model="name" required>
-            <label>Name (Display)</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s6">
-            <input type="text" v-model="price" required>
-            <label>Price</label>
-          </div>
-          <div class="input-field col s6">
-            <input type="text" v-model="category" required>
-            <label>Category</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input type="text" v-model="description" required>
-            <label>Description</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <b-form-file @change="fileSelected" v-model="file" :state="Boolean(file)" accept="image/jpeg, image/png, image/gif" placeholder="Choose a file..."></b-form-file>
-          </div>
-        </div>
-        <button type="submit" class="btn"><i class="fa fa-save"></i></button>
-        <router-link to="/" class="btn grey"><i class="fa fa-ban"></i></router-link>
-      </form>
-    </div>
+    <v-container>
+      <v-layout row wrap>
+        <h3>{{$t('newproduct')}}</h3>
+      </v-layout>
+      <v-layout row wrap>
+         <v-flex xs6>
+          <v-text-field
+            v-bind:label="$t('barcode')"
+            v-model="barcode"
+          >
+          </v-text-field>
+        </v-flex>
+        <v-flex xs6>
+          <v-text-field
+            v-bind:label="$t('articlenumber')"
+            v-model="article_number"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-text-field
+            v-bind:label="$t('namegerman')"
+            v-model="name_ger"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-text-field
+            v-bind:label="$t('namedisplay')"
+            v-model="name"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <!-- @submit.prevent="updateProduct" -->
+        <v-flex xs6>
+          <v-text-field
+            v-bind:label="$t('price')"
+            v-model="price"
+          >
+          </v-text-field>
+        </v-flex>
+        <v-flex xs6>
+          <v-text-field
+            v-bind:label="$t('category')"
+            v-model="category"
+          >
+          </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-divider></v-divider>
+          <v-tooltip top>
+            <v-btn @click="saveProduct" slot="activator"><v-icon>save</v-icon></v-btn>
+            <span>{{$t('save')}}</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <v-btn @click="abort" slot="activator"><v-icon>highlight_off</v-icon></v-btn>
+            <span>{{$t('cancel')}}</span>
+          </v-tooltip>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 
@@ -66,13 +85,11 @@ export default {
       barcode: null,
       category: null,
       colour: null,
-      description: null,
       name: null,
       name_ger: null,
       price: null,
       size: null,
-      tags: null,
-      file: null
+      tags: null
     };
   },
   methods: {
@@ -146,10 +163,10 @@ export default {
         .catch(error => {
           console.log(err);
         });
+    },
+    abort() {
+      this.$router.push('/')
     }
-  },
-  fileSelected(event) {
-    this.file = event.target.files[0];
   }
 };
 </script>

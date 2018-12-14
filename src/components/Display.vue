@@ -11,14 +11,14 @@
           <v-select
             :items="categories"
             box
-            label="Display per page"
+            v-bind:label="$t('displayperpage')"
             v-model="currentCategory" 
             @change="categoryChanged"
           ></v-select>
         </v-flex>
         <v-flex xs4>
           <div style="{display: block}">
-            <input v-model="txtSearch" class="kleiner" type="text" placeholder="Search..." />
+            <input v-model="txtSearch" class="kleiner" type="text" v-bind:placeholder="$t('search')" />
             <v-btn color="info" v-on:click="search">
               <v-icon>search</v-icon>
             </v-btn>
@@ -28,7 +28,7 @@
           <v-select
             :items="sclItemsPerPage"
             box
-            label="Display per page"
+            v-bind:label="$t('itemsperpage')"
             v-model="pageOne.itemsPerPage"
             @change="perPageChanged"
           ></v-select>

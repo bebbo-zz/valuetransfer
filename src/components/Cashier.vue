@@ -7,13 +7,13 @@
             <v-text-field
               v-model="barcode"
               ref="barcode"
-              label="Barcode"
+              v-bind:label="$t('barcode')"
               large
               required
             ></v-text-field>
             <v-text-field
               v-model="quantity"
-              label="Quantity"
+              v-bind:label="$t('quantity')"
               large
               required
             ></v-text-field>
@@ -22,11 +22,11 @@
               @click="submit"
               large
             >
-              Submit
+              {{$t('submit')}}
             </v-btn>
-            <v-btn @click="manualEntry" large>Manual Entry</v-btn>
+            <v-btn @click="manualEntry" large>{{$t('manualentry')}}</v-btn>
           </v-form>
-          <p><v-btn @click='checkout' color="success">Cash Payment</v-btn></p>
+          <p><v-btn @click='checkout' color="success">{{$t('cashpayment')}}</v-btn></p>
         </v-flex>
         <v-flex xs6 offset-xs1>
           <Cart />
@@ -39,28 +39,28 @@
         persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Manual Entry</span>
+          <span class="headline">{{$t('manualentry')}}</span>
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
               v-model="manual_quantity"
-              label="Quantity"
+              v-bind:label="$t('quantity')"
               required
             ></v-text-field>
             <v-text-field
               v-model="manual_purchase_price"
-              label="Purchase Price"
+              v-bind:label="$t('purchaseprice')"
               required
             ></v-text-field>
              <v-text-field
               v-model="manual_name"
-              label="Item Name"
+              v-bind:label="$t('itemname')"
               required
             ></v-text-field>
           </v-form>
-          <v-btn @click.native="dialog = false">Cancel</v-btn>
-          <v-btn @click.native="addItemManually">Add</v-btn>
+          <v-btn @click.native="dialog = false">{{$t('cancel')}}</v-btn>
+          <v-btn @click.native="addItemManually">{{$t('add')}}</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -70,7 +70,7 @@
         persistent max-width="700px">
       <v-card>
         <v-card-title>
-          <span class="headline">Payment</span>
+          <span class="headline">{{$t('payment')}}</span>
         </v-card-title>
         <v-card-text>
           <!-- grid with a lot of buttons -->
@@ -144,16 +144,16 @@
             </v-layout>
              <v-layout row wrap>
               <v-flex xs2>
-               <v-btn @click.native="clear" color="error" large>Clear</v-btn>
+               <v-btn @click.native="clear" color="error" large>{{$t('clear')}}</v-btn>
               </v-flex>
               <v-flex xs2>
                <p>&nbsp;</p>
               </v-flex>
               <v-flex xs2>
-                <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>                
+                <v-btn @click.native="closeDialog" color="error" large>{{$t('cancel')}}</v-btn>                
               </v-flex>
               <v-flex xs2 offset-xs2>
-                <v-btn @click.native="finishPayment" color="success" large>Print Receipt</v-btn>
+                <v-btn @click.native="finishPayment" color="success" large>{{$t('printreceipt')}}</v-btn>
               </v-flex>
             </v-layout>
           </v-container>        
@@ -166,24 +166,24 @@
         persistent max-width="800px">
       <v-card>
         <v-card-title>
-          <span class="headline">Give Change</span>
+          <span class="headline">{{$t('givechange')}}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-layout row wrap>
               <v-flex xs12>
-                <p>Please return {{formatPrice(changeToGive)}} VND</p>
+                <p>{{$t('pleasereturn')}} {{formatPrice(changeToGive)}} {{$t('vnd')}}</p>
               </v-flex>
             </v-layout>
             <v-layout row wrap>
               <v-flex xs4>
-                <v-btn @click.native="closeDialog" color="info" large>Print Additional Receipt</v-btn>
+                <v-btn @click.native="closeDialog" color="info" large>{{$t('printadditionalreceipt')}}</v-btn>
               </v-flex>
               <v-flex xs3 offset-xs1>
-                <v-btn @click.native="closeDialog" color="error" large>Cancel</v-btn>                
+                <v-btn @click.native="closeDialog" color="error" large>{{$t('cancel')}}</v-btn>                
               </v-flex>
               <v-flex xs3 offset-xs1>
-                <v-btn @click.native="nextCustomer" color="success" large>Next Customer</v-btn>                
+                <v-btn @click.native="nextCustomer" color="success" large>{{$t('nextcustomer')}}</v-btn>                
               </v-flex>
             </v-layout>
           </v-container>        

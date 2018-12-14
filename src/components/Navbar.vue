@@ -12,13 +12,13 @@
         color="success"
         @click="register"
       >
-        <span class="mr-2">REGISTER</span>
+        <span class="mr-2">{{$t('register')}}</span>
       </v-btn>
       <v-btn
         flat
         @click="login"
       >
-        <span class="mr-2">LOGIN</span>
+        <span class="mr-2">{{$t('login')}}</span>
       </v-btn>
     </v-toolbar>
 
@@ -33,7 +33,7 @@
             <v-icon>home</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Home</v-list-tile-title>
+            <v-list-tile-title>{{$t('home')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile @click="cashier">
@@ -41,7 +41,7 @@
             <v-icon>add_to_queue</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Cashier</v-list-tile-title>
+            <v-list-tile-title>{{$t('cashier')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
          <v-list-tile @click="selling">
@@ -49,13 +49,13 @@
             <v-icon>dashboard</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Products</v-list-tile-title>
+            <v-list-tile-title>{{$t('products')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
       <v-expansion-panel>
         <v-expansion-panel-content>
-          <div slot="header">Categories</div>
+          <div slot="header">{{$t('categories')}}</div>
           <v-list dense>
             <v-list-tile v-for="cat in categories" v-bind:key="cat.value" @click="category(cat.value)">
               <v-list-tile-action>

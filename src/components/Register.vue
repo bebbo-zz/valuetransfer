@@ -1,27 +1,29 @@
 <template>
   <div id="register">
-    <div class="container">
-      <div class="row">
-        <div class="col s12 m8 offset-m2">
+    <v-container>
+      <v-layout row wrap>
+        <v-flex xs12>
           <div class="login card-panel grey lighten-4 black-text">
-            <h3>Login</h3>
-            <form>
-              <div class="input-field">
-                <i class="material-icons prefix">email</i>
-                <input type="text" id="email" v-model="email">
-                <label for="email">Email</label>
-              </div>
-              <div class="input-field">
-                <i class="material-icons prefix">lock</i>
-                <input type="password" id="password" v-model="password">
-                <label for="password">Password</label>
-              </div>
-              <button v-on:click="register" class="btn btn-large grey lighten-4 black-text">Register</button>
-            </form>
+            <h3>{{$t('register')}}</h3>
+            <v-form>
+                <v-icon>email</v-icon>
+                <v-text-field
+                  v-bind:label="$t('email')"
+                  v-model="email"
+                >
+                </v-text-field>
+                <v-icon>lock</v-icon>
+                <v-text-field
+                  v-bind:label="$t('password')"
+                  v-model="password"
+                >
+                </v-text-field>
+                <v-btn @click="register" color="success">{{$t('register')}}</v-btn>
+            </v-form>
           </div>
-        </div>
-      </div>
-    </div>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 

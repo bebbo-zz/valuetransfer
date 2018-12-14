@@ -1,9 +1,9 @@
 <template>
   <div class="cart">
-    <h1 class="title">Your Cart</h1>
+    <h1 class="title">{{$t('yourcart')}}</h1>
     <p v-show="!products.length">
-      <i>Your cart is empty!</i>
-      <router-link to="/">Go shopping</router-link>
+      <i>{{$t('yourcartisempty')}}</i>
+      <router-link to="/">{{$t('goshopping')}}</router-link>
     </p>
     <v-data-table 
       :headers="headers"
@@ -13,17 +13,17 @@
       <template slot="items" slot-scope="props">
         <td>{{ props.item.name }}</td>
         <td>{{ props.item.quantity }}</td>
-        <td>{{ formatPrice(props.item.price) }} VND</td>
-        <td><v-btn @click="removeFromCart(props.item)" title="Delete Entry"><v-icon>delete</v-icon></v-btn></td>
+        <td>{{ formatPrice(props.item.price) }} {{$t('vnd')}}</td>
+        <td><v-btn @click="removeFromCart(props.item)"><v-icon>delete</v-icon></v-btn></td>
       </template>
     </v-data-table>
     <v-container>
       <v-layout row wrap>
         <v-flex xs6>
-          <b>Total:</b>
+          <b>{{$t('total')}}:</b>
         </v-flex>
         <v-flex xs6>
-          <b>{{ formatPrice(total) }} VND</b>
+          <b>{{ formatPrice(total) }} {{$t('vnd')}}</b>
         </v-flex>
       </v-layout>
     </v-container>

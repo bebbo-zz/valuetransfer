@@ -2,12 +2,12 @@
   <div id="confirm-order">
     <v-container>
       <v-layout row wrap>
-        <h3>Thank you for your purchase...</h3>
+        <h3>{{$t('thankyouforpurchase')}}</h3>
         <v-spacer></v-spacer>
       </v-layout>
     <v-layout row wrap>
-        <h4>Order id: {{this.order_id}}</h4><br />
-        <h4>Total sum: {{this.totalPrice}}</h4>
+        <h4>{{$t('order')}}: {{this.order_id}}</h4><br />
+        <h4>{{$t('total')}}: {{this.totalPrice}}</h4>
         <v-spacer></v-spacer>
       </v-layout>
       <v-layout row wrap v-for="item in items" v-bind:key="item.product_id">
@@ -17,8 +17,8 @@
           {{item.quantity}} X {{item.price}} = {{item.total}}
         </v-flex>
         <v-flex xs2>
-          <v-btn color="warning" @click="sendreview(item.product_id)">Send Review</v-btn>
-          <v-btn color="warning" @click="ordermore(item.product_id)">Order More</v-btn>
+          <v-btn color="warning" @click="sendreview(item.product_id)">{{$t('review')}}</v-btn>
+          <v-btn color="warning" @click="ordermore(item.product_id)">{{$t('ordermore')}}</v-btn>
         </v-flex>
       </v-layout>
     </v-container>
@@ -27,7 +27,7 @@
         persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Review Product</span>
+          <span class="headline">{{$t('review')}}</span>
         </v-card-title>
         <v-card-text>
           <v-form ref="form">
@@ -43,8 +43,8 @@
               v-model="currentComment"
             ></v-textarea>
           </v-form>
-          <v-btn @click.native="reviewDialog = false">Cancel</v-btn>
-          <v-btn @click.native="addReview">Add Review</v-btn>
+          <v-btn @click.native="reviewDialog = false">{{$t('cancel')}}</v-btn>
+          <v-btn @click.native="addReview">{{$t('add')}}</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>

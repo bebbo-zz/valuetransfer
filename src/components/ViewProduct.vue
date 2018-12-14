@@ -19,11 +19,11 @@
         <v-flex xs4>
           <ul style="list-style-type: none;">
             <li><h4>{{name}}</h4></li>
-            <li>Price: {{ formatPrice(price) }} VND</li>
-            <li>Barcode: {{barcode}}</li>
+            <li>{{$t('price')}}: {{ formatPrice(price) }} {{$t('vnd')}}</li>
+            <li>{{$t('barcode')}}: {{barcode}}</li>
             <!--li>Article Number: {{article_number}}</li-->
             <!--li>Name (German): {{name_ger}}</li-->
-            <li>Category: {{category}}</li>
+            <li>{{$t('category')}}: {{category}}</li>
           </ul>
           <v-btn
             color="pink"
@@ -41,14 +41,14 @@
         <v-flex xs12>
           <p>&nbsp;</p>
           <v-divider></v-divider>
-          <v-subheader>Product Description</v-subheader>
+          <v-subheader>{{$t('productdescription')}}</v-subheader>
           <p>{{description}}</p>
         </v-flex>
       </v-layout> 
       <v-layout row wrap>
         <v-flex xs12>
           <v-divider></v-divider>
-          <v-subheader>Product Reviews</v-subheader>
+          <v-subheader>{{$t('review')}}</v-subheader>
           <p></p>
         </v-flex>
       </v-layout> 
