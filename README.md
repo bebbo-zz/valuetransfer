@@ -25,35 +25,54 @@ npm run build
 
 ```
 
-user: pi
-password: raspberry
+install raspberian on SD Card
+!!! firebase config and other keys must be installed on SD card beforehand !!!
+
 
 - low voltage: bought cable and it works
 
-- before anything
+user: pi
+password: raspberry
+
+set up keyboard and time
+sudo nano /etc/default/keyboard
+sudo dpkg-reconfigure locales
+
 sudo apt-get update
 sudo apt-get upgrade
 
+curl -sL https://deb.nodesource.com/setup_10.x | bash -
 sudo apt-get install -y nodejs
 
-sudo apt-get install git
+sudo apt-get install -y git
 git config --global user.name "bebbo-zz"
 git config --global user.email martin.brehm@web.de
 git clone https://github.com/bebbo-zz/pythonserver.git
 
-sudo apt-get install python-pip
+sudo apt-get install -y python-pip
 sudo pip install flask
 
 - for an update either in the server or website
 git pull origin master
 
-(sudo apt-get install python3.6) already there
-... code file
-... in folder of py file
 sudo python webserver.py
-(right now 192)
+(right now 192.178.168.123)
 
-- how to run two processes at the same time without desktop
+git clone https://github.com/bebbo-zz/valuetransfer.git
+cd valuetransfer
+npm set audit false
+npm install
+npm run build
+
+
+Crtl + F1-12 for different process
+
+
+sudo reboot
+
+start two processes automatically after reboot
+sudo nano /etc/rc.local
+su pi -c 'node /home/pi/NAMEOFDICRECTORY/server.js < /dev/null &'
 
 
 - how to automatically answer questions with y when installing and more disk space is required???
