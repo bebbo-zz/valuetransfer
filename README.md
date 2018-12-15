@@ -41,16 +41,30 @@ sudo dpkg-reconfigure locales
 sudo apt-get update
 sudo apt-get upgrade
 
-curl -sL https://deb.nodesource.com/setup_10.x | bash -
-sudo apt-get install -y nodejs
+sudo apt-get install nginx
+
+- delete
+sudo rm /var/www/html/*.*
+- copy
+sudo cp -f /home/pi/bebbo-zz.github.io/*.* /var/www/html
 
 sudo apt-get install -y git
 git config --global user.name "bebbo-zz"
 git config --global user.email martin.brehm@web.de
 git clone https://github.com/bebbo-zz/pythonserver.git
 
+
+- proxy fuer nginx richtig einstellen 
+
 sudo apt-get install -y python-pip
-sudo pip install flask
+
+sudo pip install virtualenv
+mkdir flask_app
+cd flask_app
+virtualenv env       (creating virtual envrione in this folder)
+source env/bin/activate
+sudo pip install flask gunicorn
+gunicorn hello:app    (sowas wie dateiname:mainfunctionname)
 
 - for an update either in the server or website
 git pull origin master
@@ -64,6 +78,8 @@ npm set audit false
 npm install
 npm run build
 
+- restart webserver
+sudo /etc/init.d/nginx restart
 
 Crtl + F1-12 for different process
 
@@ -73,6 +89,8 @@ sudo reboot
 start two processes automatically after reboot
 sudo nano /etc/rc.local
 su pi -c 'node /home/pi/NAMEOFDICRECTORY/server.js < /dev/null &'
+(curl -sL https://deb.nodesource.com/setup_10.x | bash -
+sudo apt-get install -y nodejs)
 
 
 - how to automatically answer questions with y when installing and more disk space is required???
