@@ -42,7 +42,7 @@ export default {
       console.log('register')
       firebaseApp.auth().signInWithEmailAndPassword(this.email, this.password)
         .then(user => {
-          //  alert('You are logged in as ${user.email}');
+          console.log('You are logged in as ' + user.email)
           this.$router.go({path: this.$router.path})
         },
         err => {

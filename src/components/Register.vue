@@ -42,7 +42,7 @@ export default {
       console.log('register')
       firebaseApp.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(user => {
-          alert('Account created for ${user.email}')
+          console.log('Account created for ' + user.email)
           this.$router.go({path: this.$router.path})
         },
         err => {

@@ -317,8 +317,13 @@ export default {
             products: tmpProductArray,
             created: new Date(),
           }
-          db.collection("prints").add(printData)
-            .then(() => {console.log("print request sent")})
+        // here print request
+        //  db.collection("prints").add(printData)
+        //    .then(() => {console.log("print request sent")})
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/app/process", true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send(printData); 
       })
     },
     formatPrice( value ) {

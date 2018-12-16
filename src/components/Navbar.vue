@@ -117,7 +117,7 @@ export default {
     },
     category ( value ) {
       this.$router.push('/categories/' + value)
-      e.preventDefault()
+     // e.preventDefault()
     }
   }
 }

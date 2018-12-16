@@ -37,40 +37,34 @@ password: raspberry
 set up keyboard and time
 sudo nano /etc/default/keyboard
 sudo dpkg-reconfigure locales
+sudo nano /etc/rc.local
 
 sudo apt-get update
 sudo apt-get upgrade
 
-sudo apt-get install nginx
+sudo apt-get install -y nginx
+sudo /etc/init.d/nginx start
+sudo /etc/init.d/nginx restart
+sudo /etc/init.d/nginx stop
+
+curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"name":"value"}' http://localhost:8080/app/process
 
 - delete
-sudo rm /var/www/html/*.*
+sudo rm /var/www/html/*
 - copy
-sudo cp -f /home/pi/bebbo-zz.github.io/*.* /var/www/html
+sudo cp -f -r /home/pi/bebbo-zz.github.io/* /var/www/html
 
 sudo apt-get install -y git
 git config --global user.name "bebbo-zz"
 git config --global user.email martin.brehm@web.de
 git clone https://github.com/bebbo-zz/pythonserver.git
 
-
-- proxy fuer nginx richtig einstellen 
-
-sudo apt-get install -y python-pip
-
-sudo pip install virtualenv
-mkdir flask_app
-cd flask_app
-virtualenv env       (creating virtual envrione in this folder)
-source env/bin/activate
-sudo pip install flask gunicorn
-gunicorn hello:app    (sowas wie dateiname:mainfunctionname)
+java -jar target/pos-javaserver-0.1.0.jar
+(als process aufsetzen)
 
 - for an update either in the server or website
 git pull origin master
 
-sudo python webserver.py
-(right now 192.178.168.123)
 
 git clone https://github.com/bebbo-zz/valuetransfer.git
 cd valuetransfer
@@ -78,30 +72,46 @@ npm set audit false
 npm install
 npm run build
 
-- restart webserver
-sudo /etc/init.d/nginx restart
 
 Crtl + F1-12 for different process
 
-
 sudo reboot
 
-start two processes automatically after reboot
-sudo nano /etc/rc.local
-su pi -c 'node /home/pi/NAMEOFDICRECTORY/server.js < /dev/null &'
-(curl -sL https://deb.nodesource.com/setup_10.x | bash -
-sudo apt-get install -y nodejs)
+cd /etc/nginx/sites-available
+sudo nano default
 
+location /app {
+	     proxy_pass http://localhost:8083/;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_set_header X-Forwarded-Proto $scheme;
+             proxy_set_header X-Forwarded-Port $server_port;
+	}
 
-- how to automatically answer questions with y when installing and more disk space is required???
+- init script
+in /etc/systemd/system/helloworld.service
+after that sudo systemctl start helloworld
+and sudo systemctl status helloworld
+
+[Unit]
+Description=Spring Boot HelloWorld
+After=syslog.target
+After=network.target[Service]
+User=username
+Type=simple
+
+[Service]
+ExecStart=/usr/bin/java -jar /home/linode/hello-world/build/libs/hello-world-0.0.1-SNAPSHOT.jar
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=helloworld
+
+[Install]
+WantedBy=multi-user.target
+
+(right now 192.178.168.123)
 
 - run phyton APIs on raspberry pi 
-    http://mattrichardson.com/Raspberry-Pi-Flask/
-    
-
-    a) for getting print job and calling web socket from there
-    https://realpython.com/python-sockets/#echo-client
-    https://www.w3resource.com/python/python-bytes.php
 
     b) and updating git files, basically run terminal commands
 
@@ -120,4 +130,24 @@ sudo apt-get install -y nodejs)
     sudo deluser pi sudo
     sudo deluser pi adm
 
+
+
+
+    su pi -c 'node /home/pi/NAMEOFDICRECTORY/server.js < /dev/null &'
+(curl -sL https://deb.nodesource.com/setup_10.x | bash -
+sudo apt-get install -y nodejs)
+sudo apt-get install -y python-pip
+
+sudo pip install virtualenv
+mkdir flask_app
+cd flask_app
+virtualenv env       (creating virtual envrione in this folder)
+source env/bin/activate
+sudo pip install flask gunicorn
+gunicorn hello:app    (sowas wie dateiname:mainfunctionname)
+
+sudo python webserver.py
+
 ```
+
+
