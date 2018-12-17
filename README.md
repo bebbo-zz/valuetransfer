@@ -11,17 +11,43 @@ npm install
 
 ```
 
-### Compiles
+### DevOps
 ```
-# Compiles and hot-reloads for development
-npm run serve
-
-# Compiles and minifies for production
+# Compile and Deploy Frontend
+cd /home/martin/Documents/Vue/valuetransfer
 npm run build
 
+# locally
+sudo /etc/init.d/nginx stop
+sudo rm -f /var/www/html/*
+sudo cp -r /home/martin/Documents/Vue/valuetransfer/dist/* /var/www/html
+sudo /etc/init.d/nginx restart
+
+# on raspberry
+cd /home/martin/Documents/Deployment/frontend
+sudo rm /home/martin/Documents/Deployment/frontend/*
+cp -r /home/martin/Documents/Vue/valuetransfer/dist/* /home/martin/Documents/Deployment/frontend
+git add *
+git commit -am "new deployment"
+git push -u origin master
+
+
+# Compile and Deploy Backend
+
+
 ```
 
-### Planned enhancements
+### Planned Enhancements
+
+```
+- vue call ipad camera
+- camera will recognize barcode
+- user management
+
+```
+
+
+### Production Environment
 
 ```
 
@@ -120,17 +146,12 @@ WantedBy=multi-user.target
 
 - start node server and python server whenever raspberry pi switches on and restart once terminated
 
-- vue call ipad camera
-- camera will recognize barcode
-- user management
 - create a new user with password and add him (here named admin) to sudo and adm group and later revoke the rights of the default user pi
     sudo adduser admin
     sudo adduser admin sudo
     sudo adduser admin adm
     sudo deluser pi sudo
     sudo deluser pi adm
-
-
 
 
     su pi -c 'node /home/pi/NAMEOFDICRECTORY/server.js < /dev/null &'

@@ -307,8 +307,6 @@ export default {
       var vm = this
       db.collection("orders").add(docData)
         .then(docRef => {
-          //vm.receiptId = docRef.id
-          console.log("order stored successfully")
           var printData = {
             orderId: docRef.id,
             totalPrice: vm.totalSum,
@@ -320,10 +318,12 @@ export default {
         // here print request
         //  db.collection("prints").add(printData)
         //    .then(() => {console.log("print request sent")})
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/app/process", true);
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.send(printData); 
+        const xhttp = new XMLHttpRequest()
+        xhttp.open("POST", "/app/process", true)
+        xhttp.setRequestHeader("Content-Type", "application/json")
+        printData = JSON.stringify(printData)
+       // console.log(printData)
+        xhttp.send(printData) 
       })
     },
     formatPrice( value ) {
