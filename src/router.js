@@ -8,6 +8,8 @@ import ViewProduct from './components/ViewProduct.vue'
 import ConfirmOrder from './components/ConfirmOrder.vue'
 import Login from './components/Login.vue'
 import Register from './components/Register.vue'
+import Charts from './components/Charts.vue'
+import Admin from './components/Admin.vue'
 
 Vue.use(Router)
 
@@ -42,6 +44,16 @@ export default new Router({
       path: '/display',
       name: 'display',
       component: Display
+    },
+    {
+      path: '/charts',
+      name: 'charts',
+      component: Charts
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: Admin
     },
     {
       path: '/edit/:product_id',

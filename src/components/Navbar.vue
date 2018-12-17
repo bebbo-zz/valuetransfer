@@ -44,12 +44,28 @@
             <v-list-tile-title>{{$t('cashier')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-         <v-list-tile @click="selling">
+        <v-list-tile @click="selling">
           <v-list-tile-action>
             <v-icon>dashboard</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>{{$t('products')}}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="selling">
+          <v-list-tile-action>
+            <v-icon>finance</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Management</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="selling">
+          <v-list-tile-action>
+            <v-icon>settings</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>System Admin</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -113,6 +129,14 @@ export default {
     },
     register: function( e ) {
       this.$router.push('/register')
+      e.preventDefault()
+    },
+    register: function( e ) {
+      this.$router.push('/admin')
+      e.preventDefault()
+    },
+    register: function( e ) {
+      this.$router.push('/charts')
       e.preventDefault()
     },
     category ( value ) {

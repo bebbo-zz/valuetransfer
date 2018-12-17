@@ -1,8 +1,10 @@
 <template>
   <v-container>
       <v-layout row wrap>
-        <button v-on:click="productUpload" type="button" class="btn">Start Upload</button>
-        <button v-on:click="deleteAll" type="button" class="btn">Delete Barcodes</button>
+        <v-btn @click="productUpload" color="info">Start Upload</v-btn>
+        <v-btn @click="deleteAll" color="info">Reset DB</v-btn>
+        <v-btn @click="update" color="info">Update Frontend</v-btn>
+        <v-btn @click="update" color="info">Update Backend</v-btn>
     </v-layout>
   </v-container>
 </template>
@@ -52,6 +54,9 @@ export default {
           querySnapshot.forEach(doc => { doc.delete();})
         })
       });
+    },
+    update() {
+      //
     },
     deleteAll() {
       console.log("delete started")

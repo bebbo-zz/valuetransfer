@@ -40,9 +40,12 @@ git push -u origin master
 ### Planned Enhancements
 
 ```
-- vue call ipad camera
-- camera will recognize barcode
+- paperless receipt and stuff (with token stored to receipt)
+- vue call ipad camera (exp)
+- camera will recognize barcode (exp)
 - user management
+- charts 
+- sys admin
 
 ```
 
