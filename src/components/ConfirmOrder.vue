@@ -53,7 +53,6 @@
 
 <script>
 import firebaseApp from './firebaseInit'
-import SHA256 from 'crypto-js/sha256'
 
 export default {
   name: 'confirm-order',
@@ -82,35 +81,30 @@ export default {
     docRef.get().then(function(doc) {
       if (doc.exists) {
         var pwd = to.params.token
-        var orderid = to.params.order_id
-        var internalpwd = '123'
-        var price = Math.floor(doc.data().totalPrice)
-        var forsha = orderid + internalpwd + price
-        var compare = SHA256(forsha).toString()
-        console.log(pwd)
-        console.log(compare)
-
-        if(pwd == compare) {
-          next(vm => {
-            vm.order_id = doc.id
-            vm.totalPrice = doc.data().totalPrice
-            var products = []
-            doc.data().products.forEach(item => {
-              const data = {
-                  'barcode': item.barcode,
-                  'name': item.name,
-                  'quantity': item.quantity,
-                  'price': item.price,
-                  'total': item.total,
-                  'product_id': item.product_id
-                }
-              products.push(data)
-            })
-            vm.items = products
-          })
-        }else{
-          // route somewhere else
-        }
+        
+        next(vm => {
+            // check token
+            if(pwd == doc.data().token) {
+              vm.order_id = doc.id
+              vm.totalPrice = doc.data().totalPrice
+              var products = []
+              doc.data().products.forEach(item => {
+                const data = {
+                    'barcode': item.barcode,
+                    'name': item.name,
+                    'quantity': item.quantity,
+                    'price': item.price,
+                    'total': item.total,
+                    'product_id': item.product_id
+                  }
+                
+                  products.push(data)
+              })
+              vm.items = products
+            }else{
+              // route somewhere else
+            }
+        })
       } else {
         console.log("No such document!");
       }

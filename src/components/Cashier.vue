@@ -195,6 +195,7 @@
 
 <script>
 import Cart from '@/components/Cart'
+import SHA256 from 'crypto-js/sha256'
 import firebaseApp from './firebaseInit'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -298,10 +299,18 @@ export default {
       })
       // 4000991030777
       // 123123
+
+      var salt = Math.floor(Math.random() * 1000) + 1 
+      var internalpwd = '123'
+      var price = Math.floor(this.totalSum)
+      var forsha = salt + internalpwd + price
+      var token = SHA256(forsha).toString()
+
       console.log(this.totalSum)
       var docData = {
         totalPrice: this.totalSum,
         receiptDate: new Date(),
+        token: token,
         products: tmpProductArray
       }
       var vm = this
@@ -319,7 +328,7 @@ export default {
         //  db.collection("prints").add(printData)
         //    .then(() => {console.log("print request sent")})
         const xhttp = new XMLHttpRequest()
-        xhttp.open("POST", "/app/process", true)
+        xhttp.open("POST", "/app/print", true)
         xhttp.setRequestHeader("Content-Type", "application/json")
         printData = JSON.stringify(printData)
        // console.log(printData)
