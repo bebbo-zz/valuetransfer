@@ -343,7 +343,7 @@ export default {
       })
     },
     updateProduct() {
-      var db = firebaseApp.firestore();
+      var db = firebaseApp.firestore()
       var docRef = db.collection("products").doc(this.$route.params.product_id);
       // db.collection('products').where('barcode', '==', this.$route.params.product_id).get()
       console.log("here to update")
