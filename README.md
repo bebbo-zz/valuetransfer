@@ -33,19 +33,18 @@ git push -u origin master
 
 
 # Compile and Deploy Backend
-
+cd /home/martin/Documents/Java/javaserver
+mvn package
+java -jar target/pos-javaserver-0.1.0.jar
 
 ```
 
 ### Planned Enhancements
 
 ```
-- paperless receipt and stuff (with token stored to receipt)
-- vue call ipad camera (exp)
-- camera will recognize barcode (exp)
+- vue call ipad camera
+- camera will recognize barcode
 - user management
-- charts 
-- sys admin
 
 ```
 

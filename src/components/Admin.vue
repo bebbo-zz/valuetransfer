@@ -17,8 +17,8 @@ export default {
   data () {
     return {
       products: [
-        // { name_ger: 'Garnier body intensive, peach', name: 'Sữa dưỡng thể Garnier chiết xuất đào', size: '250ml', colour: '', category: 'Làm đẹp- sức khoẻ', price: 135000, barcode: '3600542098182', article_number: '', description: '' }, 
-      ]
+
+]
     }
   },
   methods: {
@@ -38,10 +38,10 @@ export default {
           description: ''
         })
         .then(docRef => {
-          // console.log("product added")
+           console.log("product added " + docRef)
         })
         .catch(error => {
-          console.log(err)
+          console.log(error)
         })
       });
       console.log("finished upload")

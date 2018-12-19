@@ -132,9 +132,8 @@
             <span>{{$t('addintake')}}</span>
           </v-tooltip>
           <ul>
-            <li v-for="intake in intakes" v-bind:key="intake.id">
-              <div class="chip">{{intake.quantity}}</div>
-              {{intake.purchase_price}} {{$t('from')}} {{intake.supplier}}
+            <li v-for="intake in intakes" v-bind:key="intake.id" style="list-style-type: none;">
+              <v-chip>{{intake.created}}</v-chip> {{intake.quantity}} x {{intake.purchase_price}} {{$t('vnd')}} {{$t('from')}} {{intake.supplier}}
             </li>
           </ul>
         </v-flex>
@@ -159,7 +158,8 @@
     </v-container>
     <!-- Modal Component -->
     <v-dialog 
-      v-model="modalAddIntake">
+      v-model="modalAddIntake"
+      persistent max-width="800px">
       <v-card>
         <v-card-title>
           <span class="headline">{{$t('newintake')}}</span>
@@ -194,11 +194,11 @@
             <v-layout row wrap>
               <v-flex xs12>
                 <v-tooltip top>
-                  <v-btn @click.native="saveIntake" slot="activator" color="success" large>Save</v-btn> 
+                  <v-btn @click.native="saveIntake" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
                   <span>{{$t('save')}}</span>
                 </v-tooltip>
                 <v-tooltip top>
-                  <v-btn @click.native="closeDialog" slot="activator" color="error" large>Cancel</v-btn>    
+                  <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
                   <span>{{$t('cancel')}}</span>
                 </v-tooltip>
               </v-flex>
@@ -262,7 +262,6 @@ export default {
           tempIntakes.push(data)
         })
     })
-    console.log("routerbeforeenter: " + to.params.product_id)
     var docRef = db.collection("products").doc(to.params.product_id);
     docRef.get().then(function(doc) {
       if (doc.exists) {
@@ -309,7 +308,8 @@ export default {
                   'id': doc.id,
                   'purchase_price': doc.data().purchase_price,
                   'quantity': doc.data().quantity,
-                  'supplier': doc.data().supplier
+                  'supplier': doc.data().supplier,
+                  'created': doc.data().created
               }
               this.intakes.push(data)
           })
@@ -395,7 +395,6 @@ export default {
         tags: this.tags
       })
       .then(() => {
-        console.log("it worked")
         this.$router.push({name: 'edit-product', params: {product_id: this.product_id}}) 
       })
       .catch(error => {
@@ -474,7 +473,7 @@ export default {
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'blob';
       xhr.onload = function() {
-        var returnedBlob = new Blob([xhr.response], {type: 'image/jpeg'});
+        var returnedBlob = new Blob([xhr.response], {type: 'image/jpeg'})
         var link = document.createElement('a')
         link.href = window.URL.createObjectURL(returnedBlob)
         link.download = downloadString
@@ -486,7 +485,7 @@ export default {
     deleteProduct() {
       if (confirm('Are you sure?')) {
         var db = firebaseApp.firestore();
-        var docRef = db.collection("products").doc(this.$route.params.product_id);
+        var docRef = db.collection("products").doc(this.$route.params.product_id)
         docRef.delete()
         this.$router.push('/')
       } 
@@ -495,7 +494,7 @@ export default {
       this.newin_quantity = null
       this.newin_purchase_price = null
       this.newin_supplier = null
-      this.$refs.modal1.show()  
+      this.modalAddIntake = true 
     },
     saveIntake() {
       var db = firebaseApp.firestore();
@@ -503,7 +502,8 @@ export default {
         product_id: this.$route.params.product_id,
         purchase_price: this.newin_purchase_price,
         quantity: this.newin_quantity,
-        supplier: this.newin_supplier
+        supplier: this.newin_supplier,
+        created: new Date()
       })
       .then(docRef => {
         //this.$router.push('/')
@@ -511,10 +511,12 @@ export default {
           'id': docRef.id,
           'purchase_price': this.newin_purchase_price,
           'quantity': this.newin_quantity,
-          'supplier': this.newin_supplier
+          'supplier': this.newin_supplier,
+          'created': new Date()
         }
         console.log(data)
         this.intakes.push(data)
+        this.modalAddIntake = false
       })
       .catch(error => {
           console.log(error)
@@ -591,13 +593,10 @@ export default {
     uploadBlob(curBlob, mime) {
       var curProductID = this.$route.params.product_id
       var vm = this
-      console.log("twenty")
       var storageRef = firebaseApp.storage().ref();
       var storageSpace = "images/" + curProductID + "_thumb"
       var imageRef = storageRef.child(storageSpace)
-      console.log("twentyone")
       var uploadTask = imageRef.put(curBlob, { contentType: mime })
-      console.log("twentytwo")
       uploadTask.on('state_changed', function(snapshot){
         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log('Upload is ' + progress + '% done');

@@ -281,7 +281,6 @@ export default {
       this.$store.getters.cartProducts
     },
     storeReceipt() {
-      console.log("store receipt")
       var db = firebaseApp.firestore()
       var tmpProductArray = []
       this.products.forEach(prod => {
@@ -322,7 +321,7 @@ export default {
             moneyPaid: vm.moneyPaid,
             moneyChange: vm.changeToGive,
             products: tmpProductArray,
-            created: new Date(),
+            created: new Date()
           }
         // here print request
         //  db.collection("prints").add(printData)
@@ -341,7 +340,6 @@ export default {
     manualEntry() {
       console.log("write " + this.$refs.barcode.$el.children[0].text)
       this.$nextTick(() => this.$refs.barcode.focus())
-      
       this.manual_quantity = 1
       this.manual_purchase_price = 0
       this.manual_name = 'extra item'

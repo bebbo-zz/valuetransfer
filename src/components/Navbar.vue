@@ -20,6 +20,16 @@
       >
         <span class="mr-2">{{$t('login')}}</span>
       </v-btn>
+      <!-- 
+      <v-btn>
+        <v-icon
+          large
+          color="grey lighten-1"
+        >
+          shopping_cart
+        </v-icon>
+      </v-btn>
+      -->
     </v-toolbar>
 
     <v-navigation-drawer
@@ -52,15 +62,15 @@
             <v-list-tile-title>{{$t('products')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="selling">
+        <v-list-tile @click="charts">
           <v-list-tile-action>
-            <v-icon>finance</v-icon>
+            <v-icon>timeline</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Management</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="selling">
+        <v-list-tile @click="admin">
           <v-list-tile-action>
             <v-icon>settings</v-icon>
           </v-list-tile-action>
@@ -131,11 +141,11 @@ export default {
       this.$router.push('/register')
       e.preventDefault()
     },
-    register: function( e ) {
+    admin: function( e ) {
       this.$router.push('/admin')
       e.preventDefault()
     },
-    register: function( e ) {
+    charts: function( e ) {
       this.$router.push('/charts')
       e.preventDefault()
     },
