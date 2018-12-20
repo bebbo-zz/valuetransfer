@@ -130,9 +130,9 @@ export default {
         .where('product_id', '==', product_id)
         .get()
         .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
+          querySnapshot.forEach(
               count = count + 1
-          })
+          )
       })
       if(count > 0) {
         alert("Review for this item already given")

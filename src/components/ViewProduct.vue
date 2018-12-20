@@ -49,7 +49,21 @@
         <v-flex xs12>
           <v-divider></v-divider>
           <v-subheader>{{$t('review')}}</v-subheader>
-          <p></p>
+          <v-container v-for="review in reviews" v-bind:key="review.id">
+            <v-layout row wrap>
+              <v-flex xs4>
+                <v-rating
+                  v-model="review.rating"
+                  background-color="orange lighten-3"
+                  color="orange"
+                  x-large
+                ></v-rating>
+              </v-flex>
+              <v-flex xs6>
+                <p>{{review.comment}}</p>
+              </v-flex>
+            </v-layout>
+          </v-container>
         </v-flex>
       </v-layout> 
     </v-container>
@@ -86,13 +100,14 @@ export default {
       size: null,
       tags: null,
       pictures: [],
-      picturesRendered: []
+      picturesRendered: [],
+      reviews: []
     }
   },
   beforeRouteEnter(to, from, next) {
     console.log("here gehts")
-    var db = firebaseApp.firestore();
-    var docRef = db.collection("products").doc(to.params.product_id);
+    var db = firebaseApp.firestore()
+    var docRef = db.collection("products").doc(to.params.product_id)
     docRef.get().then(function(doc) {
       if (doc.exists) {
         next(vm => {
@@ -108,41 +123,55 @@ export default {
             vm.size = doc.data().size
             if(doc.data().picsUrl != undefined) {
               vm.pictures = doc.data().picsUrl
-            var rendered = []
-            doc.data().picsUrl.forEach(pic => {
-              var img = new Image();
-              img.onload = function( ) {
-                var width = this.width
-                var height = this.height
-                var max_size = 300
-                if (width > height) {
-                  if (width > max_size) {
-                      height *= max_size / width
-                      width = max_size
-                    }
-                } else {
-                  if (height > max_size) {
-                        width *= max_size / height
-                        height = max_size
-                    }
+              var rendered = []
+              doc.data().picsUrl.forEach(pic => {
+                var img = new Image();
+                img.onload = function( ) {
+                  var width = this.width
+                  var height = this.height
+                  var max_size = 300
+                  if (width > height) {
+                    if (width > max_size) {
+                        height *= max_size / width
+                        width = max_size
+                      }
+                  } else {
+                    if (height > max_size) {
+                          width *= max_size / height
+                          height = max_size
+                      }
+                  }
+                  var data = {
+                    'url': pic,
+                    'width': width,
+                    'height': height,
+                  }
+                  rendered.push(data)
                 }
-                const data = {
-                  'url': pic,
-                  'width': width,
-                  'height': height,
-                }
-                rendered.push(data)
-              }
-              img.src = pic;
-            })
-            vm.picturesRendered = rendered
+                img.src = pic
+              })
+              vm.picturesRendered = rendered
             }
+
+            var revs = []
+            db.collection("reviews").where('product_id', '==', doc.id).get
+              .then(querySnapshot => {
+                querySnapshot.forEach(rev => { 
+                  var data = {
+                    'id': rev.id,
+                    'rating': rev.data().rating,
+                    'comment': rev.data().comment
+                  } 
+                  revs.push(data)
+                })
+              })
+            vm.reviews = revs
           })
       } else {
-        console.log("No such document!");
+        console.log("No such document!")
       }
     }).catch(function(error) {
-      console.log("Error getting document:", error);
+      console.log("Error getting document: ", error)
     })
   },
   watch: {

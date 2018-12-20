@@ -102,8 +102,8 @@ export default {
   data () {
     return {
       tabs: null,
-      intakesRaw: null,
-      ordersRaw: null,
+    //  intakesRaw: [],
+      ordersRaw: [],
       chartData: [
         ['Month', 'Bought', 'Sold'],
         ['2014', 1000, 400],
@@ -152,8 +152,12 @@ export default {
       ],
     }
   },
-  beforeUpdate ( ) {
+  beforeMount ( ) {
     var prodDict = {}
+    var intakesRaw = []
+    var ordersRaw = []
+    var intakesResult = null
+    var ordersResult = null
     //this.chartData.push(['Month', 'Bought', 'Sold'])
     var db = firebaseApp.firestore()
     db.collection('products').get()
@@ -166,10 +170,8 @@ export default {
         newLine.push(doc.data().name)
         prodDict[strId] = newLine
       })
-    }) 
 
-    this.intakesRaw = []
-    db.collection('intakes').get()
+      db.collection('intakes').get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             var strDate = ""
@@ -182,34 +184,130 @@ export default {
                     ].join('-');
             }
             var strCat = ""
-            var prodInfo = prodDict[doc.data().product_id]
-            if(prodInfo[0] == undefined) {
+            var strBarcode = ""
+            var strName = ""
+            var prodInfo = null
+            if(prodInfo == undefined || doc.data().product_id == undefined) {
               strCat = "Other"
+              strName = "Other"
+              strBarcode = "Other"
             }else{
-              strCat = prodInfo[0]
+              prodInfo = prodDict[strCat]
+              if(prodInfo[0] == undefined) {
+                strCat = "Other"
+              }else{
+                strCat = prodInfo[0]
+              }
+              if(prodInfo[2] == undefined) {
+                strName = "Other"
+              }else{
+                strName = prodInfo[2]
+              }
+              if(prodInfo[1] == undefined) {
+                strBarcode = "Other"
+              }else{
+                strBarcode = prodInfo[1]
+              }
+            }
+            var tempQuantity = Number(doc.data().quantity)
+            var tempAmount = tempQuantity * Number(doc.data().purchase_price)
+            const intakeentry = {
+              'created': strDate,
+              'quantity': tempQuantity,
+              'amount': tempAmount,
+              'prod_name': strName,
+              'prod_barcode': strBarcode,
+              'prod_category': strCat
+            } 
+        //    console.log(entry)
+            intakesRaw.push(intakeentry)
+          })
+       
+         intakesResult =
+          _(intakesRaw)
+            .groupBy('created')
+            .map((objs, key) => ({
+                'created': key,
+                'intakes_qty': _.sumBy(objs, 'quantity'),
+                'intakes_amt': _.sumBy(objs, 'amount') }))
+            .value()
+
+          console.log(intakesResult)
+        })
+
+       db.collection('orders').get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            console.log(doc.data())
+            var strDate = ""
+            if(doc.data().receiptDate == undefined) {
+              strDate = "2018-10"
+            }else{
+              var mm = doc.data().receiptDate.getMonth() + 1 // getMonth() is zero-based
+              strDate = [doc.data().receiptDate.getFullYear(),
+                      (mm>9 ? '' : '0') + mm
+                    ].join('-');
             }
 
-            var entry = {
-              'created': strDate,
-              'quantity': Number(doc.data().quantity),
-              'purchase_price': Number(doc.data().purchase_price),
-              'prod_name': prodInfo[2],
-              'prod_barcode': prodInfo[1],
-              'prod_category': strCat
-            }
-          
-         //   newLine.push(strCat)
-            this.intakesRaw.push(entry)
-            
-            // var groupedData = _.groupBy(data, function(d){return d.division});
-            // but this works on JSON
+            var tempProducts = doc.data().products
+            tempProducts.forEach(item => {
+              const orderentry = {
+                'created': strDate,
+                'quantity': Number(item.quantity),
+                'amount': Number(item.price),
+                'prod_name': item.name,
+                'prod_barcode': item.barcode,
+                'prod_category': item.category
+              }
+              ordersRaw.push(orderentry)
+            })
+            ordersResult =
+            _(ordersRaw)
+              .groupBy('created')
+              .map((objs, key) => ({
+                  'created': key,
+                  'order_qty': _.sumBy(objs, 'quantity'),
+                  'order_amt': _.sumBy(objs, 'amount') }))
+              .value()
           })
-          console.log(this.intakesRaw)
-          var groupedData = _.groupBy(this.intakesRaw, function(d){return d.created})
-          console.log(groupedData)
-    })
-    
-    this.ordersRaw = []
+
+          // ok now the make the arrays
+          var tempChartData = []
+          tempChartData.push(['Month', 'Intake_Amt', 'Order_Amt'])
+
+          var monthDict = {}
+
+          intakesResult.forEach(res => {
+            var newLine = []
+            var strCreated = res.created
+            newLine.push(res.created)
+            newLine.push(res.intakes_amt)
+            newLine.push(0)
+            monthDict[strCreated] = newLine
+          })
+          console.log(monthDict)
+          ordersResult.forEach(res => {
+            var strCreated = res.created
+            if(monthDict[strCreated] == undefined) {
+              var newLine = []
+              newLine.push(res.created)
+              newLine.push(0)
+              newLine.push(res.intakes_amt)
+              monthDict[strCreated] = newLine
+            }else{
+              monthDict[strCreated][2] = res.order_amt
+            }
+          })
+          console.log(monthDict)
+          tempChartData.push(monthDict.values)
+          console.log(tempChartData)
+         // this.chartData = tempChartData
+        }).catch(function(error) {
+          console.log(error)
+        })  
+    }).catch(function(error) {
+      console.log(error)
+    })    
   }
 }
 </script>
