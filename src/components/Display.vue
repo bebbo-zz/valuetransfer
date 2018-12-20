@@ -68,6 +68,16 @@
           </v-card>
         </v-flex>
       </v-layout>
+      <v-btn
+            color="pink"
+            dark
+            absolute
+            bottom
+            right
+            fab
+          >
+            <v-icon>add</v-icon>
+          </v-btn>
     </v-container>
   </div>
 </template>

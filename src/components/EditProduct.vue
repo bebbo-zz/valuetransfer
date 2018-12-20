@@ -10,6 +10,7 @@
           <v-text-field
             v-bind:label="$t('barcode')"
             v-model="barcode"
+            disabled
           >
           </v-text-field>
         </v-flex>

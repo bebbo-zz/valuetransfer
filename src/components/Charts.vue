@@ -59,7 +59,11 @@
       >
         <v-card>
           <v-card-text>
-            Some text 2
+            <GChart
+              type="PieChart"
+              :data="pieChartData"
+              :options="pieChartOptions"
+            />
           </v-card-text>
         </v-card>
       </v-tab-item>
@@ -68,7 +72,20 @@
       >
         <v-card>
           <v-card-text>
-            Some text 3
+            <v-data-table 
+              :headers="headers"
+              :items="productsTable"
+              class="elevation-1"
+              >
+              <template slot="items" slot-scope="props">
+                <td>{{ props.item.barcode }}</td>
+                <td>{{ props.item.name }}</td>
+                <td>{{ props.item.intake_quantity }}</td>
+                <td>{{ props.item.intake_amount }}</td>
+                <td>{{ props.item.order_quantity }}</td>
+                <td>{{ props.item.order_amount }}</td>
+              </template>
+            </v-data-table>
           </v-card-text>
         </v-card>
       </v-tab-item>
@@ -86,6 +103,7 @@ export default {
     return {
       tabs: null,
       intakesRaw: null,
+      ordersRaw: null,
       chartData: [
         ['Month', 'Bought', 'Sold'],
         ['2014', 1000, 400],
@@ -99,6 +117,17 @@ export default {
           subtitle: 'Sales, Expenses 2014-2017',
         }
       },
+      pieChartData: [
+          ['Task', 'Hours per Day'],
+          ['Work',     11],
+          ['Eat',      2],
+          ['Commute',  2],
+          ['Watch TV', 2],
+          ['Sleep',    7]
+      ],
+      pieChartOptions: {
+          title: 'My Daily Activities'
+      },
       sampleChartData: [
         ['Month', 'Bought', 'Sold'],
         ['2014', 1000, 400],
@@ -111,23 +140,34 @@ export default {
           title: 'Company Performance',
           subtitle: 'Sales, Expenses 2014-2017',
         }
-      }
+      },
+      productsTable: [],
+      headers: [
+        { text: 'Barcode', value: 'barcode' },
+        { text: 'Name', value: 'name' },
+        { text: 'Bought_Qty', value: 'intake_quantity' },
+        { text: 'Bought_Amt', value: 'intake_amount' },
+        { text: 'Sold_Qty', value: 'order_quantity' },
+        { text: 'Sold_Amt', value: 'order_amount' }
+      ],
     }
   },
   beforeUpdate ( ) {
-    this.intakesRaw = []
-    var catDict = {}
+    var prodDict = {}
     //this.chartData.push(['Month', 'Bought', 'Sold'])
     var db = firebaseApp.firestore()
     db.collection('products').get()
     .then(querySnapshot => {
       querySnapshot.forEach(doc => {
         var strId = doc.id.toString()
-        catDict[strId] = doc.data().category
+        var newLine = []
+        newLine.push(doc.data().category)
+        newLine.push(doc.data().barcode)
+        newLine.push(doc.data().name)
+        prodDict[strId] = newLine
       })
     }) 
 
-    var newLine = []
     this.intakesRaw = []
     db.collection('intakes').get()
         .then(querySnapshot => {
@@ -142,17 +182,20 @@ export default {
                     ].join('-');
             }
             var strCat = ""
-            if(catDict[doc.data().product_id] == undefined) {
+            var prodInfo = prodDict[doc.data().product_id]
+            if(prodInfo[0] == undefined) {
               strCat = "Other"
             }else{
-              strCat = catDict[doc.data().product_id]
+              strCat = prodInfo[0]
             }
 
             var entry = {
               'created': strDate,
               'quantity': Number(doc.data().quantity),
               'purchase_price': Number(doc.data().purchase_price),
-              'category': strCat
+              'prod_name': prodInfo[2],
+              'prod_barcode': prodInfo[1],
+              'prod_category': strCat
             }
           
          //   newLine.push(strCat)
@@ -164,8 +207,9 @@ export default {
           console.log(this.intakesRaw)
           var groupedData = _.groupBy(this.intakesRaw, function(d){return d.created})
           console.log(groupedData)
-      })
+    })
     
+    this.ordersRaw = []
   }
 }
 </script>

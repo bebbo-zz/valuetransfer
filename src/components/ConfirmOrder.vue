@@ -17,7 +17,7 @@
           {{item.quantity}} X {{item.price}} = {{item.total}}
         </v-flex>
         <v-flex xs2>
-          <v-btn color="warning" @click="sendreview(item.product_id)">{{$t('review')}}</v-btn>
+          <v-btn color="warning" @click="openreviewdialog(item.product_id)">{{$t('review')}}</v-btn>
           <v-btn color="warning" @click="ordermore(item.product_id)">{{$t('ordermore')}}</v-btn>
         </v-flex>
       </v-layout>
@@ -103,6 +103,7 @@ export default {
               vm.items = products
             }else{
               // route somewhere else
+              this.$router.push('/')
             }
         })
       } else {
@@ -112,19 +113,40 @@ export default {
       console.log("Error getting document:", error);
     })
   },
-  watch: {
-    '$route': 'fetchData'
-  },
   methods: {
-    fetchData ( ) {
-     //
-    },
-    sendreview (product_id) {
+    openreviewdialog (product_id) {
       this.currentProduct = product_id
       this.reviewDialog = true
     },
     addReview () {
-      //
+      var db = firebaseApp.firestore()
+
+      var product_id = this.currentProduct
+      var order_id = this.orderId
+      // check if review for this order was made already
+      var count = 0
+      db.collection('reviews')
+        .where('order_id', '==', order_id)
+        .where('product_id', '==', product_id)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+              count = count + 1
+          })
+      })
+      if(count > 0) {
+        alert("Review for this item already given")
+      }else{
+        // add new 
+        var data = {
+              'order_id': order_id,
+              'product_id': product_id,
+              'comment': this.currentComment,
+              'rating': this.currentRating
+            }
+        db.collection('reviews').add(data)
+          .then(this.reviewDialog = false)
+      }
     },
     ordermore (product_id) {
       this.$router.push({name: 'view-product', params: {product_id: product_id}})
