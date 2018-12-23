@@ -176,8 +176,13 @@
               </v-flex>
             </v-layout>
             <v-layout row wrap>
+              <v-flex xs12>
+                <p><qr-code v-bind:text="qrsource"></qr-code></p>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap>
               <v-flex xs4>
-                <v-btn @click.native="closeDialog" color="info" large>{{$t('printadditionalreceipt')}}</v-btn>
+                <v-btn @click.native="printPhysicalReceipt" color="info" large>{{$t('printadditionalreceipt')}}</v-btn>
               </v-flex>
               <v-flex xs3 offset-xs1>
                 <v-btn @click.native="closeDialog" color="error" large>{{$t('cancel')}}</v-btn>                
@@ -221,7 +226,9 @@ export default {
       moneyPaid: 0,
       paidDisplay: null,
       changeToGive: 0,
-      receiptId: null
+      receiptId: null,
+      printData: null,
+      qrsource: null
     }
   },
   components: {
@@ -323,16 +330,18 @@ export default {
             products: tmpProductArray,
             created: new Date()
           }
-        // here print request
-        //  db.collection("prints").add(printData)
-        //    .then(() => {console.log("print request sent")})
-        const xhttp = new XMLHttpRequest()
+        
+        // print only on demand. otherwise QR Code
+        vm.qrsource = process.env.PUBLIC_URL + "/receipt/" + docRef.id + "/" + token
+        vm.printData = printData
+      })
+    },
+    printPhysicalReceipt() {
+      const xhttp = new XMLHttpRequest()
         xhttp.open("POST", "/app/print", true)
         xhttp.setRequestHeader("Content-Type", "application/json")
-        printData = JSON.stringify(printData)
-       // console.log(printData)
+        printData = JSON.stringify(this.printData)
         xhttp.send(printData) 
-      })
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")

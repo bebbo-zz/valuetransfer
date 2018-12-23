@@ -98,20 +98,7 @@ export default {
       currentUser: false,
       isEmployee: false,
       currentCategory: 'All',
-      categories: ["All", 
-        "Ăn dặm",
-        "bách hoá",
-        "Chăm sóc sức khoẻ cho trẻ em",
-        "đồ chơi",
-        "Đồ dùng gia đình",
-        "Đồ dùng nhà bếp",
-        "Làm đẹp- súc khoẻ",
-        "Làm đẹp- sức khoẻ",
-        "thời trang nam",
-        "thời trang nữ",
-        "thời trang trẻ em",
-        "thời trang unisex",
-        "Vệ sinh phụ nữ"],
+      categories: [],
       sclItemsPerPage: [
         10,
         50,
@@ -129,6 +116,8 @@ export default {
     }
   },
   beforeMount ( ) {
+    this.categories = process.env.CATEGORIES
+    this.categories.push('All')
     console.log("running through only once")
     var db = firebaseApp.firestore();
     if (firebaseApp.auth().currentUser) {

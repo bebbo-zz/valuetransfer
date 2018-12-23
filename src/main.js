@@ -6,6 +6,7 @@ import store from './store'
 import { i18n } from './plugins/i18n.js'
 import './plugins/lodash.js'
 import './plugins/googlecharts.js'
+import './plugins/qrcode.js'
 
 Vue.config.productionTip = false
 
