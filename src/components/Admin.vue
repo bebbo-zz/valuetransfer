@@ -97,8 +97,21 @@ export default {
         })
       })
     },
-    checkDuplicatedBarcodes() {
+    checkCorrectness() {
+      console.log("check barcodes and semi-colons")
+      var localBarcodes = []
+      var errors = []
+      var lines = this.productString.split('\n')
+      lines.forEach(line => { 
+        var curBarcode = line.substr(0, line.indexOf(';'))
+        if((line.match(new RegExp("str", "g")) || []).length != 6) {
+          "Wrong"
+        }
+      })
       
+      //var db = firebaseApp.firestore()
+
+
     },
     productUpload() {
       console.log("start upload")
