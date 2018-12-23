@@ -7,7 +7,7 @@ import EditProduct from './components/EditProduct.vue'
 import ViewProduct from './components/ViewProduct.vue'
 import ConfirmOrder from './components/ConfirmOrder.vue'
 import Login from './components/Login.vue'
-import Register from './components/Register.vue'
+//import Register from './components/Register.vue'
 import Charts from './components/Charts.vue'
 import Admin from './components/Admin.vue'
 import SpecialOffers from './components/SpecialOffers.vue'
@@ -26,11 +26,11 @@ export default new Router({
       name: 'login',
       component: Login
     },
-    {
+ /*   {
       path: '/register',
       name: 'register',
       component: Register
-    },
+    }, */
     {
       path: '/specialoffers',
       name: 'specialoffers',

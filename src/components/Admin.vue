@@ -144,11 +144,13 @@ export default {
           flag_err = true
         }
         localBarcodes[curBarcode] = 'insert'
-        if((line.match(new RegExp("str", "g")) || []).length != 6) {
+        if((line.match(new RegExp("\;", "g")) || []).length != 6) {
           syntax_err.push({'name':curBarcode})
           flag_err = true
         }
       })
+      console.log(syntax_err)
+      console.log(double_err)
 
       if(flag_err == false) {
         var barcodes_insert = []
@@ -178,7 +180,7 @@ export default {
             'name': 'Wrong number of ;',
             'children': syntax_err
           }
-          upload_items.push(data)
+          this.upload_items.push(data)
         }
 
         if(double_err.length > 1) {
@@ -186,13 +188,13 @@ export default {
             'name': 'Duplicated barcodes within upload',
             'children': double_err
           }
-          upload_items.push(data)
+          this.upload_items.push(data)
         }
       }
-      confirmDialog = true
+      this.confirmDialog = true
     },
     closeDialog() {
-      confirmDialog = false
+      this.confirmDialog = false
     },
     productUpload() {
       console.log("start upload")
@@ -200,8 +202,8 @@ export default {
 
       var lines = this.productString.split('\n')
       lines.forEach(line => { 
-        var attributes = this.line.split(';')
-        if(this.uploadMethod[attributes[0]] = 'insert') {
+        var attributes = line.split(';')
+        if(this.uploadMethod[attributes[0]] == 'insert') {
           const data = {
             barcode: attributes[0],
             article_number: attributes[1],

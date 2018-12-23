@@ -7,13 +7,13 @@
         <span class="font-weight-light">HANG DUC</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
+      <!--v-btn
         flat
         color="success"
         @click="register"
       >
         <span class="mr-2">{{$t('register')}}</span>
-      </v-btn>
+      </v-btn-->
       <v-btn
         flat
         @click="login"
@@ -145,10 +145,10 @@ export default {
       this.$router.push('/login')
       e.preventDefault()
     },
-    register: function( e ) {
+   /* register: function( e ) {
       this.$router.push('/register')
       e.preventDefault()
-    },
+    }, */
     admin: function( e ) {
       this.$router.push('/admin')
       e.preventDefault()
