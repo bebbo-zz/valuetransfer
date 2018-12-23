@@ -23,7 +23,7 @@
             </v-text-field>
           </v-flex>
         </v-layout>
-        <v-layout row wrap>
+        <!--v-layout row wrap>
           <v-flex xs12>
             <v-text-field
               v-bind:label="$t('namegerman')"
@@ -31,7 +31,7 @@
             >
             </v-text-field>
           </v-flex>
-        </v-layout>
+        </v-layout-->
         <v-layout row wrap>
           <v-flex xs12>
             <v-text-field
@@ -44,7 +44,6 @@
           </v-flex>
         </v-layout>
         <v-layout row wrap>
-          <!-- @submit.prevent="updateProduct" -->
           <v-flex xs6>
             <v-text-field
               v-bind:label="$t('price')"
@@ -56,6 +55,22 @@
             <v-text-field
               v-bind:label="$t('category')"
               v-model="category"
+            >
+            </v-text-field>
+          </v-flex>
+        </v-layout>
+        <v-layout row wrap>
+          <v-flex xs6>
+            <v-text-field
+              v-bind:label="$t('colour')"
+              v-model="colour"
+            >
+            </v-text-field>
+          </v-flex>
+          <v-flex xs6>
+            <v-text-field
+              v-bind:label="$t('size')"
+              v-model="size"
             >
             </v-text-field>
           </v-flex>
@@ -108,7 +123,7 @@ export default {
   },
   methods: {
     saveProduct() {
-      var db = firebaseApp.firestore();
+      var db = firebaseApp.firestore()
 
       db.collection("products")
         .add({
@@ -116,9 +131,7 @@ export default {
           barcode: this.barcode,
           category: this.category,
           colour: this.colour,
-          description: this.description,
           name: this.name,
-          name_ger: this.name_ger,
           price: this.price,
           size: this.size
         })

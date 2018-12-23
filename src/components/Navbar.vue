@@ -46,6 +46,14 @@
             <v-list-tile-title>{{$t('home')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile @click="specialoffers">
+          <v-list-tile-action>
+            <v-icon>money_off</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Special Offers</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile @click="cashier">
           <v-list-tile-action>
             <v-icon>add_to_queue</v-icon>
@@ -147,6 +155,10 @@ export default {
     },
     charts: function( e ) {
       this.$router.push('/charts')
+      e.preventDefault()
+    },
+    specialoffers: function( e ) {
+      this.$router.push('/specialoffers')
       e.preventDefault()
     },
     category ( value ) {

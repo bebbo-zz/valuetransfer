@@ -22,7 +22,7 @@
           </v-text-field>
         </v-flex>
       </v-layout>
-      <v-layout row wrap>
+      <!--v-layout row wrap>
         <v-flex xs12>
           <v-text-field
             v-bind:label="$t('namegerman')"
@@ -30,7 +30,7 @@
           >
           </v-text-field>
         </v-flex>
-      </v-layout>
+      </v-layout-->
       <v-layout row wrap>
         <v-flex xs12>
           <v-text-field
