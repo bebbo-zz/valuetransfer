@@ -471,8 +471,8 @@ export default {
     downloadPicture(i) {
       console.log("download: " + this.picsUrl[i])
       var downloadString = this.picsReference[i] + 'jpg'
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'blob';
+      var xhr = new XMLHttpRequest()
+      xhr.responseType = 'blob'
       xhr.onload = function() {
         var returnedBlob = new Blob([xhr.response], {type: 'image/jpeg'})
         var link = document.createElement('a')
@@ -481,11 +481,11 @@ export default {
         link.click()
       };
       xhr.open('GET', this.picsUrl[i])
-      xhr.send();   
+      xhr.send()  
     },
     deleteProduct() {
       if (confirm('Are you sure?')) {
-        var db = firebaseApp.firestore();
+        var db = firebaseApp.firestore()
         var docRef = db.collection("products").doc(this.$route.params.product_id)
         docRef.delete()
         this.$router.push('/')

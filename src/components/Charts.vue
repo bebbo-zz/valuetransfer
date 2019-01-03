@@ -128,6 +128,17 @@ export default {
       pieChartOptions: {
           title: 'My Daily Activities'
       },
+      samplePieChartData: [
+          ['Task', 'Hours per Day'],
+          ['Work',     11],
+          ['Eat',      2],
+          ['Commute',  2],
+          ['Watch TV', 2],
+          ['Sleep',    7]
+      ],
+      samplePieChartOptions: {
+          title: 'My Daily Activities'
+      },
       sampleChartData: [
         ['Month', 'Bought', 'Sold'],
         ['2014', 1000, 400],
@@ -156,8 +167,9 @@ export default {
     var prodDict = {}
     var intakesRaw = []
     var ordersRaw = []
-    var intakesResult = null
-    var ordersResult = null
+    var intakesByMonthResult = null
+    var ordersByMonthResult = null
+    var ordersByCategoryResult = null
     //this.chartData.push(['Month', 'Bought', 'Sold'])
     var db = firebaseApp.firestore()
     db.collection('products').get()
@@ -223,7 +235,7 @@ export default {
             intakesRaw.push(intakeentry)
           })
        
-         intakesResult =
+         intakesByMonthResult =
           _(intakesRaw)
             .groupBy('created')
             .map((objs, key) => ({
@@ -231,8 +243,6 @@ export default {
                 'intakes_qty': _.sumBy(objs, 'quantity'),
                 'intakes_amt': _.sumBy(objs, 'amount') }))
             .value()
-
-          console.log(intakesResult)
         })
 
        db.collection('orders').get()
@@ -261,7 +271,7 @@ export default {
               }
               ordersRaw.push(orderentry)
             })
-            ordersResult =
+            ordersByMonthResult =
             _(ordersRaw)
               .groupBy('created')
               .map((objs, key) => ({
@@ -269,15 +279,25 @@ export default {
                   'order_qty': _.sumBy(objs, 'quantity'),
                   'order_amt': _.sumBy(objs, 'amount') }))
               .value()
+
+            ordersByCategoryResult =
+            _(ordersRaw)
+              .groupBy('prod_category')
+              .map((objs, key) => ({
+                  'prod_category': key,
+                  'order_qty': _.sumBy(objs, 'quantity'),
+                  'order_amt': _.sumBy(objs, 'amount') }))
+              .value()
           })
 
-          // ok now the make the arrays
           var tempChartData = []
-          tempChartData.push(['Month', 'Intake_Amt', 'Order_Amt'])
-
           var monthDict = {}
 
-          intakesResult.forEach(res => {
+          // here not so much error handling anymore
+          // all undefined and stuff should be caught before
+
+          // line chart
+          intakesByMonthResult.forEach(res => {
             var newLine = []
             var strCreated = res.created
             newLine.push(res.created)
@@ -285,8 +305,7 @@ export default {
             newLine.push(0)
             monthDict[strCreated] = newLine
           })
-          console.log(monthDict)
-          ordersResult.forEach(res => {
+          ordersByMonthResult.forEach(res => {
             var strCreated = res.created
             if(monthDict[strCreated] == undefined) {
               var newLine = []
@@ -299,9 +318,23 @@ export default {
             }
           })
           console.log(monthDict)
-          tempChartData.push(monthDict.values)
+          tempChartData.push(['Month', 'Intake_Amt', 'Order_Amt'])
+          tempChartData = _.union(tempChartData, monthDict.values)
           console.log(tempChartData)
-         // this.chartData = tempChartData
+      // this.chartData = tempChartData
+
+          // pie chart
+          tempChartData = []
+          tempChartData.push(['Category', 'Quantity'])
+          ordersByCategoryResult.forEach(res => {
+            var newLine = []
+            newLine.push(res.prod_category)
+            newLine.push(res.order_qty)
+            tempChartData.push(newLine)
+          })
+    //  this.pieChartData = tempChartData
+
+    
         }).catch(function(error) {
           console.log(error)
         })  

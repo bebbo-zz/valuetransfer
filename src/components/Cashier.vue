@@ -340,7 +340,7 @@ export default {
       const xhttp = new XMLHttpRequest()
         xhttp.open("POST", "/app/print", true)
         xhttp.setRequestHeader("Content-Type", "application/json")
-        printData = JSON.stringify(this.printData)
+        var printData = JSON.stringify(this.printData)
         xhttp.send(printData) 
     },
     formatPrice( value ) {
