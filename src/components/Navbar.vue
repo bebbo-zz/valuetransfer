@@ -3,8 +3,8 @@
     <v-toolbar fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title class="headline text-uppercase">
-        <span>POS</span>
-        <span class="font-weight-light">HANG DUC</span>
+        <span>OpenPOS</span>
+        <span class="font-weight-light">Vietnam</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <!--v-btn

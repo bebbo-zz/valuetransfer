@@ -9,7 +9,7 @@
             class="white--text"
           >
             <img src="assets/vuetify.png" height="200">
-            <h1 class="white--text mb-2 display-1 text-xs-center">POS Hang Duc</h1>
+            <h1 class="white--text mb-2 display-1 text-xs-center">OpenPOS Vietnam</h1>
             <div class="subheading mb-3 text-xs-center">Powered by Graffl</div>
             <v-btn
               class="blue lighten-2 mt-5"

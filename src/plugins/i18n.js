@@ -5,7 +5,7 @@ import vn from '@/lang/vn.json'
 
 Vue.use(VueI18n)
 export const i18n = new VueI18n({
-    locale: process.env.LANGUAGE,
+    locale: process.env.VUE_APP_LANGUAGE,
     fallbackLocale: 'en',
     messages: { en, vn }
 })

@@ -66,6 +66,16 @@
             />
           </v-card-text>
         </v-card>
+        <br />
+        <v-card>
+          <v-card-text>
+            <GChart
+              type="PieChart"
+              :data="samplePieChartData"
+              :options="samplePieChartOptions"
+            />
+          </v-card-text>
+        </v-card>
       </v-tab-item>
       <v-tab-item
         :key="3"
@@ -106,38 +116,13 @@ export default {
       ordersRaw: [],
       chartData: [
         ['Month', 'Bought', 'Sold'],
-        ['2014', 1000, 400],
-        ['2015', 1170, 460],
-        ['2016', 660, 1120],
-        ['2017', 1030, 540]
+        ['2014', 1000, 400]
       ],
       chartOptions: {
         chart: {
-          title: 'Company Performance',
-          subtitle: 'Sales, Expenses 2014-2017',
+          title: 'Monthly Performance',
+          subtitle: 'Orders, Intakes per month',
         }
-      },
-      pieChartData: [
-          ['Task', 'Hours per Day'],
-          ['Work',     11],
-          ['Eat',      2],
-          ['Commute',  2],
-          ['Watch TV', 2],
-          ['Sleep',    7]
-      ],
-      pieChartOptions: {
-          title: 'My Daily Activities'
-      },
-      samplePieChartData: [
-          ['Task', 'Hours per Day'],
-          ['Work',     11],
-          ['Eat',      2],
-          ['Commute',  2],
-          ['Watch TV', 2],
-          ['Sleep',    7]
-      ],
-      samplePieChartOptions: {
-          title: 'My Daily Activities'
       },
       sampleChartData: [
         ['Month', 'Bought', 'Sold'],
@@ -148,9 +133,27 @@ export default {
       ],
       sampleChartOptions: {
         chart: {
-          title: 'Company Performance',
-          subtitle: 'Sales, Expenses 2014-2017',
+          title: 'Sample Area Chart',
+          subtitle: 'Sample as Reference',
         }
+      },
+      pieChartData: [
+          ['Task', 'Hours per Day'],
+          ['Work',     11]
+      ],
+      pieChartOptions: {
+          title: 'Orders by Category'
+      },
+      samplePieChartData: [
+          ['Task', 'Hours per Day'],
+          ['Work',     11],
+          ['Eat',      2],
+          ['Commute',  2],
+          ['Watch TV', 2],
+          ['Sleep',    7]
+      ],
+      samplePieChartOptions: {
+          title: 'Sample Pie Chart'
       },
       productsTable: [],
       headers: [
@@ -170,6 +173,8 @@ export default {
     var intakesByMonthResult = null
     var ordersByMonthResult = null
     var ordersByCategoryResult = null
+    var intakesByBarcode = null
+    var ordersByBarcode = null
     //this.chartData.push(['Month', 'Bought', 'Sold'])
     var db = firebaseApp.firestore()
     db.collection('products').get()
@@ -204,7 +209,7 @@ export default {
               strName = "Other"
               strBarcode = "Other"
             }else{
-              prodInfo = prodDict[strCat]
+              prodInfo = prodDict[doc.data().product_id]
               if(prodInfo[0] == undefined) {
                 strCat = "Other"
               }else{
@@ -231,7 +236,6 @@ export default {
               'prod_barcode': strBarcode,
               'prod_category': strCat
             } 
-        //    console.log(entry)
             intakesRaw.push(intakeentry)
           })
        
@@ -243,12 +247,20 @@ export default {
                 'intakes_qty': _.sumBy(objs, 'quantity'),
                 'intakes_amt': _.sumBy(objs, 'amount') }))
             .value()
+
+          intakesByBarcode =
+          _(intakesRaw)
+            .groupBy('prod_barcode')
+            .map((objs, key) => ({
+                'barcode': key,
+                'intakes_qty': _.sumBy(objs, 'quantity'),
+                'intakes_amt': _.sumBy(objs, 'amount') }))
+            .value()
         })
 
        db.collection('orders').get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            console.log(doc.data())
             var strDate = ""
             if(doc.data().receiptDate == undefined) {
               strDate = "2018-10"
@@ -288,6 +300,15 @@ export default {
                   'order_qty': _.sumBy(objs, 'quantity'),
                   'order_amt': _.sumBy(objs, 'amount') }))
               .value()
+
+            ordersByBarcode =
+            _(ordersRaw)
+              .groupBy('prod_barcode')
+              .map((objs, key) => ({
+                  'barcode': key,
+                  'order_qty': _.sumBy(objs, 'quantity'),
+                  'order_amt': _.sumBy(objs, 'amount') }))
+              .value()
           })
 
           var tempChartData = []
@@ -317,11 +338,9 @@ export default {
               monthDict[strCreated][2] = res.order_amt
             }
           })
-          console.log(monthDict)
           tempChartData.push(['Month', 'Intake_Amt', 'Order_Amt'])
-          tempChartData = _.union(tempChartData, monthDict.values)
-          console.log(tempChartData)
-      // this.chartData = tempChartData
+          tempChartData = _.union(tempChartData, Object.values(monthDict))
+          this.chartData = tempChartData
 
           // pie chart
           tempChartData = []
@@ -332,8 +351,39 @@ export default {
             newLine.push(res.order_qty)
             tempChartData.push(newLine)
           })
-    //  this.pieChartData = tempChartData
+          this.pieChartData = tempChartData
 
+          // table of items
+          // we run through each item of product dictionary and extend by values
+          console.log("orders by barcode")
+          console.log(ordersByBarcode)
+          ordersDict = {}
+         // here still the problem that odersbyBarcode is not a dictionary
+          Object.values(prodDict).forEach(prodArray => {
+            if(intakesByBarcode[prodArray[1]] == undefined) {
+              // quantity
+              prodArray.push(0)
+              // amount
+              prodArray.push(0)
+            }else{
+              prodArray.push(intakesByBarcode[prodArray[1]]['intakes_qty'])
+              prodArray.push(intakesByBarcode[prodArray[1]]['intakes_amt'])
+              console.log("after push")
+              console.log(prodArray)
+            }
+
+            if(ordersByBarcode[prodArray[1]] == undefined) {
+              // quantity
+              prodArray.push(0)
+              // amount
+              prodArray.push(0)
+            }else{
+              prodArray.push(ordersByBarcode[prodArray[1]]['order_qty'])
+              prodArray.push(ordersByBarcode[prodArray[1]]['order_amt'])
+              console.log("after push")
+              console.log(prodArray)
+            }
+          })
     
         }).catch(function(error) {
           console.log(error)

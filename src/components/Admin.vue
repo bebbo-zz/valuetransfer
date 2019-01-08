@@ -141,7 +141,6 @@ export default {
     },
     intakeUpload() {
       // 4000991030777;1;30;Lidl
-      var localBarcodes = {}
       var cloudBarcodes = {}
 
       var db = firebaseApp.firestore()

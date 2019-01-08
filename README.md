@@ -1,5 +1,56 @@
 # valuetransfer
 
+## Run Open Source POS
+```
+
+# Prerequsists
+
+Get an Github account for the hosting on GitPages
+https://github.com/
+
+Get an free Firebase account
+https://firebase.google.com/
+
+Install NodeJS
+https://nodejs.org
+
+Install Git
+https://git-scm.com/
+
+
+# firebase setup
+
+- New Project
+- Add Firestore
+
+
+# Get POS and configure it
+
+Clone and download POS repository
+https://github.com/bebbo-zz/valuetransfer
+
+Extract repository to any folder X.
+in ...X\src\components\ add an file firebaseConfig.js
+and copy the following information from your firebase account under Authentication > Web Setup (top right corner)
+export default {
+    apiKey: "...",
+    authDomain: "...",
+    databaseURL: "...",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "..."
+}
+
+navigate in console into folder X and run the following commands:
+npm run build
+
+
+# Deploy POS
+
+
+
+```
+
 ## Project setup
 ```
 install node

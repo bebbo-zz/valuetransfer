@@ -228,7 +228,7 @@ export default {
       changeToGive: 0,
       receiptId: null,
       printData: null,
-      qrsource: null
+      qrsource: ''
     }
   },
   components: {
@@ -241,7 +241,6 @@ export default {
     }),
   },
   updated: function() {
-    console.log("updated " + this.$refs.barcode)
     this.$nextTick(() => this.$refs.barcode.focus())
   },
   methods: {
@@ -250,6 +249,7 @@ export default {
       this.modalPayment = true
     },
     closeDialog() {
+      // closes all possible dialogs for this page
       this.modalPayment = false
       this.modalReturn = false
     },
@@ -312,7 +312,6 @@ export default {
       var forsha = salt + internalpwd + price
       var token = SHA256(forsha).toString()
 
-      console.log(this.totalSum)
       var docData = {
         totalPrice: this.totalSum,
         receiptDate: new Date(),
@@ -332,16 +331,22 @@ export default {
           }
         
         // print only on demand. otherwise QR Code
-        vm.qrsource = process.env.PUBLIC_URL + "/receipt/" + docRef.id + "/" + token
+        vm.qrsource = process.env.VUE_APP_PUBLIC_URL + "/receipt/" + docRef.id + "/" + token
+
+        // for printing a physical receipt
         vm.printData = printData
       })
     },
     printPhysicalReceipt() {
-      const xhttp = new XMLHttpRequest()
+      if(process.env.PREMIUM) {
+        const xhttp = new XMLHttpRequest()
         xhttp.open("POST", "/app/print", true)
         xhttp.setRequestHeader("Content-Type", "application/json")
         var printData = JSON.stringify(this.printData)
-        xhttp.send(printData) 
+        xhttp.send(printData)
+      }else{
+        alert("Only possible with Premium account")
+      }
     },
     formatPrice( value ) {
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
