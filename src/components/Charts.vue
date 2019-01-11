@@ -90,10 +90,10 @@
               <template slot="items" slot-scope="props">
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.intake_quantity }}</td>
-                <td>{{ props.item.intake_amount }}</td>
-                <td>{{ props.item.order_quantity }}</td>
-                <td>{{ props.item.order_amount }}</td>
+                <td>{{ props.item.intake_qty }}</td>
+                <td>{{ props.item.intake_amt }}</td>
+                <td>{{ props.item.order_qty }}</td>
+                <td>{{ props.item.order_amt }}</td>
               </template>
             </v-data-table>
           </v-card-text>
@@ -253,8 +253,8 @@ export default {
             .groupBy('prod_barcode')
             .map((objs, key) => ({
                 'barcode': key,
-                'intakes_qty': _.sumBy(objs, 'quantity'),
-                'intakes_amt': _.sumBy(objs, 'amount') }))
+                'intake_qty': _.sumBy(objs, 'quantity'),
+                'intake_amt': _.sumBy(objs, 'amount') }))
             .value()
         })
 
@@ -354,37 +354,56 @@ export default {
           this.pieChartData = tempChartData
 
           // table of items
-          // we run through each item of product dictionary and extend by values
-          console.log("orders by barcode")
-          console.log(ordersByBarcode)
-          ordersDict = {}
-         // here still the problem that odersbyBarcode is not a dictionary
-          Object.values(prodDict).forEach(prodArray => {
-            if(intakesByBarcode[prodArray[1]] == undefined) {
-              // quantity
-              prodArray.push(0)
-              // amount
-              prodArray.push(0)
-            }else{
-              prodArray.push(intakesByBarcode[prodArray[1]]['intakes_qty'])
-              prodArray.push(intakesByBarcode[prodArray[1]]['intakes_amt'])
-              console.log("after push")
-              console.log(prodArray)
+          
+          // we join orders and intakes to one array
+          var found = false
+          var joinedAmtQty = []
+          ordersByBarcode.forEach(orderJson => {
+            var joinedEntry = orderJson
+            var orderCode = orderJson['barcode']
+            found = false
+            var indexToRemove = 0
+            for (let i = 0; i < intakesByBarcode.length; i++) {
+              var intakeJson = intakesByBarcode[i]
+              
+              if (intakeJson['barcode'] == orderCode) {
+                found = true
+                joinedEntry['intake_qty'] = intakeJson['intakes_qty']
+                joinedEntry['intake_amt'] = intakeJson['intakes_amt']
+                indexToRemove = i
+                break
+              }
             }
-
-            if(ordersByBarcode[prodArray[1]] == undefined) {
-              // quantity
-              prodArray.push(0)
-              // amount
-              prodArray.push(0)
+            
+            if(found == false) {
+              joinedEntry['intake_qty'] = 0
+              joinedEntry['intake_amt'] = 0
             }else{
-              prodArray.push(ordersByBarcode[prodArray[1]]['order_qty'])
-              prodArray.push(ordersByBarcode[prodArray[1]]['order_amt'])
-              console.log("after push")
-              console.log(prodArray)
+              intakesByBarcode.splice(indexToRemove, 1)
             }
+            joinedAmtQty.push(joinedEntry)
           })
-    
+
+          intakesByBarcode.forEach(intakeJson => {
+            var joinedEntry = intakeJson
+            joinedEntry['order_qty'] = 0
+            joinedEntry['order_amt'] = 0
+            joinedAmtQty.push(joinedEntry)
+          })
+
+          joinedAmtQty.forEach(amtQtyJson => {
+            var completeJson = amtQtyJson
+            if(prodDict[amtQtyJson['barcode']] == undefined) {
+              completeJson['category'] = 'Other'
+              completeJson['name'] = 'Unknown'
+            }else{
+              var curProdArray = prodDict[amtQtyJson['barcode']]
+              completeJson['category'] = curProdArray[0]
+              completeJson['name'] = curProdArray[2]
+            }
+            console.log(completeJson)
+            this.productsTable.push(completeJson)
+          })
         }).catch(function(error) {
           console.log(error)
         })  

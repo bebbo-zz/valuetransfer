@@ -10,7 +10,7 @@ import Login from './components/Login.vue'
 //import Register from './components/Register.vue'
 import Charts from './components/Charts.vue'
 import Admin from './components/Admin.vue'
-import SpecialOffers from './components/SpecialOffers.vue'
+import Receipt from './components/Receipt.vue'
 
 Vue.use(Router)
 
@@ -30,12 +30,12 @@ export default new Router({
       path: '/register',
       name: 'register',
       component: Register
-    }, */
+    }, 
     {
       path: '/specialoffers',
       name: 'specialoffers',
       component: SpecialOffers
-    },
+    },*/
     {
       path: '/categories/:category_id',
       name: 'categories',
@@ -75,6 +75,11 @@ export default new Router({
       path: '/order/:order_id/:token',
       name: 'confirm-order',
       component: ConfirmOrder
+    },
+    {
+      path: '/receipt/:order_id/:token',
+      name: 'receipt',
+      component: Receipt
     },
     {
       path: '/about',

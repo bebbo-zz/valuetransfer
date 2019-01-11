@@ -116,7 +116,8 @@ export default {
     }
   },
   beforeMount ( ) {
-    this.categories = process.env.CATEGORIES
+    this.categories =  process.env.VUE_APP_CATEGORIES.split(',')
+    console.log(this.categories)
     this.categories.push('All')
     console.log("running through only once")
     var db = firebaseApp.firestore();

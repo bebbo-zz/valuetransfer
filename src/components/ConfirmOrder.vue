@@ -1,24 +1,28 @@
 <template>
   <div id="confirm-order">
     <v-container>
-      <v-layout row wrap>
+      <v-layout row wrap ma-3>
         <h3>{{$t('thankyouforpurchase')}}</h3>
-        <v-spacer></v-spacer>
       </v-layout>
-    <v-layout row wrap>
-        <h4>{{$t('order')}}: {{this.order_id}}</h4><br />
-        <h4>{{$t('total')}}: {{this.totalPrice}}</h4>
-        <v-spacer></v-spacer>
+      <v-layout row wrap ma-1>
+        <p>{{$t('order')}} {{this.order_id}}</p>
+      </v-layout>
+      <v-layout row wrap ma-1>
+        <h4>{{$t('total')}} {{formatPrice(this.totalPrice)}} {{$t('vnd')}}</h4>
       </v-layout>
       <v-layout row wrap v-for="item in items" v-bind:key="item.product_id">
-        <v-flex xs8>
+        <v-flex xs6>
           <v-divider></v-divider>
           {{item.name}} <br />
-          {{item.quantity}} X {{item.price}} = {{item.total}}
+          {{item.quantity}} X {{formatPrice(item.price)}} {{$t('vnd')}} = {{formatPrice(item.total)}} {{$t('vnd')}}
         </v-flex>
         <v-flex xs2>
-          <v-btn color="warning" @click="openreviewdialog(item.product_id)">{{$t('review')}}</v-btn>
+          <v-divider></v-divider>
           <v-btn color="warning" @click="ordermore(item.product_id)">{{$t('ordermore')}}</v-btn>
+        </v-flex>
+        <v-flex xs2>
+          <v-divider></v-divider>
+          <v-btn color="warning" @click="openreviewdialog(item.product_id)">{{$t('review')}}</v-btn>
         </v-flex>
       </v-layout>
     </v-container>
@@ -43,8 +47,8 @@
               v-model="currentComment"
             ></v-textarea>
           </v-form>
-          <v-btn @click.native="reviewDialog = false">{{$t('cancel')}}</v-btn>
-          <v-btn @click.native="addReview">{{$t('add')}}</v-btn>
+          <v-btn @click.native="addReview" color="success">{{$t('add')}}</v-btn>
+          <v-btn @click.native="reviewDialog = false" color="error">{{$t('cancel')}}</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -68,14 +72,10 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-
-    // product
-    // 09H2BQPxACFfM2nqC8O7
-
     // order
-    //47IELoFEJRgHyQ3bYY0P
-    // 62c563a922085443392de39f26d6a71c08093012662e82b39121a4281608819c
-    // http://localhost:8080/order/47IELoFEJRgHyQ3bYY0P?pwd=62c563a922085443392de39f26d6a71c08093012662e82b39121a4281608819c
+    // cFbDU0TKh42hWLMuhIyd
+    // 708e4504da1307f05fda2dc670493fb2c381734d58b762258e92bc44cb7f0416
+    // http://localhost:8080/#/order/cFbDU0TKh42hWLMuhIyd/708e4504da1307f05fda2dc670493fb2c381734d58b762258e92bc44cb7f0416
     var db = firebaseApp.firestore()
     var docRef = db.collection("orders").doc(to.params.order_id);
     docRef.get().then(function(doc) {
@@ -116,13 +116,22 @@ export default {
   methods: {
     openreviewdialog (product_id) {
       this.currentProduct = product_id
+      this.currentComment = null
+      this.currentRating = 3
       this.reviewDialog = true
+    },
+    formatPrice( value ) {
+        if(value == null) {
+          return 0
+        }else{
+          return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+        }
     },
     addReview () {
       var db = firebaseApp.firestore()
 
       var product_id = this.currentProduct
-      var order_id = this.orderId
+      var order_id = this.order_id
       // check if review for this order was made already
       var count = 0
       db.collection('reviews')

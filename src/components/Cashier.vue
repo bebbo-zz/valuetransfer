@@ -176,7 +176,7 @@
               </v-flex>
             </v-layout>
             <v-layout row wrap>
-              <v-flex xs12>
+              <v-flex xs12 align-center>
                 <p><qr-code v-bind:text="qrsource"></qr-code></p>
               </v-flex>
             </v-layout>
