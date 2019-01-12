@@ -401,7 +401,6 @@ export default {
               completeJson['category'] = curProdArray[0]
               completeJson['name'] = curProdArray[2]
             }
-            console.log(completeJson)
             this.productsTable.push(completeJson)
           })
         }).catch(function(error) {

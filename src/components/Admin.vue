@@ -27,7 +27,7 @@
           <v-subheader>Intake Batch Upload/Update</v-subheader>
           <v-btn @click="intakesCheckCorrectness" color="info">Start Upload</v-btn>
           <br />
-          {{$t('barcode')}};{{$t('quantity')}};{{$t('purchase_price')}};{{$t('supplier')}}
+          {{$t('barcode')}};{{$t('quantity')}};{{$t('price')}};{{$t('supplier')}}
           <br />
           <v-textarea
             solo
@@ -157,9 +157,10 @@ export default {
             var attributes = line.split(';')
             const data = {
               product_id: cloudBarcodes[attributes[0]],
-              purchase_price: this.attributes[2],
-              quantity: this.attributes[1],
-              supplier: this.attributes[3],
+              barcode: attributes[0],
+              purchase_price: attributes[2],
+              quantity: attributes[1],
+              supplier: attributes[3],
               created: new Date()
             }
             db.collection('intakes').add(data)

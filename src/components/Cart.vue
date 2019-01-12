@@ -1,9 +1,8 @@
 <template>
-  <div class="cart">
+  <div class="cart" style="margin-top: 15px;">
     <h1 class="title">{{$t('yourcart')}}</h1>
     <p v-show="!products.length">
       <i>{{$t('yourcartisempty')}}</i>
-      <router-link to="/">{{$t('goshopping')}}</router-link>
     </p>
     <v-data-table 
       :headers="headers"

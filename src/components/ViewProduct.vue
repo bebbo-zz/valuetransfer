@@ -28,7 +28,7 @@
           <v-btn
             color="pink"
             dark
-            absolute
+            fixed
             bottom
             right
             fab
@@ -105,10 +105,9 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    console.log("here gehts")
     var db = firebaseApp.firestore()
     var docRef = db.collection("products").doc(to.params.product_id)
-    docRef.get().then(function(doc) {
+    docRef.get().then(doc => {
       if (doc.exists) {
         next(vm => {
             vm.product_id = doc.id
@@ -154,7 +153,7 @@ export default {
             }
 
             var revs = []
-            db.collection("reviews").where('product_id', '==', doc.id).get
+            db.collection("reviews").where('product_id', '==', doc.id).get()
               .then(querySnapshot => {
                 querySnapshot.forEach(rev => { 
                   var data = {
@@ -179,7 +178,11 @@ export default {
   },
   methods: {
     formatPrice( value ) {
+      if(value == null) {
+        return 0
+      }else{
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      }
     },
     fetchData ( ) {
       var db = firebaseApp.firestore();

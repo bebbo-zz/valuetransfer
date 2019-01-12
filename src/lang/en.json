@@ -53,5 +53,7 @@
   "categories": "Categories",
   "email": "Email",
   "password": "Password",
-  "newproduct": "New Product"
+  "newproduct": "New Product",
+  "colour": "Colour",
+  "size": "Size"
 }

@@ -15,6 +15,20 @@
         <span class="mr-2">{{$t('register')}}</span>
       </v-btn-->
       <v-btn
+            flat
+            @click='goToCart'
+          >
+        <v-badge left>
+          <span slot="badge">{{numberCart}}</span>
+          <v-icon
+            large
+            color="grey lighten-1"
+          >
+            shopping_cart
+          </v-icon>
+        </v-badge>
+      </v-btn>
+      <v-btn
         flat
         @click="login"
       >
@@ -112,6 +126,7 @@ export default {
   data () {
     return {
       drawer: null,
+      numberCart: 0,
       categories: [{"text": "Ăn dặm", "value": 1},
           {"text": "bách hoá", "value": 2},
           {"text": "Chăm sóc sức khoẻ cho trẻ em", "value": 3},
@@ -155,6 +170,10 @@ export default {
     },
     charts: function( e ) {
       this.$router.push('/charts')
+      e.preventDefault()
+    },
+    goToCart: function( e ) {
+      this.$router.push('/cart')
       e.preventDefault()
     },
   //  specialoffers: function( e ) {

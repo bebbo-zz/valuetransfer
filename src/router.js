@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Cashier from './components/Cashier.vue'
+import Cart from './components/Cart.vue'
 import Display from './components/Display.vue'
+import NewProduct from './components/NewProduct.vue'
 import EditProduct from './components/EditProduct.vue'
 import ViewProduct from './components/ViewProduct.vue'
 import ConfirmOrder from './components/ConfirmOrder.vue'
@@ -47,6 +49,11 @@ export default new Router({
       component: Cashier
     },
     {
+      path: '/cart',
+      name: 'cart',
+      component: Cart
+    },
+    {
       path: '/display',
       name: 'display',
       component: Display
@@ -60,6 +67,11 @@ export default new Router({
       path: '/admin',
       name: 'admin',
       component: Admin
+    },
+    {
+      path: '/new',
+      name: 'new',
+      component: NewProduct
     },
     {
       path: '/edit/:product_id',

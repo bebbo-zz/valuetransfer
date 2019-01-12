@@ -6,7 +6,7 @@
       </v-layout>
       <v-layout row wrap>
         <!-- @submit.prevent="updateProduct" -->
-        <v-flex xs6>
+        <v-flex xs5>
           <v-text-field
             v-bind:label="$t('barcode')"
             v-model="barcode"
@@ -14,7 +14,7 @@
           >
           </v-text-field>
         </v-flex>
-        <v-flex xs6>
+        <v-flex xs5 offset-xs1>
           <v-text-field
             v-bind:label="$t('articlenumber')"
             v-model="article_number"
@@ -22,15 +22,6 @@
           </v-text-field>
         </v-flex>
       </v-layout>
-      <!--v-layout row wrap>
-        <v-flex xs12>
-          <v-text-field
-            v-bind:label="$t('namegerman')"
-            v-model="name_ger"
-          >
-          </v-text-field>
-        </v-flex>
-      </v-layout-->
       <v-layout row wrap>
         <v-flex xs12>
           <v-text-field
@@ -42,14 +33,14 @@
       </v-layout>
       <v-layout row wrap>
         <!-- @submit.prevent="updateProduct" -->
-        <v-flex xs6>
+        <v-flex xs5>
           <v-text-field
             v-bind:label="$t('price')"
             v-model="price"
           >
           </v-text-field>
         </v-flex>
-        <v-flex xs6>
+        <v-flex xs5 offset-xs1>
           <v-text-field
             v-bind:label="$t('category')"
             v-model="category"
@@ -168,14 +159,14 @@
         <v-card-text>
           <v-container>
             <v-layout row wrap>
-              <v-flex xs6>
+              <v-flex xs5>
                 <v-text-field
                   v-bind:label="$t('quantity')"
                   v-model="newin_quantity"
                 >
                 </v-text-field>
               </v-flex>
-              <v-flex xs6>
+              <v-flex xs5 offset-xs1>
                 <v-text-field
                   v-bind:label="$t('purchaseprice')"
                   v-model="newin_purchase_price"
@@ -184,7 +175,7 @@
               </v-flex>
             </v-layout>
             <v-layout row wrap>
-              <v-flex xs12>
+              <v-flex xs11>
                   <v-text-field
                     v-bind:label="$t('supplier')"
                     v-model="newin_supplier"
@@ -254,11 +245,14 @@ export default {
     db.collection('intakes').where('product_id', '==', to.params.product_id).get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
+          const d = doc.data().created
+          const date = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2)  + "-" + ("0" + d.getDate()).slice(-2) 
           var data = {
             'id': doc.id,
             'purchase_price': doc.data().purchase_price,
             'quantity': doc.data().quantity,
-            'supplier': doc.data().supplier
+            'supplier': doc.data().supplier,
+            'created': date
           }
           tempIntakes.push(data)
         })
@@ -305,12 +299,16 @@ export default {
       db.collection('intakes').where('product_id', '==', this.$route.params.product_id).get()
       .then(querySnapshot => {
           querySnapshot.forEach(doc => {
+            console.log(doc.data().created)
+              const timestamp = doc.data().created
+              const date = timestamp.toDate()
+              console.log(date)
               var data = {
                   'id': doc.id,
                   'purchase_price': doc.data().purchase_price,
                   'quantity': doc.data().quantity,
                   'supplier': doc.data().supplier,
-                  'created': doc.data().created
+                  'created': date
               }
               this.intakes.push(data)
           })
@@ -347,7 +345,6 @@ export default {
       var db = firebaseApp.firestore()
       var docRef = db.collection("products").doc(this.$route.params.product_id)
       // db.collection('products').where('barcode', '==', this.$route.params.product_id).get()
-      console.log("here to update")
       if (this.article_number == undefined) {
           this.article_number = ''
       }
@@ -403,7 +400,6 @@ export default {
       })
     },
     deletePicture(i) {
-        console.log("delete picture number: " + i)
         if (confirm('Are you sure?')) {
             this.picsUrl.splice(i, 1)
             var nameofref = this.picsReference.splice(i, 1)
@@ -469,7 +465,6 @@ export default {
       }
 		},
     downloadPicture(i) {
-      console.log("download: " + this.picsUrl[i])
       var downloadString = this.picsReference[i] + 'jpg'
       var xhr = new XMLHttpRequest()
       xhr.responseType = 'blob'
@@ -501,13 +496,13 @@ export default {
       var db = firebaseApp.firestore();
       db.collection('intakes').add({
         product_id: this.$route.params.product_id,
+        barcode: this.barcode,
         purchase_price: this.newin_purchase_price,
         quantity: this.newin_quantity,
         supplier: this.newin_supplier,
         created: new Date()
       })
       .then(docRef => {
-        //this.$router.push('/')
         var data = {
           'id': docRef.id,
           'purchase_price': this.newin_purchase_price,
@@ -515,7 +510,6 @@ export default {
           'supplier': this.newin_supplier,
           'created': new Date()
         }
-        console.log(data)
         this.intakes.push(data)
         this.modalAddIntake = false
       })
@@ -525,7 +519,6 @@ export default {
     },
     fileSelected(event) {
         this.file = event.target.files[0]
-        console.log(event.target.files)
         this.uploadFile()
        // this.file.forEach(pic => { this.uploadFile (pic) })
        // console.log(this.file)
@@ -540,7 +533,6 @@ export default {
       var curProductID = this.$route.params.product_id
       var curReference = 1
       if ((this.picsMaxRef == undefined) || this.picsMaxRef == null) {
-          console.log("nothing was there before")
           curReference = 1
           this.picsUrl = []
           this.picsReference = []
@@ -550,7 +542,6 @@ export default {
       }
       var vm = this
       if (curFile != null) {
-        console.log("start importing")
         var storageRef = firebaseApp.storage().ref();
         var storageSpace = "images/" + curProductID + "_" + curReference
         var imageRef = storageRef.child(storageSpace)
@@ -579,7 +570,6 @@ export default {
           // Handle successful uploads on complete
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-            console.log('File available at', downloadURL);
             vm.picsUrl.push(downloadURL);
             vm.picsReference.push(curProductID + "_" + curReference);
             vm.picsLength = vm.picsLength + 1;
@@ -618,6 +608,9 @@ export default {
     abort() {
       this.$router.push('/')
     },
+    closeDialog() {
+      this.modalAddIntake = false
+    },
     loadfileresized() {
       // Read in file
       var outputQuality = 1
@@ -630,8 +623,8 @@ export default {
       reader.onload = function (readerEvent) {
         var image = new Image()
         image.onload = function (imageEvent) {
-          // Resize the image
           console.log(imageEvent)
+          // Resize the image
           var newx = 0
           var newy = 0
           var canvas = document.createElement('canvas'),
@@ -655,7 +648,6 @@ export default {
           canvas.height = max_size
           canvas.getContext('2d').drawImage(image, newx, newy, width, height)
           canvas.toBlob((blob) => {
-            console.log("twelve" + blob) //output image as a blob
           //  curBlob = blob
             //const file = new File([blob], this.thumbFile, {
             //    type: 'image/jpeg',

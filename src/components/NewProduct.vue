@@ -1,5 +1,5 @@
 <template>
-  <div id="new-product">
+  <div id="new">
     <v-form v-model="valid">
       <v-container>
         <v-layout row wrap>
@@ -98,15 +98,14 @@
 import firebaseApp from "./firebaseInit";
 
 export default {
-  name: "new-product",
+  name: "new",
   data() {
     return {
       product_id: null,
       article_number: null,
       barcode: null,
       barcodeRules: [
-        v => !!v || 'Barcode is required',
-        v => this.checkBarcode(v) == true || 'Barcode already exists'
+        v => !!v || 'Barcode is required'
       ],
       category: null,
       colour: null,
@@ -124,45 +123,44 @@ export default {
   methods: {
     saveProduct() {
       var db = firebaseApp.firestore()
-
-      db.collection("products")
-        .add({
-          article_number: this.article_number,
-          barcode: this.barcode,
-          category: this.category,
-          colour: this.colour,
-          name: this.name,
-          price: this.price,
-          size: this.size
+      var counter = 0
+      var tmpString = ''
+      var vm = this
+      db.collection("products").where('barcode', '==', this.barcode).get
+        .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              tmpString = tmpString + ' ' + doc.id
+              counter = counter + 1
+            })
+            if(counter > 0) {
+              alert("Barcode already exists in product " + tmpString)
+            }else{
+              db.collection("products")
+              .add({
+                article_number: vm.article_number,
+                barcode: vm.barcode,
+                category: vm.category,
+                colour: vm.colour,
+                name: vm.name,
+                price: vm.price,
+                size: vm.size
+              })
+              .then(
+                vm.$router.push("/")
+              )
+              .catch(error => {
+                console.log(error);
+              })
+            }
         })
-        .then(
-          this.$router.push("/")
-        )
         .catch(error => {
-          console.log(error);
-        })
+            console.log(error)
+            return true
+      })
     },
     abort() {
       this.$router.push('/')
     }
-  },
-  checkBarcode(curBarcode) {
-    var counter = 0
-    db.collection("products").where('barcode', '==', curBarcode).get
-      .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            counter = counter + 1
-          })
-          if(counter > 0) {
-            return false
-          }else{
-            return true
-          }
-      })
-      .catch(error => {
-          console.log(error)
-          return true
-    })
   }
 }
 </script>

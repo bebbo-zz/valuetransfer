@@ -44,7 +44,7 @@
       </v-layout>
       <v-layout align-start justify-center row wrap v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
         <v-flex align-self-center xs-4 v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id">
-          <v-card tile elevation-8>
+          <v-card tile elevation-8 fill-height>
               <v-img
                 center
                 max-width="250px"
@@ -52,8 +52,8 @@
                 v-bind:src="product.thumbUrl"
               ></v-img>
             <v-card-title primary-title>
-              <v-container>
-                <small width="100%" class="text-muted"><b>{{ product.name }}</b><br />{{ formatPrice(product.price) }} VND</small>
+              <v-container d-block>
+                <small width="100%" class="text-muted" d-block><b>{{ product.name }}</b><br />{{ formatPrice(product.price) }} VND</small>
               </v-container>
             </v-card-title>
             <!--button @click='viewProduct(product.product_id)' class='button is-info'><i class="fa fa-eye"></i></button>
@@ -71,10 +71,11 @@
       <v-btn
             color="pink"
             dark
-            absolute
+            fixed
             bottom
             right
             fab
+            @click='addToProduct'
           >
             <v-icon>add</v-icon>
           </v-btn>
@@ -116,10 +117,8 @@ export default {
     }
   },
   beforeMount ( ) {
-    this.categories =  process.env.VUE_APP_CATEGORIES.split(',')
-    console.log(this.categories)
-    this.categories.push('All')
-    console.log("running through only once")
+    this.categories = process.env.VUE_APP_CATEGORIES.split(',')
+    this.categories.unshift('All')
     var db = firebaseApp.firestore();
     if (firebaseApp.auth().currentUser) {
       this.isLoggedIn = true
@@ -134,11 +133,9 @@ export default {
         })
       })
     }
-    console.log(this.$route.params.category_id)
     if(this.$route.params.category_id == undefined) {
       this.singleSearch("1", "1", "1", "==", "1")
     }else{        
-      console.log(this.categories[this.$route.params.category_id])
       this.currentCategory = this.categories[this.$route.params.category_id]
       this.singleSearch("category", this.currentCategory, "1", "==", "1")
     }
@@ -229,7 +226,6 @@ export default {
       this.products = this.productsAll.slice(0, upperLimit)
     },
     pageOneChanged (pageNum) {
-      console.log("page changed, items per page: " + this.pageOne.itemsPerPage)
       this.pageOne.currentPage = pageNum
       this.products = this.productsAll.slice((pageNum - 1) * this.pageOne.itemsPerPage, this.pageOne.itemsPerPage * pageNum)
     },
@@ -249,6 +245,9 @@ export default {
     editProduct(productId) {
       // /edit/:product_id
       this.$router.push('/edit/' + productId)
+    },
+    addToProduct() {
+      this.$router.push('/new')
     }
   }
 }

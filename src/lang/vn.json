@@ -53,5 +53,7 @@
   "categories": "Danh mục",
   "email": "Email",
   "password": "Mật khẩu",
-  "newproduct": "Sản phẩm mới"
+  "newproduct": "Sản phẩm mới",
+  "colour": "Màu",
+  "size": "kích thước"
 }
