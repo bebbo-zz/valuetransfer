@@ -10,6 +10,7 @@
               v-bind:label="$t('barcode')"
               large
               required
+              @keyup="keyEvent"
             ></v-text-field>
             <v-text-field
               v-model="quantity"
@@ -78,7 +79,27 @@
           <v-container>
             <v-layout row wrap>
               <v-flex xs12>
-                <v-text-field placeholder="0" solo prefix="VND" v-model="paidDisplay" disabled></v-text-field>
+                <div v-if="visible === true">
+                  <v-text-field
+                    v-model="paidDisplay"
+                    @blur="onBlurNumber"
+                    type="number"
+                    solo
+                    prefix="VND"
+                  >
+                  </v-text-field>
+                </div>
+                <div v-if="visible === false">
+                  <v-text-field
+                    v-model="paidDisplay"
+                    @focus="onFocusText"
+                    type="text"
+                    solo
+                    prefix="VND"
+                  >
+                  </v-text-field>
+                </div>
+                <!--v-text-field placeholder="0" solo prefix="VND" v-model="paidDisplay" disabled></v-text-field-->
               </v-flex>
             </v-layout>
             <v-layout row wrap>
@@ -225,6 +246,9 @@ export default {
       valid: true,
       moneyPaid: 0,
       paidDisplay: null,
+      amount: null,
+      temp: null,
+      visible: true,
       changeToGive: 0,
       receiptId: null,
       printData: null,
@@ -241,12 +265,36 @@ export default {
     }),
   },
   updated: function() {
-    this.$nextTick(() => this.$refs.barcode.focus())
+    if((this.modalPayment === false) && (this.modalReturn === false)) {
+      this.$nextTick(() => this.$refs.barcode.focus())
+    }
   },
   methods: {
     ...mapActions(['addToCart']),
     checkout () {
       this.modalPayment = true
+    },
+    keyEvent: function(e) {
+      if (e.keyCode === 13) {
+        this.submit()
+      }
+    },
+    onBlurNumber(e) {
+      console.log(e)
+      this.visible = false
+      this.moneyPaid = this.paidDisplay
+      this.paidDisplay = this.thousandSeprator(this.paidDisplay)
+    },
+    onFocusText() {
+      this.visible = true
+      this.paidDisplay = this.moneyPaid
+    },
+    thousandSeprator(amount) {
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      } else {
+        return amount
+      }
     },
     closeDialog() {
       // closes all possible dialogs for this page

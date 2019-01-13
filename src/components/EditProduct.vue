@@ -10,6 +10,7 @@
           <v-text-field
             v-bind:label="$t('barcode')"
             v-model="barcode"
+            :rules="barcodeRules"
             disabled
           >
           </v-text-field>
@@ -27,6 +28,7 @@
           <v-text-field
             v-bind:label="$t('namedisplay')"
             v-model="name"
+            :rules="nameRules"
           >
           </v-text-field>
         </v-flex>
@@ -34,11 +36,28 @@
       <v-layout row wrap>
         <!-- @submit.prevent="updateProduct" -->
         <v-flex xs5>
-          <v-text-field
-            v-bind:label="$t('price')"
-            v-model="price"
-          >
-          </v-text-field>
+          <div v-if="visible === true">
+              <v-text-field
+                v-bind:label="$t('price')"
+                v-model="amount"
+                :rules="priceRules"
+                required
+                @blur="onBlurNumber"
+                type="number"
+              >
+              </v-text-field>
+            </div>
+            <div v-if="visible === false">
+              <v-text-field
+                v-bind:label="$t('price')"
+                v-model="amount"
+                :rules="priceRules"
+                required
+                @focus="onFocusText"
+                type="text"
+              >
+              </v-text-field>
+            </div>
         </v-flex>
         <v-flex xs5 offset-xs1>
           <v-text-field
@@ -163,6 +182,7 @@
                 <v-text-field
                   v-bind:label="$t('quantity')"
                   v-model="newin_quantity"
+                  type="number"
                 >
                 </v-text-field>
               </v-flex>
@@ -221,8 +241,15 @@ export default {
       colour: null,
       description: null,
       name: null,
-      name_ger: null,
-      price: null,
+      nameRules: [
+        v => !!v || 'Name is required'
+      ],
+      amount: null,
+      temp: null,
+      visible: true,
+      priceRules: [
+        v => !!v || 'Price is required'
+      ],
       size: null,
       tags: [],
       file: null,
@@ -269,7 +296,8 @@ export default {
           vm.description = doc.data().description,
           vm.name = doc.data().name,
           vm.name_ger = doc.data().name_ger,
-          vm.price = doc.data().price,
+          vm.temp = doc.data().price,
+          vm.amount = doc.data().price,
           vm.size = doc.data().size,
           vm.intakes = tempIntakes,
           vm.picsUrl = doc.data().picsUrl,
@@ -294,6 +322,23 @@ export default {
     quillEditor
   },
   methods: {
+    onBlurNumber(e) {
+      console.log(e)
+      this.visible = false
+      this.temp = this.amount
+      this.amount = this.thousandSeprator(this.amount)
+    },
+    onFocusText() {
+      this.visible = true
+      this.amount = this.temp
+    },
+    thousandSeprator(amount) {
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      } else {
+        return amount
+      }
+    },
     fetchData () {
       var db = firebaseApp.firestore();
       db.collection('intakes').where('product_id', '==', this.$route.params.product_id).get()
@@ -324,8 +369,8 @@ export default {
           this.colour = doc.data().colour
           this.description = doc.data().description
           this.name = doc.data().name
-          this.name_ger = doc.data().name_ger
-          this.price = doc.data().price
+          this.amount = doc.data().price
+          this.temp = doc.data().price
           this.size = doc.data().size
           this.picsUrl = doc.data().picsUrl
           this.picsReference = doc.data().picsReference
@@ -382,8 +427,7 @@ export default {
         colour: this.colour,
         description: this.description,
         name: this.name,
-        name_ger: this.name_ger,
-        price: this.price,
+        price: this.temp,
         size: this.size,
         picsUrl: this.picsUrl,
         picsReference: this.picsReference,
