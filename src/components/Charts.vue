@@ -94,6 +94,7 @@
                 <td>{{ props.item.intake_amt }}</td>
                 <td>{{ props.item.order_qty }}</td>
                 <td>{{ props.item.order_amt }}</td>
+                <td>{{ props.item.profit_amt }}</td>
               </template>
             </v-data-table>
           </v-card-text>
@@ -159,10 +160,11 @@ export default {
       headers: [
         { text: 'Barcode', value: 'barcode' },
         { text: 'Name', value: 'name' },
-        { text: 'Bought_Qty', value: 'intake_quantity' },
-        { text: 'Bought_Amt', value: 'intake_amount' },
-        { text: 'Sold_Qty', value: 'order_quantity' },
-        { text: 'Sold_Amt', value: 'order_amount' }
+        { text: 'Bought_Qty', value: 'intake_qty' },
+        { text: 'Bought_Amt', value: 'intake_amt' },
+        { text: 'Sold_Qty', value: 'order_qty' },
+        { text: 'Sold_Amt', value: 'order_amt' },
+        { text: 'Profit', value: 'profit_amt' }
       ],
     }
   },
@@ -370,6 +372,7 @@ export default {
                 found = true
                 joinedEntry['intake_qty'] = intakeJson['intakes_qty']
                 joinedEntry['intake_amt'] = intakeJson['intakes_amt']
+                joinedEntry['profit_amt'] = orderJson['order_amt'] - intakeJson['intakes_amt']
                 indexToRemove = i
                 break
               }
@@ -378,6 +381,7 @@ export default {
             if(found == false) {
               joinedEntry['intake_qty'] = 0
               joinedEntry['intake_amt'] = 0
+              joinedEntry['profit_amt'] = orderJson['order_amt']
             }else{
               intakesByBarcode.splice(indexToRemove, 1)
             }
@@ -388,6 +392,7 @@ export default {
             var joinedEntry = intakeJson
             joinedEntry['order_qty'] = 0
             joinedEntry['order_amt'] = 0
+            joinedEntry['profit_amt'] = (-1) * intakeJson['intakes_amt']
             joinedAmtQty.push(joinedEntry)
           })
 

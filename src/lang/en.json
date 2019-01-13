@@ -55,5 +55,6 @@
   "password": "Password",
   "newproduct": "New Product",
   "colour": "Colour",
-  "size": "Size"
+  "size": "Size",
+  "and": "and"
 }
