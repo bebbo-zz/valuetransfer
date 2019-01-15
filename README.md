@@ -113,6 +113,16 @@ install raspberian on SD Card
 user: pi
 password: raspberry
 
+start/stop/check a script:
+    sudo systemctl start javaserver
+    sudo systemctl stop javaserver
+    sudo systemctl status javaserver
+
+    sudo /etc/init.d/nginx start
+    sudo /etc/init.d/nginx restart
+    sudo /etc/init.d/nginx stop
+
+
 set up keyboard and time
 sudo nano /etc/default/keyboard
 sudo dpkg-reconfigure locales
@@ -122,9 +132,6 @@ sudo apt-get update
 sudo apt-get upgrade
 
 sudo apt-get install -y nginx
-sudo /etc/init.d/nginx start
-sudo /etc/init.d/nginx restart
-sudo /etc/init.d/nginx stop
 
 curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"name":"value"}' http://localhost:8080/app/process
 
@@ -167,26 +174,26 @@ location /app {
 	}
 
 - init script
-in /etc/systemd/system/helloworld.service
-after that sudo systemctl start helloworld
-and sudo systemctl status helloworld
+all scripts are in:
+    /etc/systemd/system/
 
 [Unit]
-Description=Spring Boot HelloWorld
+Description=POS Backend Java
 After=syslog.target
 After=network.target[Service]
 User=username
 Type=simple
 
 [Service]
-ExecStart=/usr/bin/java -jar /home/linode/hello-world/build/libs/hello-world-0.0.1-SNAPSHOT.jar
-Restart=always
+ExecStart=/usr/bin/java -jar /home/pi/deployment/pos_prod_backend/pos-javaserver-0.1.0.jar
+Restart=no
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=helloworld
+SyslogIdentifier=javaserver
 
 [Install]
 WantedBy=multi-user.target
+
 
 (right now 192.178.168.123)
 
@@ -203,6 +210,10 @@ WantedBy=multi-user.target
     sudo adduser admin
     sudo adduser admin sudo
     sudo adduser admin adm
+
+    then stop services and
+    mv /home/pi/* /home/grafflmartin/
+
     sudo deluser pi sudo
     sudo deluser pi adm
 
