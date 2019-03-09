@@ -20,3 +20,5 @@ yarn-error.log*
 *.sln
 *.sw*
 firebaseConfig.js*
+firebaseConfigDev.js*
+firebaseConfigProd.js*

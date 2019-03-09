@@ -13,6 +13,10 @@ import Login from './components/Login.vue'
 import Charts from './components/Charts.vue'
 import Admin from './components/Admin.vue'
 import Receipt from './components/Receipt.vue'
+import NewCost from './components/NewCost.vue'
+import NewProfit from './components/NewProfit.vue'
+import BusinessPartner from './components/BusinessPartner.vue'
+import WriteInvoice from './components/WriteInvoice.vue'
 
 Vue.use(Router)
 
@@ -27,6 +31,26 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/newcost',
+      name: 'newcost',
+      component: NewCost
+    },
+    {
+      path: '/newprofit',
+      name: 'newprofit',
+      component: NewProfit
+    },
+    {
+      path: '/writeinvoice',
+      name: 'writeinvoice',
+      component: WriteInvoice
+    },
+    {
+      path: '/businesspartner',
+      name: 'businesspartner',
+      component: BusinessPartner
     },
  /*   {
       path: '/register',

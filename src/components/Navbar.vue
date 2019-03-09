@@ -84,23 +84,85 @@
             <v-list-tile-title>{{$t('products')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="charts">
-          <v-list-tile-action>
-            <v-icon>timeline</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Management</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="admin">
-          <v-list-tile-action>
-            <v-icon>settings</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>System Admin</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
       </v-list>
+      <v-expansion-panel>
+        <v-expansion-panel-content>
+          <div slot="header">Management</div>
+          <v-list dense>
+            <v-list-tile @click="charts">
+              <v-list-tile-action>
+                <v-icon>timeline</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Sales Overview</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="admin">
+              <v-list-tile-action>
+                <v-icon>settings</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>System Admin</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="businessPartner">
+              <v-list-tile-action>
+                <v-icon>perm_identity</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Business Partner</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-content>
+          <div slot="header">{{$t('profitandloss')}}</div>
+          <v-list dense>
+            <v-list-tile @click="costsection('/newcost')">
+              <v-list-tile-action>
+                <v-icon>attach_file</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('newcost')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/writeinvoice')">
+              <v-list-tile-action>
+                <v-icon>edit</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('writeinvoice')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/newprofit')">
+              <v-list-tile-action>
+                <v-icon>attach_money</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('newprofit')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/manageentries')">
+              <v-list-tile-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('manageentries')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/overview')">
+              <v-list-tile-action>
+                <v-icon>timeline</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('overview')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-content>
           <div slot="header">{{$t('categories')}}</div>
@@ -176,6 +238,10 @@ export default {
       this.$router.push('/cart')
       e.preventDefault()
     },
+    businessPartner: function( e ) {
+      this.$router.push('/businesspartner')
+      e.preventDefault()
+    },
   //  specialoffers: function( e ) {
   //    this.$router.push('/specialoffers')
   //    e.preventDefault()
@@ -183,6 +249,9 @@ export default {
     category ( value ) {
       this.$router.push('/categories/' + value)
      // e.preventDefault()
+    },
+    costsection ( value ) {
+      this.$router.push(value)
     }
   }
 }

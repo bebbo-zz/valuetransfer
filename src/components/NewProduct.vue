@@ -180,7 +180,7 @@ export default {
     saveProduct(nextPage) {
       if (this.$refs.form.validate()) {
         var db = firebaseApp.firestore()
-      var counter = 0
+        var counter = 0
       var tmpString = ''
       var vm = this
       db.collection("products").where('barcode', '==', this.barcode).get()

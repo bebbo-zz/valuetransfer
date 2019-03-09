@@ -35,13 +35,66 @@
         </v-flex>
       </v-layout>
       <v-layout row wrap>
-        <v-pagination
-          v-model="pageOne.currentPage"
-          :length="pageOne.totalPages"
-          :total-visible="5"
-          @input="pageOneChanged"
-        ></v-pagination>
+        <v-flex xs8>
+          <v-pagination
+            v-model="pageOne.currentPage"
+            :length="pageOne.totalPages"
+            :total-visible="5"
+            @input="pageOneChanged"
+          ></v-pagination>
+        </v-flex>
+        <v-flex xs4>
+          <v-btn-toggle>
+            <v-btn flat @click='viewChange(true)'><v-icon>view_headline</v-icon></v-btn>
+            <v-btn flat @click='viewChange(true)'><v-icon>view_module</v-icon></v-btn>
+          </v-btn-toggle>
+        </v-flex>
       </v-layout>
+      <v-btn
+            color="pink"
+            dark
+            fixed
+            bottom
+            right
+            fab
+            @click='addToProduct'
+      >
+        <v-icon>add</v-icon>
+      </v-btn>
+    <v-container v-if="listView">
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-list two-line>
+            <template v-for="(item, index) in products">
+              <v-list-tile
+                :key="index"
+                @click="editProduct(item.product_id)"
+                >
+                <v-list-tile-action>
+                  <!--v-icon color="indigo">add</v-icon-->
+                  <v-icon color="indigo">touch_app</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ formatPrice(item.price) }} VND</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>edit</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-divider
+                v-if="index + 1 < products.length"
+                :key="index"
+              ></v-divider>
+            </template>
+          </v-list>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    </v-container>
+    <v-container v-if="listView === false">
       <v-layout align-start justify-center row wrap v-for="i in Math.ceil(products.length / 3)" v-bind:key="i">
         <v-flex align-self-center xs-4 v-for="product in products.slice((i - 1) * 3, i * 3)" v-bind:key="product.id">
           <v-card tile elevation-8 fill-height>
@@ -68,17 +121,6 @@
           </v-card>
         </v-flex>
       </v-layout>
-      <v-btn
-            color="pink"
-            dark
-            fixed
-            bottom
-            right
-            fab
-            @click='addToProduct'
-          >
-            <v-icon>add</v-icon>
-          </v-btn>
     </v-container>
   </div>
 </template>
@@ -94,6 +136,7 @@ export default {
  // components : { Pagination },
   data ( ) {
     return {
+      listView: true,
       txtSearch: null,
       isLoggedIn: false,
       currentUser: false,
@@ -168,7 +211,7 @@ export default {
       }               
     },
     singleSearch(oneleft, oneright, twoleft, twomiddle, tworight) {
-      var db = firebaseApp.firestore();
+      var db = firebaseApp.firestore()
 
       // 4008789-093905
      // db.collection('products').where(oneleft, "==", oneright).where(twoleft, twomiddle, tworight).get().then(querySnapshot => {
@@ -224,6 +267,9 @@ export default {
       }
       var upperLimit = Math.min(this.pageOne.itemsPerPage, this.productsAll.length)
       this.products = this.productsAll.slice(0, upperLimit)
+    },
+    viewChange (listViewBool) {
+      this.listView = listViewBool
     },
     pageOneChanged (pageNum) {
       this.pageOne.currentPage = pageNum

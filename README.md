@@ -65,22 +65,26 @@ npm install
 ### DevOps
 ```
 # Compile and Deploy Frontend
-cd /home/martin/Documents/Vue/valuetransfer
+# on Mac
+cd ~/Documents/Development/Vue/valuetransfer
 npm run build
-
-# locally
-sudo /etc/init.d/nginx stop
-sudo rm -f /var/www/html/*
-sudo cp -r /home/martin/Documents/Vue/valuetransfer/dist/* /var/www/html
-sudo /etc/init.d/nginx restart
-
-# on raspberry
-cd /home/martin/Documents/Deployment/frontend
-sudo rm /home/martin/Documents/Deployment/frontend/*
-cp -r /home/martin/Documents/Vue/valuetransfer/dist/* /home/martin/Documents/Deployment/frontend
-git add *
+sudo cp -r ~/Documents/Development/Vue/valuetransfer/dist/* ~/Documents/Development/POS/pos_prod_frontend/
+cd ~/Documents/Development/POS/pos_prod_frontend/
+git add .
 git commit -am "new deployment"
 git push -u origin master
+
+# on raspberry
+sudo /etc/init.d/nginx stop
+cd /home/grafflmartin/deployment/pos_prod_frontend/
+sudo git pull origin master
+sudo rm -rf /var/www/html/*
+sudo cp -r /home/grafflmartin/deployment/pos_prod_frontend/* /var/www/html
+sudo /etc/init.d/nginx restart
+
+
+# Python IP Service
+
 
 
 # Compile and Deploy Backend
@@ -135,21 +139,12 @@ sudo apt-get install -y nginx
 
 curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"name":"value"}' http://localhost:8080/app/process
 
-- delete
-sudo rm /var/www/html/*
-- copy
-sudo cp -f -r /home/pi/bebbo-zz.github.io/* /var/www/html
 
 sudo apt-get install -y git
 git config --global user.name "bebbo-zz"
 git config --global user.email martin.brehm@web.de
 git clone https://github.com/bebbo-zz/pythonserver.git
 
-java -jar target/pos-javaserver-0.1.0.jar
-(als process aufsetzen)
-
-- for an update either in the server or website
-git pull origin master
 
 
 git clone https://github.com/bebbo-zz/valuetransfer.git
@@ -195,16 +190,6 @@ SyslogIdentifier=javaserver
 WantedBy=multi-user.target
 
 
-(right now 192.178.168.123)
-
-- run phyton APIs on raspberry pi 
-
-    b) and updating git files, basically run terminal commands
-
-
-- edit files when there is no IDE. probably that is not the plan. rather good deployment strategy that would work everywhere. update on click
-
-- start node server and python server whenever raspberry pi switches on and restart once terminated
 
 - create a new user with password and add him (here named admin) to sudo and adm group and later revoke the rights of the default user pi
     sudo adduser admin
