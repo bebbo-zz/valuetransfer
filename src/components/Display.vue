@@ -46,7 +46,7 @@
         <v-flex xs4>
           <v-btn-toggle>
             <v-btn flat @click='viewChange(true)'><v-icon>view_headline</v-icon></v-btn>
-            <v-btn flat @click='viewChange(true)'><v-icon>view_module</v-icon></v-btn>
+            <v-btn flat @click='viewChange(false)'><v-icon>view_module</v-icon></v-btn>
           </v-btn-toggle>
         </v-flex>
       </v-layout>

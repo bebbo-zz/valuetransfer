@@ -57,12 +57,12 @@
   "colour": "Colour",
   "size": "Size",
   "and": "and",
-  "profitandloss": "Profit and Loss",
-  "newcost": "New Cost",
+  "accounting": "Accounting",
+  "newcost": "New Supplier Invoice",
   "writeinvoice": "Write Invoice",
   "newprofit": "New Profit",
-  "manageentries": "Manage Entries",
-  "overview": "Overview",
+  "accoutingentries": "Accouting Entries",
+  "profitandloss": "Profit and Loss Statement",
   "addpage": "Add File or Page",
   "internalRef": "System ID",
   "bookingDate": "System Date",
@@ -86,5 +86,6 @@
   "selectitems": "Select Items",
   "selectfee": "Select Fee",
   "businesspartner": "Business Partner",
-  "generateinvoice": "Generate Invoice"
+  "generateinvoice": "Generate Invoice",
+  "stock": "Stock"
 }

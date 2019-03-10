@@ -84,10 +84,49 @@
             <v-list-tile-title>{{$t('products')}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile @click="costsection('/stock')">
+          <v-list-tile-action>
+            <v-icon>dashboard</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>{{$t('stock')}}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
       <v-expansion-panel>
         <v-expansion-panel-content>
-          <div slot="header">Management</div>
+          <div slot="header">{{$t('accounting')}}</div>
+          <v-list dense>
+            <v-list-tile @click="costsection('/newcost')">
+              <v-list-tile-action>
+                <v-icon>attach_file</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('newcost')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/writeinvoice')">
+              <v-list-tile-action>
+                <v-icon>edit</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('writeinvoice')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="costsection('/accoutingentries')">
+              <v-list-tile-action>
+                <v-icon>table_chart</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('accoutingentries')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-content>
+          <div slot="header">Reports</div>
           <v-list dense>
             <v-list-tile @click="charts">
               <v-list-tile-action>
@@ -97,6 +136,21 @@
                 <v-list-tile-title>Sales Overview</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
+            <v-list-tile @click="costsection('/profitandloss')">
+              <v-list-tile-action>
+                <v-icon>timeline</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{$t('profitandloss')}}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-content>
+          <div slot="header">Configuration</div>
+          <v-list dense>
             <v-list-tile @click="admin">
               <v-list-tile-action>
                 <v-icon>settings</v-icon>
@@ -116,54 +170,7 @@
           </v-list>
         </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-expansion-panel>
-        <v-expansion-panel-content>
-          <div slot="header">{{$t('profitandloss')}}</div>
-          <v-list dense>
-            <v-list-tile @click="costsection('/newcost')">
-              <v-list-tile-action>
-                <v-icon>attach_file</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{$t('newcost')}}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile @click="costsection('/writeinvoice')">
-              <v-list-tile-action>
-                <v-icon>edit</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{$t('writeinvoice')}}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile @click="costsection('/newprofit')">
-              <v-list-tile-action>
-                <v-icon>attach_money</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{$t('newprofit')}}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile @click="costsection('/manageentries')">
-              <v-list-tile-action>
-                <v-icon>table_chart</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{$t('manageentries')}}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile @click="costsection('/overview')">
-              <v-list-tile-action>
-                <v-icon>timeline</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{$t('overview')}}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-      <v-expansion-panel>
+      <!--v-expansion-panel>
         <v-expansion-panel-content>
           <div slot="header">{{$t('categories')}}</div>
           <v-list dense>
@@ -177,7 +184,7 @@
             </v-list-tile>
           </v-list>
         </v-expansion-panel-content>
-      </v-expansion-panel>
+      </v-expansion-panel-->
     </v-navigation-drawer>
   </div>
 </template>

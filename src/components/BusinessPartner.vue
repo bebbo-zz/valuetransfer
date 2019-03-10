@@ -117,7 +117,7 @@ export default {
       newin_name: null,
       newin_ustnummer: null,
       newin_address: null,
-      bptypes: ['Supplier', 'Customer', 'Both'],
+      bptypes: ['Supplier', 'Customer'],
       businesspartners: []
       // name, umstnummer, address
     }

@@ -37,18 +37,32 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs5>
-          <v-text-field
+          <v-select
+            :items="availableSuppliers"
+            item-text="sup_name"
+            item-value="sup_ustnbr"
+            box
             v-bind:label="$t('invoiceSupplier')"
-            v-model="invoiceSupplier"
-          >
-          </v-text-field>
+            v-model="selectSupplier"
+            v-on:change="changeSupplier" 
+          ></v-select>
         </v-flex>
         <v-flex xs5 offset-xs1>
           <v-text-field
             v-bind:label="$t('invoiceUstNr')"
             v-model="invoiceUstNr"
+            disabled
           >
           </v-text-field>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-radio-group v-model="usthandling" row>
+            <v-radio label="Prices incl. 19% VAT" value="incl19"></v-radio>
+            <v-radio label="Prices incl. 7% VAT" value="incl7"></v-radio>
+            <v-radio label="Prices are exlcusive VAT" value="excl"></v-radio>
+          </v-radio-group>
         </v-flex>
       </v-layout>
       <v-layout row wrap>
@@ -131,46 +145,123 @@
           <span class="headline">{{$t('newCostItem')}}</span>
         </v-card-title>
         <v-card-text>
-          <v-container>
-            <v-layout row wrap>
-              <v-flex xs5>
-                <v-select
-                  :items="costtypes"
-                  box
-                  v-bind:label="$t('costtype')"
-                  v-model="newin_costtype" 
-                ></v-select>
-              </v-flex>
-              <v-flex xs5 offset-xs1>
-                <v-text-field
-                  v-bind:label="$t('costamount')"
-                  v-model="newin_costamount"
-                >
-                </v-text-field>
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap>
-              <v-flex xs12>
-                <v-text-field
-                  v-bind:label="$t('comment')"
-                  v-model="newin_costcomment"
-                >
-                </v-text-field>
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap>
-              <v-flex xs12>
-                <v-tooltip top>
-                  <v-btn @click.native="saveCostItem" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
-                  <span>{{$t('save')}}</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
-                  <span>{{$t('cancel')}}</span>
-                </v-tooltip>
-              </v-flex>
-            </v-layout>
-          </v-container>
+          <v-tabs
+            centered
+            dark
+            icons-and-text
+          >
+            <v-tabs-slider color="yellow"></v-tabs-slider>
+
+            <v-tab href="#tab-1">
+              Goods Receipt
+              <v-icon>all_inbox</v-icon>
+            </v-tab>
+
+            <v-tab href="#tab-2">
+              Other Cost
+              <v-icon>feedback</v-icon>
+            </v-tab>
+
+            <v-tab-item
+              key="1"
+              value="tab-1"
+            >
+              <v-card flat>
+                <v-card-text>
+                  <v-container>
+                    <v-layout row wrap>
+                      <v-flex xs5>
+                        <v-select
+                          :items="costtypes"
+                          box
+                          v-bind:label="$t('costtype')"
+                          v-model="newin_costtype" 
+                        ></v-select>
+                      </v-flex>
+                      <v-flex xs5 offset-xs1>
+                        <v-text-field
+                          v-bind:label="$t('costamount')"
+                          v-model="newin_costamount"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-text-field
+                          v-bind:label="$t('comment')"
+                          v-model="newin_costcomment"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-tooltip top>
+                          <v-btn @click.native="saveCostItem" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
+                          <span>{{$t('save')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                          <span>{{$t('cancel')}}</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+
+            <v-tab-item
+              key="2"
+              value="tab-2"
+            >
+              <v-card flat>
+                <v-card-text>
+                  <v-container>
+                    <v-layout row wrap>
+                      <v-flex xs5>
+                        <v-select
+                          :items="costtypes"
+                          box
+                          v-bind:label="$t('costtype')"
+                          v-model="newin_costtype" 
+                        ></v-select>
+                      </v-flex>
+                      <v-flex xs5 offset-xs1>
+                        <v-text-field
+                          v-bind:label="$t('costamount')"
+                          v-model="newin_costamount"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-text-field
+                          v-bind:label="$t('comment')"
+                          v-model="newin_costcomment"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-tooltip top>
+                          <v-btn @click.native="saveCostItem" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
+                          <span>{{$t('save')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                          <span>{{$t('cancel')}}</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -186,9 +277,11 @@ export default {
     return {
       modalAddCostItem: false,
       costtypes: [],
+      availableSuppliers: [],
       newin_costtype: null,
       newin_costamount: null,
       newin_costcomment: null,
+      invoiceUstNr: null,
       file: null,
       fileName: null,
       fileUrl: null,
@@ -198,12 +291,30 @@ export default {
       bookingDate: null,
       invoiceNumber: null,
       invoiceDate: null,
-      invoiceSupplier: null,
-      invoiceUstNr: null,
+      selectedSupplier: null,
+      usthandling: 'incl19',
       invoiceEntries: []
       // type, amount, comment (MwSt always separate)
       // when enter amount select if gross or net
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    var db = firebaseApp.firestore()
+    var tempSuppliers = []
+    db.collection('businesspartners').where('type', '==', 'Supplier').get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          var data = {
+            'sup_id': doc.id,
+            'sup_name': doc.data().name,
+            'sup_ustnbr': doc.data().ustnbr
+          }
+          tempSuppliers.push(data)
+        })
+        next(vm => {
+          vm.availableSuppliers = tempSuppliers
+        })
+    })
   },
   beforeMount ( ) {
     console.log(process.env.VUE_APP_COSTTYPES)
@@ -242,8 +353,8 @@ export default {
         bookingDate: new Date(),
         invoiceNumber: this.invoiceNumber,
         invoiceDate: this.invoiceDate,
-        invoiceSupplier: this.invoiceSupplier,
-        invoiceUstNr: this.invoiceUstNr,
+        invoiceSupplier: this.selectedSupplier.sup_name,
+        invoiceUstNr: this.selectedSupplier.sup_ustnbr,
         invoiceEntries: this.invoiceEntries
       }
       console.log(data)
@@ -252,6 +363,7 @@ export default {
         .add(data)
         .then(docRef => {
           vm.internalRef = docRef.id
+          vm.bookingDate = new Date()
         })
         .catch(error => {
           console.log(error)
@@ -268,9 +380,13 @@ export default {
       if(this.internalRef === null) {
         this.saveFirstTime()
       }
-      if(this.file === null) {
+      /*if(this.file === null) {
         console.log("you cannot book without receipt")
-      }
+      }*/
+
+    },
+    changeSupplier(a) {
+      this.invoiceUstNr = a.sup_ustnbr
     },
     pickFile () {
       this.$refs.invoice.click()

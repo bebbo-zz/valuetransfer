@@ -1,5 +1,25 @@
 # valuetransfer
 
+## data model 
+```
+
+# POS part
+products
+orders
+intakes
+
+# accounting
+invoices (for supplier and customer)
+accoutingentries (based on invoices or free)
+stock
+businesspartner
+
+
+supplier invoices add to intakes and stock
+customer invoices add to orders and remove from stock
+
+```
+
 ## Run Open Source POS
 ```
 

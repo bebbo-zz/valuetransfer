@@ -14,7 +14,7 @@ import Charts from './components/Charts.vue'
 import Admin from './components/Admin.vue'
 import Receipt from './components/Receipt.vue'
 import NewCost from './components/NewCost.vue'
-import NewProfit from './components/NewProfit.vue'
+import AccoutingEntries from './components/AccoutingEntries.vue'
 import BusinessPartner from './components/BusinessPartner.vue'
 import WriteInvoice from './components/WriteInvoice.vue'
 
@@ -38,9 +38,9 @@ export default new Router({
       component: NewCost
     },
     {
-      path: '/newprofit',
-      name: 'newprofit',
-      component: NewProfit
+      path: '/accoutingentries',
+      name: 'accoutingentries',
+      component: AccoutingEntries
     },
     {
       path: '/writeinvoice',
