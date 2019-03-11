@@ -5,14 +5,17 @@
 
 # POS part
 products
-orders
-intakes
+orders (not important now)
+intakes (not important now)
 
 # accounting
 invoices (for supplier and customer)
 accoutingentries (based on invoices or free)
 stock
 businesspartner
+
+draft invoices
+we need an extra table for draft invoices as their content is not spreaded out to other tables yet
 
 
 supplier invoices add to intakes and stock

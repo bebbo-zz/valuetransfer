@@ -17,6 +17,7 @@ import NewCost from './components/NewCost.vue'
 import AccoutingEntries from './components/AccoutingEntries.vue'
 import BusinessPartner from './components/BusinessPartner.vue'
 import WriteInvoice from './components/WriteInvoice.vue'
+import Stock from './components/Stock.vue'
 
 Vue.use(Router)
 
@@ -51,6 +52,11 @@ export default new Router({
       path: '/businesspartner',
       name: 'businesspartner',
       component: BusinessPartner
+    },
+    {
+      path: '/stock',
+      name: 'stock',
+      component: Stock
     },
  /*   {
       path: '/register',

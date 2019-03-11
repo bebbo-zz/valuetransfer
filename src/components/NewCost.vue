@@ -1,5 +1,7 @@
 <template>
   <div id="newcost">
+    
+<!-- START General Information -->
     <v-container>
       <v-layout row wrap>
         <v-flex xs5>
@@ -65,9 +67,7 @@
           </v-radio-group>
         </v-flex>
       </v-layout>
-      <v-layout row wrap>
-        <v-flex xs12>
-          <v-btn
+      <v-btn
             color="pink"
             dark
             fixed
@@ -78,7 +78,46 @@
           >
             <v-icon>add</v-icon>
           </v-btn>
+    </v-container>
+<!-- END General Information -->
+
+<!-- START List -->
+    <v-container>
+      <v-layout row wrap>
+        <v-flex xs12>
           <v-subheader>{{$t('invoiceitems')}}</v-subheader>
+          <v-list two-line>
+            <v-list-tile>
+                <v-list-tile-action>
+                  <!--v-icon color="indigo">add</v-icon-->
+                  <v-icon color="indigo">remove</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ sumedGoodsReceipt.type }} - {{ sumedGoodsReceipt.amount }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ sumedGoodsReceipt.comment }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>add</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-action>
+                  <!--v-icon color="indigo">add</v-icon-->
+                  <v-icon color="indigo">remove</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ sumedGoodsUmst.type }} - {{ sumedGoodsUmst.amount }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ sumedGoodsUmst.comment }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>add</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+          </v-list>
           <v-list two-line>
             <template v-for="(item, index) in invoiceEntries">
               <v-list-tile
@@ -107,6 +146,11 @@
           </v-list>
         </v-flex>
       </v-layout>
+    </v-container>
+<!-- END List -->
+
+<!-- START Actions-->
+    <v-container>
       <v-layout row wrap>
         <v-flex xs12>
           <v-tooltip top>
@@ -136,7 +180,9 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <!-- Modal Component -->
+<!-- END Actions -->
+
+<!-- START Modal Add Item -->
     <v-dialog 
       v-model="modalAddCostItem"
       persistent max-width="800px">
@@ -149,6 +195,7 @@
             centered
             dark
             icons-and-text
+            v-model="active_tab"
           >
             <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -171,17 +218,16 @@
                   <v-container>
                     <v-layout row wrap>
                       <v-flex xs5>
-                        <v-select
-                          :items="costtypes"
-                          box
-                          v-bind:label="$t('costtype')"
-                          v-model="newin_costtype" 
-                        ></v-select>
+                        <v-text-field
+                          v-bind:label="$t('barcode')"
+                          v-model="newin_barcode"
+                        >
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs5 offset-xs1>
                         <v-text-field
                           v-bind:label="$t('costamount')"
-                          v-model="newin_costamount"
+                          v-model="newin_amount"
                         >
                         </v-text-field>
                       </v-flex>
@@ -189,8 +235,8 @@
                     <v-layout row wrap>
                       <v-flex xs12>
                         <v-text-field
-                          v-bind:label="$t('comment')"
-                          v-model="newin_costcomment"
+                          v-bind:label="$t('name')"
+                          v-model="newin_name"
                         >
                         </v-text-field>
                       </v-flex>
@@ -198,7 +244,7 @@
                     <v-layout row wrap>
                       <v-flex xs12>
                         <v-tooltip top>
-                          <v-btn @click.native="saveCostItem" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
+                          <v-btn @click.native="saveGoodReceipt" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
                           <span>{{$t('save')}}</span>
                         </v-tooltip>
                         <v-tooltip top>
@@ -265,6 +311,8 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+<!-- END Modal Add Item -->
+
   </div>
 </template>
 
@@ -276,11 +324,15 @@ export default {
   data() {
     return {
       modalAddCostItem: false,
+      active_tab: 1,
       costtypes: [],
       availableSuppliers: [],
       newin_costtype: null,
       newin_costamount: null,
       newin_costcomment: null,
+      newin_barcode: null,
+      newin_name: null,
+      newin_amount: null,
       invoiceUstNr: null,
       file: null,
       fileName: null,
@@ -293,7 +345,19 @@ export default {
       invoiceDate: null,
       selectedSupplier: null,
       usthandling: 'incl19',
-      invoiceEntries: []
+      atLeastOneGoodsReceipt: false,
+      sumedGoodsReceipt: {
+        type: 'Wareneinkauf',
+        amount: 0,
+        comment: 'Sum of Goods Receipt'
+      },
+      sumedGoodsUmst: {
+        type: 'Umsatzsteuer',
+        amount: 0,
+        comment: 'Sum of Umsatzsteuer'
+      },
+      goodsReceipt: [],
+      otherAccountingEntries: []
       // type, amount, comment (MwSt always separate)
       // when enter amount select if gross or net
     }
@@ -322,6 +386,7 @@ export default {
   },
   methods: {
     addCostItem() {
+      this.active_tab = 1
       this.modalAddCostItem = true
     },
     saveCostItem() {
@@ -330,17 +395,34 @@ export default {
         'amount': this.newin_costamount,
         'comment': this.newin_costcomment,
       }
-      this.invoiceEntries.push(data)
+      this.otherAccountingEntries.push(data)
+      this.closeDialog()
+    },
+    saveGoodReceipt() {
+      var data = {
+        'barcode': this.newin_barcode,
+        'amount': this.newin_amount,
+        'name': this.newin_name,
+      }
+      this.goodsReceipt.push(data)
+      this.atLeastOneGoodsReceipt = true
+      
+      this.sumedGoodsReceipt.amount = this.sumedGoodsReceipt.amount + (this.newin_amount * 0.81)
+      this.sumedGoodsUmst.amount = this.sumedGoodsUmst.amount + (this.newin_amount * 0.19)
+      
       this.closeDialog()
     },
     closeDialog() {
+      this.newin_barcode = null
+      this.newin_name = null
+      this.newin_amount = null
       this.newin_costtype = null
       this.newin_costamount = null
       this.newin_costcomment = null
       this.modalAddCostItem = false
     },
     editCostItem (index) {
-      var data = this.invoiceEntries[index]
+      var data = this.otherAccountingEntries[index]
       console.log(data)
       this.newin_costtype = data.type
       this.newin_costamount = data.amount
@@ -349,13 +431,18 @@ export default {
     },
     saveFirstTime() {
       var db = firebaseApp.firestore()
+      var tempAllAccountingEntries = this.otherAccountingEntries
+      if(this.atLeastOneGoodsReceipt) {
+        tempAllAccountingEntries.push(this.sumedGoodsReceipt)
+        tempAllAccountingEntries.push(this.sumedGoodsUmst)
+      }
       const data = {
         bookingDate: new Date(),
         invoiceNumber: this.invoiceNumber,
         invoiceDate: this.invoiceDate,
         invoiceSupplier: this.selectedSupplier.sup_name,
         invoiceUstNr: this.selectedSupplier.sup_ustnbr,
-        invoiceEntries: this.invoiceEntries
+        invoiceEntries: tempAllAccountingEntries
       }
       console.log(data)
       var vm = this
@@ -382,7 +469,19 @@ export default {
       }
       /*if(this.file === null) {
         console.log("you cannot book without receipt")
-      }*/
+      }
+      
+      // book the invoice
+      var data = {
+            'internalRef': doc.id,
+            'invoiceNumber': doc.data().invoiceNumber,
+            'bookingDate': doc.data().bookingDate,
+            'supplier': doc.data().supplier,
+            'totalBookedAmount': doc.data().totalBookedAmount
+          }
+      
+      // store goods received to stock
+      */
 
     },
     changeSupplier(a) {

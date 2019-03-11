@@ -1,5 +1,7 @@
 <template>
   <div id="accoutingentries">
+
+    <!-- START View Selection -->
     <v-container>
       <v-layout row wrap>
         <v-flex xs12>
@@ -10,13 +12,85 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <!-- Modal Component -->
+    <!-- END View Selection -->
+
+    <!-- START Accounting List -->    
+    <v-container v-if="accountingView === true">
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-list two-line>
+            <template v-for="(item, index) in accountingEntries">
+              <v-list-tile
+                :key="index"
+                @click="editCostItem(index)"
+                >
+                <v-list-tile-action>
+                  <!--v-icon color="indigo">add</v-icon-->
+                  <v-icon color="indigo">remove</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ item.type }} - {{ item.amount }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ item.comment }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>edit</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-divider
+                v-if="index + 1 < accountingEntries.length"
+                :key="index"
+              ></v-divider>
+            </template>
+          </v-list>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    <!-- END Accounting List -->    
+
+    <!-- START Invoice List -->    
+    <v-container v-if="accountingView === false">
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-list two-line>
+            <template v-for="(item, index) in invoices">
+              <v-list-tile
+                :key="index"
+                @click="editCostItem(index)"
+                >
+                <v-list-tile-action>
+                  <!--v-icon color="indigo">add</v-icon-->
+                  <v-icon color="indigo">remove</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ item.type }} - {{ item.amount }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ item.comment }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>edit</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-divider
+                v-if="index + 1 < invoices.length"
+                :key="index"
+              ></v-divider>
+            </template>
+          </v-list>
+        </v-flex>
+      </v-layout>
+    </v-container>
+    <!-- END Invoice List --> 
+
+    <!-- START Modal Add Item -->
     <v-dialog 
-      v-model="modalAddCostItem"
+      v-model="modalAddAccoutingEntry"
       persistent max-width="800px">
       <v-card>
         <v-card-title>
-          <span class="headline">{{$t('newCostItem')}}</span>
+          <span class="headline">{{$t('newAccountingEntry')}}</span>
         </v-card-title>
           <v-card-text>
             <v-container>
@@ -66,11 +140,11 @@
               <v-layout row wrap>
                         <v-flex xs12>
                           <v-tooltip top>
-                            <v-btn @click.native="saveProfitItem" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
+                            <v-btn @click.native="saveAccoutingEntry" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
                             <span>{{$t('save')}}</span>
                           </v-tooltip>
                           <v-tooltip top>
-                            <v-btn @click.native="abort" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                            <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
                             <span>{{$t('cancel')}}</span>
                           </v-tooltip>
                         </v-flex>
@@ -79,6 +153,8 @@
           </v-card-text>
       </v-card>
     </v-dialog>
+    <!-- END Modal Add Item -->
+
   </div>
 </template>
 
@@ -89,25 +165,25 @@ export default {
   name: "accoutingentries",
   data() {
     return {
-      type: null,
-      ammount: null,
-      profittypes: [],
-      availableInvoices: [],
-      paymentDate: null,
-      comment: null
+      modalAddAccoutingEntry: false,
+      accountingView: true,
+      invoices: [],
+      accountingEntries: []
     }
   },
   beforeRouteEnter(to, from, next) {
     var db = firebaseApp.firestore()
     var tempInvoices = []
-    db.collection('profitinvoice').get()
+    var tempAccoutingEntries = []
+    db.collection('invoices').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           var data = {
-            'ref_id': doc.id,
-            'ref_date': doc.data().created,
-            'ref_amount': doc.data().totalamount,
-            'ref_customer': doc.data().customer
+            'internalRef': doc.id,
+            'invoiceNumber': doc.data().invoiceNumber,
+            'bookingDate': doc.data().bookingDate,
+            'supplier': doc.data().supplier,
+            'totalBookedAmount': doc.data().totalBookedAmount
           }
           tempInvoices.push(data)
         })
@@ -117,11 +193,18 @@ export default {
     })
   },
   methods: {
-    saveProfitItem() {
-
+    viewChange( showAccountingBool ) {
+      this.accountingView = showAccountingBool
     },
-    abort() {
-      this.$router.push('/')
+    addAccoutingEntry() {
+      this.modalAddAccoutingEntry = true
+    },
+    saveAccoutingEntry() {
+      // add to DB
+      this.closeDialog()
+    },
+    closeDialog() {
+      this.accountingView = false
     }
   }
 }

@@ -87,5 +87,6 @@
   "selectfee": "Select Fee",
   "businesspartner": "Business Partner",
   "generateinvoice": "Generate Invoice",
-  "stock": "Stock"
+  "stock": "Stock",
+  "newAccountingEntry": "New Accouting Entry"
 }
