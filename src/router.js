@@ -18,6 +18,7 @@ import AccoutingEntries from './components/AccoutingEntries.vue'
 import BusinessPartner from './components/BusinessPartner.vue'
 import WriteInvoice from './components/WriteInvoice.vue'
 import Stock from './components/Stock.vue'
+import MobileCashier from './components/MobileCashier.vue'
 
 Vue.use(Router)
 
@@ -27,6 +28,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/test',
+      name: 'mobilecashier',
+      component: MobileCashier
     },
     {
       path: '/login',

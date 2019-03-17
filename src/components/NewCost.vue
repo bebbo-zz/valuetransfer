@@ -23,11 +23,35 @@
       </v-layout>
       <v-layout row wrap>
         <v-flex xs5>
-          <v-text-field
+          <v-dialog
+            ref="dialog"
+            v-model="modal"
+            :return-value.sync="invoiceDate"
+            persistent
+            lazy
+            full-width
+            width="290px"
+          >
+            <template v-slot:activator="{ on }">
+              <v-text-field
+                v-model="invoiceDate"
+                v-bind:label="$t('invoiceDate')"
+                prepend-icon="event"
+                readonly
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="invoiceDate" scrollable>
+              <v-spacer></v-spacer>
+              <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
+              <v-btn flat color="primary" @click="$refs.dialog.save(invoiceDate)">OK</v-btn>
+            </v-date-picker>
+          </v-dialog>
+          <!--v-text-field
             v-bind:label="$t('invoiceDate')"
             v-model="invoiceDate"
           >
-          </v-text-field>
+          </v-text-field-->
         </v-flex>
         <v-flex xs5 offset-xs1>
           <v-text-field
@@ -45,7 +69,7 @@
             item-value="sup_ustnbr"
             box
             v-bind:label="$t('invoiceSupplier')"
-            v-model="selectSupplier"
+            v-model="selectedSupplier"
             v-on:change="changeSupplier" 
           ></v-select>
         </v-flex>
@@ -86,22 +110,22 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-subheader>{{$t('invoiceitems')}}</v-subheader>
+          <v-expansion-panel>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <div>{{ sumedGoodsReceipt.type }} - {{ sumedGoodsReceipt.amount }}</div>
+              </template>
+                      <v-card>
+                        <!-- und hier muss dann eine liste hin -->
+                        <v-card-text>Loadipi sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                      </v-card>
+                    </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex xs12>
           <v-list two-line>
-            <v-list-tile>
-                <v-list-tile-action>
-                  <!--v-icon color="indigo">add</v-icon-->
-                  <v-icon color="indigo">remove</v-icon>
-                </v-list-tile-action>
-
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ sumedGoodsReceipt.type }} - {{ sumedGoodsReceipt.amount }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ sumedGoodsReceipt.comment }}</v-list-tile-sub-title>
-                </v-list-tile-content>
-
-                <v-list-tile-action>
-                  <v-icon>add</v-icon>
-                </v-list-tile-action>
-              </v-list-tile>
               <v-list-tile>
                 <v-list-tile-action>
                   <!--v-icon color="indigo">add</v-icon-->
@@ -119,7 +143,7 @@
               </v-list-tile>
           </v-list>
           <v-list two-line>
-            <template v-for="(item, index) in invoiceEntries">
+            <template v-for="(item, index) in otherAccountingEntries">
               <v-list-tile
                 :key="index"
                 @click="editCostItem(index)"
@@ -139,7 +163,7 @@
                 </v-list-tile-action>
               </v-list-tile>
               <v-divider
-                v-if="index + 1 < invoiceEntries.length"
+                v-if="index + 1 < otherAccountingEntries.length"
                 :key="index"
               ></v-divider>
             </template>
@@ -340,9 +364,10 @@ export default {
       fileFile: null,
       numberOfInvoicePages: 0,
       internalRef: null,
-      bookingDate: null,
+      bookingDate: new Date().toISOString().substr(0, 10),
+      modal: false,
       invoiceNumber: null,
-      invoiceDate: null,
+      invoiceDate: new Date().toISOString().substr(0, 10),
       selectedSupplier: null,
       usthandling: 'incl19',
       atLeastOneGoodsReceipt: false,
@@ -381,7 +406,6 @@ export default {
     })
   },
   beforeMount ( ) {
-    console.log(process.env.VUE_APP_COSTTYPES)
     this.costtypes = process.env.VUE_APP_COSTTYPES.split(',')
   },
   methods: {

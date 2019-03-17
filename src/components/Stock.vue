@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import firebaseApp from './firebaseInit'
+
 export default {
   name: "stock",
   data() {

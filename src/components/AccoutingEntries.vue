@@ -187,10 +187,27 @@ export default {
           }
           tempInvoices.push(data)
         })
-        next(vm => {
-          vm.availableInvoices = tempInvoices
+        db.collection('accoutingentries').get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              var data = {
+                'internalRef': doc.id,
+                'basedOnInvoice': doc.data().basedOnInvoice,
+                'bookingDate': doc.data().bookingDate,
+                'sign': doc.data().sign,
+                'amount': doc.data().amount,
+                'type': doc.data().type
+              }
+              tempAccoutingEntries.push(data)
+            })
+            next(vm => {
+              vm.invoices = tempInvoices
+              vm.accountingEntries = tempAccoutingEntries
+            })
         })
     })
+    // two db calls 
+    // accoutingentries
   },
   methods: {
     viewChange( showAccountingBool ) {

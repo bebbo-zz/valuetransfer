@@ -88,5 +88,9 @@
   "businesspartner": "Business Partner",
   "generateinvoice": "Generate Invoice",
   "stock": "Stock",
-  "newAccountingEntry": "New Accouting Entry"
+  "newAccountingEntry": "New Accouting Entry",
+  "name": "Name",
+  "ustnr": "Umsatzsteuer-Nummer",
+  "address": "Address",
+  "bptype": "Type of Business Partner"
 }

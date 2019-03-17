@@ -7,7 +7,7 @@
           <v-list two-line>
             <template v-for="(item, index) in businesspartners">
               <v-list-tile
-                :key="index"
+                :key="index + '_tile'"
                 >
                 <v-list-tile-action>
                   <!--v-icon color="indigo">add</v-icon-->
@@ -25,7 +25,7 @@
               </v-list-tile>
               <v-divider
                 v-if="index + 1 < businesspartners.length"
-                :key="index"
+                :key="index + '_divider'"
               ></v-divider>
             </template>
           </v-list>
@@ -113,10 +113,10 @@ export default {
   data() {
     return {
       modalAddBusinessPartner: false,
-      newin_type: null,
-      newin_name: null,
-      newin_ustnummer: null,
-      newin_address: null,
+      newin_type: '',
+      newin_name: '',
+      newin_ustnummer: '',
+      newin_address: '',
       bptypes: ['Supplier', 'Customer'],
       businesspartners: []
       // name, umstnummer, address
@@ -125,7 +125,6 @@ export default {
   beforeRouteEnter(to, from, next) {
     var db = firebaseApp.firestore()
     var tempBp = []
-    console.log("here")
     db.collection('businesspartner').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
@@ -156,19 +155,18 @@ export default {
         address: this.newin_address,
         type: this.newin_type
       }
-      console.log(data)
       db.collection("businesspartner")
         .add(data)
-        .then(this.closeDialog())
+        .then(this.$router.push('/businesspartner'))
         .catch(error => {
           console.log(error)
         })  
     },
     closeDialog() {
-      this.newin_name = null
-      this.newin_ustnummer = null
-      this.newin_address = null
-      this.newin_type = null
+      this.newin_name = ''
+      this.newin_ustnummer = ''
+      this.newin_address = ''
+      this.newin_type = ''
       this.modalAddBusinessPartner = false
     }
   }
