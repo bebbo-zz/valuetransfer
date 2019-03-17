@@ -1,85 +1,33 @@
 <template>
   <v-container>
     <v-layout row wrap>
-      <v-flex xs12 sm6 md4>
-        <v-menu
-          ref="menu"
-          v-model="menu"
-          :close-on-content-click="false"
-          :nudge-right="40"
-          :return-value.sync="date"
-          lazy
-          transition="scale-transition"
-          offset-y
-          full-width
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="date"
-              label="Picker in menu"
-              prepend-icon="event"
-              readonly
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="date" no-title scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-          </v-date-picker>
-        </v-menu>
-      </v-flex>
-      <v-spacer></v-spacer>
-      <v-flex xs12 sm6 md4>
-        <v-dialog
-          ref="dialog"
-          v-model="modal"
-          :return-value.sync="date"
-          persistent
-          lazy
-          full-width
-          width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="date"
-              label="Picker in dialog"
-              prepend-icon="event"
-              readonly
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="date" scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
-          </v-date-picker>
-        </v-dialog>
-      </v-flex>
-      <v-flex xs12 sm6 md4>
-        <v-menu
-          v-model="menu2"
-          :close-on-content-click="false"
-          :nudge-right="40"
-          lazy
-          transition="scale-transition"
-          offset-y
-          full-width
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="date"
-              label="Picker without buttons"
-              prepend-icon="event"
-              readonly
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
-        </v-menu>
-      </v-flex>
+      <v-flex xs12>
+                        <div v-if="one_visible === true">
+                          <v-text-field
+                            v-model="one_paidDisplay"
+                            v-bind:label="$t('costamount')"
+                            @blur="onBlurNumber"
+                            type="text"
+                            prefix="€"
+                          >
+                          </v-text-field>
+                        </div>
+                        <div v-if="one_visible === false">
+                          <v-text-field
+                            v-model="one_paidDisplay"
+                            v-bind:label="$t('costamount')"
+                            @focus="onFocusText"
+                            type="text"
+                            prefix="€"
+                          >
+                          </v-text-field>
+                        </div>
+                        <!--v-text-field
+                          v-bind:label="$t('costamount')"
+                          v-model="newin_amount"
+                        >
+                        </v-text-field-->
+                      </v-flex>
       <v-spacer></v-spacer>
     </v-layout>
   </v-container>
@@ -89,10 +37,41 @@
 export default {
   name: 'mobilecashier',
     data: () => ({
-      date: new Date().toISOString().substr(0, 10),
-      menu: false,
-      modal: false,
-      menu2: false
-    })
+      one_visible: true,
+      one_moneyPaid: 0,
+      one_paidDisplay: null
+    }),
+  methods: {
+    onBlurNumber(e) {
+      console.log(e)
+      this.one_visible = false
+      this.one_moneyPaid = this.convertToNumber(this.one_paidDisplay)
+      this.one_paidDisplay = this.formatAmount(this.one_paidDisplay)
+    },
+    onFocusText() {
+      this.one_visible = true
+      this.one_paidDisplay = this.one_moneyPaid
+    },
+    formatAmount(amount) {
+      //console.log(amount)
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        amount = amount.replace(",", ".")
+        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
+        amount = amount.replace(".", ",")
+        return amount
+      } else {
+        return amount
+      }
+    },
+    convertToNumber(amount) {
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        amount = amount.replace(",", ".")
+        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
+        return amount
+      } else {
+        return amount
+      }
+    }
+  }
 }
 </script>

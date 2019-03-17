@@ -66,7 +66,7 @@
           <v-select
             :items="availableSuppliers"
             item-text="sup_name"
-            item-value="sup_ustnbr"
+            item-value="sup_id"
             box
             v-bind:label="$t('invoiceSupplier')"
             v-model="selectedSupplier"
@@ -113,11 +113,37 @@
           <v-expansion-panel>
             <v-expansion-panel-content>
               <template v-slot:header>
-                <div>{{ sumedGoodsReceipt.type }} - {{ sumedGoodsReceipt.amount }}</div>
+                <div>{{ sumedGoodsReceipt.type }} - {{ sumedGoodsReceipt.amount }} €</div>
               </template>
                       <v-card>
-                        <!-- und hier muss dann eine liste hin -->
-                        <v-card-text>Loadipi sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                        <v-list two-line>
+                          <template v-for="(item, index) in goodsReceipt">
+                            <v-list-tile
+                              :key="index + '_goodReceipt'"
+                              @click="editGoodsReceipt(index)"
+                              >
+                              <v-list-tile-action>
+                                <!--v-icon color="indigo">add</v-icon-->
+                                <v-icon color="indigo">remove</v-icon>
+                              </v-list-tile-action>
+
+                              <v-list-tile-content>
+                                <v-list-tile-title>{{ item.name }} - {{ item.amount }} €</v-list-tile-title>
+                                <v-list-tile-sub-title>{{ item.barcode }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+
+                              <v-list-tile-action>
+                                <v-icon>edit</v-icon>
+                              </v-list-tile-action>
+                            </v-list-tile>
+                            <v-divider
+                              v-if="index + 1 < goodsReceipt.length"
+                              :key="index + '_goodReceipt_divider'"
+                            ></v-divider>
+                          </template>
+                        </v-list>
+                        <!-- und hier muss dann eine liste hin >
+                        <v-card-text>Loadipi sed domco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text-->
                       </v-card>
                     </v-expansion-panel-content>
           </v-expansion-panel>
@@ -133,7 +159,7 @@
                 </v-list-tile-action>
 
                 <v-list-tile-content>
-                  <v-list-tile-title>{{ sumedGoodsUmst.type }} - {{ sumedGoodsUmst.amount }}</v-list-tile-title>
+                  <v-list-tile-title>{{ sumedGoodsUmst.type }} - {{ sumedGoodsUmst.amount }} €</v-list-tile-title>
                   <v-list-tile-sub-title>{{ sumedGoodsUmst.comment }}</v-list-tile-sub-title>
                 </v-list-tile-content>
 
@@ -154,7 +180,7 @@
                 </v-list-tile-action>
 
                 <v-list-tile-content>
-                  <v-list-tile-title>{{ item.type }} - {{ item.amount }}</v-list-tile-title>
+                  <v-list-tile-title>{{ item.type }} - {{ item.amount }} €</v-list-tile-title>
                   <v-list-tile-sub-title>{{ item.comment }}</v-list-tile-sub-title>
                 </v-list-tile-content>
 
@@ -209,11 +235,12 @@
 <!-- START Modal Add Item -->
     <v-dialog 
       v-model="modalAddCostItem"
+      lazy
       persistent max-width="800px">
       <v-card>
-        <v-card-title>
+        <!--v-card-title>
           <span class="headline">{{$t('newCostItem')}}</span>
-        </v-card-title>
+        </v-card-title-->
         <v-card-text>
           <v-tabs
             centered
@@ -249,11 +276,31 @@
                         </v-text-field>
                       </v-flex>
                       <v-flex xs5 offset-xs1>
-                        <v-text-field
+                        <div v-if="one_visible === true">
+                          <v-text-field
+                            v-model="one_paidDisplay"
+                            v-bind:label="$t('costamount')"
+                            @blur="onBlurNumber"
+                            type="text"
+                            prefix="€"
+                          >
+                          </v-text-field>
+                        </div>
+                        <div v-if="one_visible === false">
+                          <v-text-field
+                            v-model="one_paidDisplay"
+                            v-bind:label="$t('costamount')"
+                            @focus="onFocusText"
+                            type="text"
+                            prefix="€"
+                          >
+                          </v-text-field>
+                        </div>
+                        <!--v-text-field
                           v-bind:label="$t('costamount')"
                           v-model="newin_amount"
                         >
-                        </v-text-field>
+                        </v-text-field-->
                       </v-flex>
                     </v-layout>
                     <v-layout row wrap>
@@ -349,6 +396,9 @@ export default {
     return {
       modalAddCostItem: false,
       active_tab: 1,
+      one_visible: true,
+      one_moneyPaid: 0,
+      one_paidDisplay: null,
       costtypes: [],
       availableSuppliers: [],
       newin_costtype: null,
@@ -358,17 +408,13 @@ export default {
       newin_name: null,
       newin_amount: null,
       invoiceUstNr: null,
-      file: null,
-      fileName: null,
-      fileUrl: null,
-      fileFile: null,
-      numberOfInvoicePages: 0,
       internalRef: null,
       bookingDate: new Date().toISOString().substr(0, 10),
       modal: false,
       invoiceNumber: null,
       invoiceDate: new Date().toISOString().substr(0, 10),
       selectedSupplier: null,
+      supplierName: null,
       usthandling: 'incl19',
       atLeastOneGoodsReceipt: false,
       sumedGoodsReceipt: {
@@ -382,7 +428,12 @@ export default {
         comment: 'Sum of Umsatzsteuer'
       },
       goodsReceipt: [],
-      otherAccountingEntries: []
+      otherAccountingEntries: [],
+      file: null,
+      fileName: null,
+      fileUrl: null,
+      fileFile: null,
+      numberOfInvoicePages: 0
       // type, amount, comment (MwSt always separate)
       // when enter amount select if gross or net
     }
@@ -390,7 +441,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     var db = firebaseApp.firestore()
     var tempSuppliers = []
-    db.collection('businesspartners').where('type', '==', 'Supplier').get()
+    db.collection('businesspartner').where('type', '==', 'Supplier').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           var data = {
@@ -398,6 +449,7 @@ export default {
             'sup_name': doc.data().name,
             'sup_ustnbr': doc.data().ustnbr
           }
+          console.log(data)
           tempSuppliers.push(data)
         })
         next(vm => {
@@ -409,6 +461,36 @@ export default {
     this.costtypes = process.env.VUE_APP_COSTTYPES.split(',')
   },
   methods: {
+    onBlurNumber(e) {
+      console.log(e)
+      this.one_visible = false
+      this.one_moneyPaid = this.one_paidDisplay
+      this.one_paidDisplay = this.formatAmount(this.one_paidDisplay)
+    },
+    onFocusText() {
+      this.one_visible = true
+      this.one_paidDisplay = this.one_moneyPaid
+    },
+    formatAmount(amount) {
+      //console.log(amount)
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        amount = amount.replace(",", ".")
+        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
+        amount = amount.replace(".", ",")
+        return amount
+      } else {
+        return amount
+      }
+    },
+    convertToNumber(amount) {
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        amount = amount.replace(",", ".")
+        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
+        return amount
+      } else {
+        return amount
+      }
+    },
     addCostItem() {
       this.active_tab = 1
       this.modalAddCostItem = true
@@ -425,14 +507,14 @@ export default {
     saveGoodReceipt() {
       var data = {
         'barcode': this.newin_barcode,
-        'amount': this.newin_amount,
+        'amount': this.convertToNumber(this.newin_amount),
         'name': this.newin_name,
       }
       this.goodsReceipt.push(data)
       this.atLeastOneGoodsReceipt = true
       
-      this.sumedGoodsReceipt.amount = this.sumedGoodsReceipt.amount + (this.newin_amount * 0.81)
-      this.sumedGoodsUmst.amount = this.sumedGoodsUmst.amount + (this.newin_amount * 0.19)
+      this.sumedGoodsReceipt.amount = this.sumedGoodsReceipt.amount + (this.convertToNumber(this.newin_amount) * 0.81)
+      this.sumedGoodsUmst.amount = this.sumedGoodsUmst.amount + (this.convertToNumber(this.newin_amount) * 0.19)
       
       this.closeDialog()
     },
@@ -446,11 +528,21 @@ export default {
       this.modalAddCostItem = false
     },
     editCostItem (index) {
+      this.active_tab = 2
       var data = this.otherAccountingEntries[index]
       console.log(data)
       this.newin_costtype = data.type
       this.newin_costamount = data.amount
       this.newin_costcomment = data.comment
+      this.modalAddCostItem = true
+    },
+    editGoodsReceipt (index) {
+      this.active_tab = 1
+      var data = this.goodsReceipt[index]
+      console.log(data)
+      this.newin_barcode = data.barcode
+      this.newin_amount = data.amount
+      this.newin_name = data.name
       this.modalAddCostItem = true
     },
     saveFirstTime() {
@@ -461,20 +553,19 @@ export default {
         tempAllAccountingEntries.push(this.sumedGoodsUmst)
       }
       const data = {
-        bookingDate: new Date(),
+        bookingDate: this.bookingDate,
         invoiceNumber: this.invoiceNumber,
         invoiceDate: this.invoiceDate,
-        invoiceSupplier: this.selectedSupplier.sup_name,
-        invoiceUstNr: this.selectedSupplier.sup_ustnbr,
+        invoiceSupplier: this.supplierName,
+        invoiceUstNr: this.invoiceUstNr,
         invoiceEntries: tempAllAccountingEntries
       }
       console.log(data)
       var vm = this
-      db.collection("costinvoice")
+      db.collection("invoices")
         .add(data)
         .then(docRef => {
           vm.internalRef = docRef.id
-          vm.bookingDate = new Date()
         })
         .catch(error => {
           console.log(error)
@@ -508,8 +599,14 @@ export default {
       */
 
     },
-    changeSupplier(a) {
-      this.invoiceUstNr = a.sup_ustnbr
+    changeSupplier() {
+      var selectedId = this.selectedSupplier
+      this.availableSuppliers.forEach(cursup => {
+        if(cursup.sup_id == selectedId) {
+          this.supplierName = cursup.sup_name
+          this.invoiceUstNr = cursup.sup_ustnbr
+        }
+      })
     },
     pickFile () {
       this.$refs.invoice.click()

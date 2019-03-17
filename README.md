@@ -1,5 +1,22 @@
 # valuetransfer
 
+## update all npm packages
+```
+
+- wipe-dependencies.js must be copied from here to root folder
+
+- this added to package.json
+“scripts”: {
+  “update:packages”: “node wipe-dependencies.js &&
+                      rm -rf node_modules && npm update --save-dev
+                      && npm update --save”
+},
+
+- then it can run with
+    npm run update:packages
+
+```
+
 ## data model 
 ```
 
