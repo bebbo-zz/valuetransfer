@@ -128,7 +128,7 @@
                               </v-list-tile-action>
 
                               <v-list-tile-content>
-                                <v-list-tile-title>{{ item.name }} - {{ item.amount }} €</v-list-tile-title>
+                                <v-list-tile-title>{{ item.name }} - {{ item.amount }} € - {{item.quantity}} x</v-list-tile-title>
                                 <v-list-tile-sub-title>{{ item.barcode }}</v-list-tile-sub-title>
                               </v-list-tile-content>
 
@@ -204,6 +204,10 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-tooltip top>
+            <v-btn @click.native="loadDraft" slot="activator" color="warning" large>{{$t('loaddraft')}}</v-btn> 
+            <span>{{$t('loaddraft')}}</span>
+          </v-tooltip>
+          <v-tooltip top>
             <v-btn @click.native="saveAsDraft" slot="activator" color="warning" large>{{$t('saveasdraft')}}</v-btn> 
             <span>{{$t('save')}}</span>
           </v-tooltip>
@@ -273,15 +277,25 @@
                           v-bind:label="$t('barcode')"
                           v-model="newin_barcode"
                           ref="barcode"
+                          @input="checkBarcode"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs5>
+                        <v-text-field
+                          v-bind:label="$t('goodsreceiptamount')"
+                          v-model="newin_amount"
+                          type="text"
+                          prefix="€"
                         >
                         </v-text-field>
                       </v-flex>
                       <v-flex xs5 offset-xs1>
                         <v-text-field
-                          v-bind:label="$t('costamount')"
-                          v-model="newin_amount"
-                          type="text"
-                          prefix="€"
+                          v-bind:label="$t('quantity')"
+                          v-model="newin_quantity"
                         >
                         </v-text-field>
                       </v-flex>
@@ -291,6 +305,7 @@
                         <v-text-field
                           v-bind:label="$t('name')"
                           v-model="newin_name"
+                          ref="productname"
                         >
                         </v-text-field>
                       </v-flex>
@@ -371,6 +386,53 @@
     </v-dialog>
 <!-- END Modal Add Item -->
 
+<!-- START Modal Load Draft -->
+    <v-dialog 
+      v-model="modalOpenDraft"
+      lazy
+      persistent max-width="800px">
+      <v-card>
+        <!--v-card-title>
+          <span class="headline">{{$t('newCostItem')}}</span>
+        </v-card-title-->
+        <v-card-text>
+          <v-list two-line>
+                          <template v-for="(item, index) in availabledrafts">
+                            <v-list-tile
+                              :key="index + '_draft'"
+                              @click="openDraft(item.draftid)"
+                              >
+                              <v-list-tile-action>
+                                <!--v-icon color="indigo">add</v-icon-->
+                                <v-icon color="indigo">remove</v-icon>
+                              </v-list-tile-action>
+
+                              <v-list-tile-content>
+                                <v-list-tile-title>{{ item.invoicenumber }} - {{ item.supplier }}</v-list-tile-title>
+                                <v-list-tile-sub-title>{{ item.systemdate }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+
+                              <v-list-tile-action>
+                                <v-icon>open</v-icon>
+                              </v-list-tile-action>
+                            </v-list-tile>
+                            <v-divider
+                              v-if="index + 1 < availabledrafts.length"
+                              :key="index + '_draft_divider'"
+                            ></v-divider>
+                          </template>
+            </v-list>
+          <!--v-container>
+            <v-layout row wrap>
+              <v-flex xs12>
+
+              </v-flex>
+            </v-layout>
+          </v-container-->
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+<!-- END Modal Load Draft -->
   </div>
 </template>
 
@@ -382,15 +444,18 @@ export default {
   data() {
     return {
       modalAddCostItem: false,
+      modalOpenDraft: false,
       active_tab: 1,
       costtypes: [],
       availableSuppliers: [],
+      availabledrafts: [],
       newin_costtype: null,
       newin_costamount: null,
       newin_costcomment: null,
       newin_barcode: null,
       newin_name: null,
       newin_amount: null,
+      newin_quantity: 1,
       invoiceUstNr: null,
       internalRef: null,
       bookingDate: new Date().toISOString().substr(0, 10),
@@ -468,6 +533,19 @@ export default {
       this.otherAccountingEntries.push(data)
       this.closeDialog()
     },
+    checkBarcode() {
+      var db = firebaseApp.firestore()
+      var vm = this
+      this.$refs.productname.disabled = false
+      this.newin_name = ""
+      db.collection("products").where('barcode', '==', this.newin_barcode).get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          vm.newin_name = doc.data().name
+          vm.$refs.productname.disabled = true
+        })
+      })
+    },
     saveandnext() {
       this.saveGoodReceipt()
       this.resetDialog()
@@ -480,7 +558,8 @@ export default {
     saveGoodReceipt() {
       var data = {
         'barcode': this.newin_barcode,
-        'amount': this.formatAmount(this.newin_amount),
+        'amount': this.formatAmount(this.newin_amount * 0.81),
+        'quantity': this.newin_quantity,
         'name': this.newin_name,
       }
       this.goodsReceipt.push(data)
@@ -493,6 +572,7 @@ export default {
       this.newin_barcode = null
       this.newin_name = null
       this.newin_amount = null
+      this.newin_quantity = 1
       this.newin_costtype = null
       this.newin_costamount = null
       this.newin_costcomment = null
@@ -516,6 +596,7 @@ export default {
       console.log(data)
       this.newin_barcode = data.barcode
       this.newin_amount = data.amount
+      this.newin_quantity = data.quantity
       this.newin_name = data.name
       this.modalAddCostItem = true
     },
@@ -545,6 +626,46 @@ export default {
           console.log(error)
         })  
     },
+    loadDraft() {
+      var db = firebaseApp.firestore()
+      var tempDrafts = []
+      var vm = this
+      db.collection('drafts').where('type', '==', 'SupplierInvoice').get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var data = {
+              'draftid': doc.id,
+              'invoicenumber': doc.data().invoicenumber,
+              'supplier': doc.data().supplier,
+              'systemdate': doc.data().bookingDate
+            }
+            console.log(data)
+            tempDrafts.push(data)
+          })
+          vm.availabledrafts = tempDrafts
+          vm.modalOpenDraft = true
+      })
+    },
+    loadDataFromDraft(draftid) {
+      var db = firebaseApp.firestore()
+      var vm = this
+      // get this id somehow
+      db.collection('drafts').get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var data = {
+              'draftid': doc.id,
+              'invoicenumber': doc.data().invoicenumber,
+              'supplier': doc.data().supplier,
+              'systemdate': doc.data().bookingDate
+            }
+            console.log(data)
+            tempDrafts.push(data)
+          })
+          vm.availabledrafts = tempDrafts
+          vm.modalOpenDraft = true
+      })
+    },
     saveAsDraft() {
       if(this.internalRef === null) {
         this.saveFirstTime()
@@ -570,6 +691,7 @@ export default {
           }
       
       // store goods received to stock
+      // determine average costs and quantity
       */
 
     },

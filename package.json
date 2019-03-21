@@ -1,1 +1,37 @@
-{"name":"valuetransfer","version":"0.1.0","private":true,"scripts":{"serve":"vue-cli-service serve","build":"vue-cli-service build","lint":"vue-cli-service lint"},"dependencies":{"crypto-js":"*","firebase":"*","npm-check-updates":"*","vue":"*","vue-google-charts":"*","vue-i18n":"*","vue-lodash":"*","vue-qrcode-component":"*","vue-quill-editor":"*","vue-router":"*","vuetify":"*","vuex":"*"},"devDependencies":{"@vue/cli-plugin-babel":"*","@vue/cli-plugin-eslint":"*","@vue/cli-service":"*","babel-eslint":"*","eslint":"*","eslint-plugin-vue":"*","stylus":"*","stylus-loader":"*","vue-cli-plugin-vuetify":"*","vue-template-compiler":"*","vuetify-loader":"*"}}
+{
+  "name": "valuetransfer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "crypto-js": "*",
+    "firebase": "*",
+    "npm-check-updates": "*",
+    "vue": "*",
+    "vue-google-charts": "*",
+    "vue-i18n": "*",
+    "vue-lodash": "*",
+    "vue-qrcode-component": "*",
+    "vue-quill-editor": "*",
+    "vue-router": "*",
+    "vuetify": "*",
+    "vuex": "*"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "*",
+    "@vue/cli-plugin-eslint": "*",
+    "@vue/cli-service": "*",
+    "babel-eslint": "*",
+    "eslint": "*",
+    "eslint-plugin-vue": "*",
+    "stylus": "*",
+    "stylus-loader": "*",
+    "vue-cli-plugin-vuetify": "*",
+    "vue-template-compiler": "*",
+    "vuetify-loader": "*"
+  }
+}

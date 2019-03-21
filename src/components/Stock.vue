@@ -41,17 +41,28 @@ export default {
   name: "stock",
   data() {
     return {
+      headers: [
+          { text: 'Barcode', align: 'left', sortable: false, value: 'barcode' },
+          { text: 'Purchase Price', value: 'intake_price' },
+          { text: 'Quantity', value: 'quantity' },
+          { text: 'Name', value: 'name' },
+          { text: 'Translation', value: 'translation' },
+          { text: 'Description', value: 'description' },
+          { text: 'Sells Price', value: 'order_price' }
+        ],
       stockItems: []
     }
   },
   beforeRouteEnter(to, from, next) {
     var db = firebaseApp.firestore()
     var tempStock = []
+    var tempProducts = []
     db.collection('stock').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           var data = {
             'id': doc.id,
+            'barcode': doc.data().barcode,
             'name': doc.data().name,
             'averagecost': doc.data().averagecost,
             'quantity': doc.data().quantity
