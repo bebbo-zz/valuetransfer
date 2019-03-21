@@ -272,35 +272,18 @@
                         <v-text-field
                           v-bind:label="$t('barcode')"
                           v-model="newin_barcode"
+                          ref="barcode"
                         >
                         </v-text-field>
                       </v-flex>
                       <v-flex xs5 offset-xs1>
-                        <div v-if="one_visible === true">
-                          <v-text-field
-                            v-model="one_paidDisplay"
-                            v-bind:label="$t('costamount')"
-                            @blur="onBlurNumber"
-                            type="text"
-                            prefix="€"
-                          >
-                          </v-text-field>
-                        </div>
-                        <div v-if="one_visible === false">
-                          <v-text-field
-                            v-model="one_paidDisplay"
-                            v-bind:label="$t('costamount')"
-                            @focus="onFocusText"
-                            type="text"
-                            prefix="€"
-                          >
-                          </v-text-field>
-                        </div>
-                        <!--v-text-field
+                        <v-text-field
                           v-bind:label="$t('costamount')"
                           v-model="newin_amount"
+                          type="text"
+                          prefix="€"
                         >
-                        </v-text-field-->
+                        </v-text-field>
                       </v-flex>
                     </v-layout>
                     <v-layout row wrap>
@@ -315,7 +298,11 @@
                     <v-layout row wrap>
                       <v-flex xs12>
                         <v-tooltip top>
-                          <v-btn @click.native="saveGoodReceipt" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
+                          <v-btn @click.native="saveandnext" slot="activator" color="success" large>{{$t('next')}}</v-btn> 
+                          <span>{{$t('next')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="saveandclose" slot="activator" color="success" large>{{$t('save')}}</v-btn> 
                           <span>{{$t('save')}}</span>
                         </v-tooltip>
                         <v-tooltip top>
@@ -396,9 +383,6 @@ export default {
     return {
       modalAddCostItem: false,
       active_tab: 1,
-      one_visible: true,
-      one_moneyPaid: 0,
-      one_paidDisplay: null,
       costtypes: [],
       availableSuppliers: [],
       newin_costtype: null,
@@ -419,12 +403,12 @@ export default {
       atLeastOneGoodsReceipt: false,
       sumedGoodsReceipt: {
         type: 'Wareneinkauf',
-        amount: 0,
+        amount: 0.00,
         comment: 'Sum of Goods Receipt'
       },
       sumedGoodsUmst: {
         type: 'Umsatzsteuer',
-        amount: 0,
+        amount: 0.00,
         comment: 'Sum of Umsatzsteuer'
       },
       goodsReceipt: [],
@@ -461,30 +445,9 @@ export default {
     this.costtypes = process.env.VUE_APP_COSTTYPES.split(',')
   },
   methods: {
-    onBlurNumber(e) {
-      console.log(e)
-      this.one_visible = false
-      this.one_moneyPaid = this.one_paidDisplay
-      this.one_paidDisplay = this.formatAmount(this.one_paidDisplay)
-    },
-    onFocusText() {
-      this.one_visible = true
-      this.one_paidDisplay = this.one_moneyPaid
-    },
     formatAmount(amount) {
       //console.log(amount)
       if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
-        amount = amount.replace(",", ".")
-        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
-        amount = amount.replace(".", ",")
-        return amount
-      } else {
-        return amount
-      }
-    },
-    convertToNumber(amount) {
-      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
-        amount = amount.replace(",", ".")
         amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
         return amount
       } else {
@@ -494,6 +457,7 @@ export default {
     addCostItem() {
       this.active_tab = 1
       this.modalAddCostItem = true
+      this.$nextTick(() => this.$refs.barcode.focus())
     },
     saveCostItem() {
       var data = {
@@ -504,27 +468,37 @@ export default {
       this.otherAccountingEntries.push(data)
       this.closeDialog()
     },
+    saveandnext() {
+      this.saveGoodReceipt()
+      this.resetDialog()
+      this.$nextTick(() => this.$refs.barcode.focus())
+    },
+    saveandclose() {
+      this.saveGoodReceipt()
+      this.closeDialog()
+    },
     saveGoodReceipt() {
       var data = {
         'barcode': this.newin_barcode,
-        'amount': this.convertToNumber(this.newin_amount),
+        'amount': this.formatAmount(this.newin_amount),
         'name': this.newin_name,
       }
       this.goodsReceipt.push(data)
       this.atLeastOneGoodsReceipt = true
       
-      this.sumedGoodsReceipt.amount = this.sumedGoodsReceipt.amount + (this.convertToNumber(this.newin_amount) * 0.81)
-      this.sumedGoodsUmst.amount = this.sumedGoodsUmst.amount + (this.convertToNumber(this.newin_amount) * 0.19)
-      
-      this.closeDialog()
+      this.sumedGoodsReceipt.amount = this.formatAmount(this.sumedGoodsReceipt.amount + (this.newin_amount * 0.81))
+      this.sumedGoodsUmst.amount = this.formatAmount(this.sumedGoodsUmst.amount + (this.newin_amount * 0.19))
     },
-    closeDialog() {
+    resetDialog() {
       this.newin_barcode = null
       this.newin_name = null
       this.newin_amount = null
       this.newin_costtype = null
       this.newin_costamount = null
       this.newin_costcomment = null
+    },
+    closeDialog() {
+      this.resetDialog()
       this.modalAddCostItem = false
     },
     editCostItem (index) {
