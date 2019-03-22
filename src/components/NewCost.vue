@@ -465,6 +465,7 @@
 
 <script>
 import firebaseApp from './firebaseInit'
+import { constants } from 'fs';
 
 export default {
   name: "newcost",
@@ -529,7 +530,6 @@ export default {
             'sup_name': doc.data().name,
             'sup_ustnbr': doc.data().ustnbr
           }
-          console.log(data)
           tempSuppliers.push(data)
         })
         next(vm => {
@@ -542,7 +542,6 @@ export default {
   },
   methods: {
     formatAmount(amount) {
-      //console.log(amount)
       if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
         amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
         return amount
@@ -617,7 +616,6 @@ export default {
     editCostItem (index) {
       this.active_tab = 2
       var data = this.otherAccountingEntries[index]
-      console.log(data)
       this.newin_costtype = data.type
       this.newin_costamount = data.amount
       this.newin_costcomment = data.comment
@@ -678,12 +676,26 @@ export default {
         goodsReceipt: this.goodsReceipt,
         otherAccountingEntries: this.otherAccountingEntries
       }
-      db.collection("invoices")
-        .update(this.invoiceRef)
+      console.log(data)
+      console.log(this.internalRef)
+      var invoiceToUpdate = db.collection("invoices").doc(this.internalRef)
+      console.log(invoiceToUpdate)
+      invoiceToUpdate.set({
+          data
+      })
+      .then(function() {
+          console.log("Document successfully updated!");
+      })
+      .catch(error => {
+          console.log(error)
+      })
+
+   /*   db.collection("invoices").doc(this.internalRef)
+        .update(data)
         .then()
         .catch(error => {
           console.log(error)
-        })  
+        })   */
     },
     loadDraft() {
       var db = firebaseApp.firestore()
@@ -698,7 +710,6 @@ export default {
               'supplierName': doc.data().supplierName,
               'systemdate': doc.data().bookingDate
             }
-            console.log(data)
             tempDrafts.push(data)
           })
           vm.availabledrafts = tempDrafts
@@ -709,13 +720,12 @@ export default {
       var db = firebaseApp.firestore()
       var vm = this
       // get this id somehow
-      console.log(draftid)
       db.collection('invoices').doc(draftid).get()
         .then(doc => {
             vm.internalRef = doc.id
             vm.invoiceUstNr = doc.data().invoiceUstNr
             vm.bookingDate = doc.data().bookingDate
-            vm.invoiceNumber = doc.data().invoicenumber
+            vm.invoiceNumber = doc.data().invoiceNumber
             vm.invoiceDate = doc.data().invoiceDate
             vm.selectedSupplier = doc.data().selectedSupplier
             vm.supplierName = doc.data().supplierName
@@ -752,15 +762,14 @@ export default {
       })
       
       // store accounting entries
-      var tempAllAccountingEntries = this.otherAccountingEntries
-      if(this.atLeastOneGoodsReceipt) {
-        tempAllAccountingEntries.push(this.sumedGoodsReceipt)
-        tempAllAccountingEntries.push(this.sumedGoodsUmst)
-      }
-      tempAllAccountingEntries.forEach(item => {
+      var tempAllAccountingEntries = []
+      tempAllAccountingEntries.push(this.otherAccountingEntries)
+      tempAllAccountingEntries.push(this.sumedGoodsReceipt)
+      tempAllAccountingEntries.push(this.sumedGoodsUmst)
+    //  tempAllAccountingEntries.forEach(item => {
         // store one accouting entry
-        this.addOneAccountEntry(item.type, item.amount, item.comment)
-      })
+    //    this.addOneAccountEntry(item.type, item.amount, item.comment)
+    //  })
 
       // close or at least disable this one
       this.viewMode = true
@@ -768,14 +777,14 @@ export default {
     addOneAccountEntry(_type, _amount, _comment) {
       var db = firebaseApp.firestore()
       const data = {
-        invoiceRef: this.internalRef,
-        invoiceDate: this.invoiDate,
+        internalRef: this.internalRef,
+        invoiceDate: this.invoiceDate,
         bookingDate: this.bookingDate,
         type: _type,
         comment: _comment,
         amount: _amount
       }
-      db.collection("stock")
+      db.collection("accoutingentries")
         .add(data)
         .then()
         .catch(error => {
@@ -785,7 +794,7 @@ export default {
     addOneGoodsReceipt(_barcode, _name, _amount, _quantity) {
       var db = firebaseApp.firestore()
       const data = {
-        invoiceRef: this.internalRef,
+        internalRef: this.internalRef,
         barcode: _barcode,
         name: _name,
         amount: _amount,

@@ -3,31 +3,21 @@
     <v-container>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-list two-line>
-            <template v-for="(item, index) in stockItems">
-              <v-list-tile
-                :key="index"
-                >
-                <v-list-tile-action>
-                  <!--v-icon color="indigo">add</v-icon-->
-                  <v-icon color="indigo">remove</v-icon>
-                </v-list-tile-action>
-
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ item.name }} - {{ item.quantity }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ item.averagecost }}</v-list-tile-sub-title>
-                </v-list-tile-content>
-
-                <v-list-tile-action>
-                  <v-icon>edit</v-icon>
-                </v-list-tile-action>
-              </v-list-tile>
-              <v-divider
-                v-if="index + 1 < stockItems.length"
-                :key="index"
-              ></v-divider>
+          <v-data-table
+            :headers="headers"
+            :items="stockItems"
+            class="elevation-1"
+          >
+            <template v-slot:items="props">
+              <td>{{ props.item.barcode }}</td>
+              <td class="text-xs-right">{{ props.item.intake_price }}</td>
+              <td class="text-xs-right">{{ props.item.quantity }}</td>
+              <td class="text-xs-right">{{ props.item.name }}</td>
+              <td class="text-xs-right">{{ props.item.translation }}</td>
+              <td class="text-xs-right">{{ props.item.description }}</td>
+              <td class="text-xs-right">{{ props.item.order_price }}</td>
             </template>
-          </v-list>
+          </v-data-table>
         </v-flex>
       </v-layout>
     </v-container>
@@ -64,13 +54,62 @@ export default {
             'id': doc.id,
             'barcode': doc.data().barcode,
             'name': doc.data().name,
-            'averagecost': doc.data().averagecost,
+            'amount': doc.data().amount,
             'quantity': doc.data().quantity
           }
           tempStock.push(data)
         })
-        next(vm => {
-          vm.stockItems = tempStock
+        db.collection('products').get()
+          .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var data = {
+              'id': doc.id,
+              'barcode': doc.data().barcode,
+              'name': doc.data().name,
+              'amount': doc.data().amount,
+              'quantity': doc.data().quantity
+            }
+            tempProducts.push(data)
+          })
+          var stockByBarcode =
+            _(tempStock)
+            .groupBy('barcode')
+            .map((objs, key) => ({
+              'barcode': key,
+              'quantity': _.sumBy(objs, 'quantity'),
+              'intake_price': _.sumBy(objs, 'amount') / _.sumBy(objs, 'quantity') }))
+            .value()
+
+          console.log(stockByBarcode)
+          var joinedEntry = []
+          stockByBarcode.forEach(stockJson => {
+            joinedEntry = stockJson
+            var barcode = stockJson['barcode']
+              found = false
+              var indexToRemove = 0
+              for (let i = 0; i < allProducts.length; i++) {
+                var productJson = allProducts[i]
+                if (productJson['barcode'] == barcode) {
+                  found = true
+                  joinedEntry['name'] = productJson['name']
+                  if(!(productJson['description'] == undefined)) {
+                    joinedEntry['description'] = productJson['description']
+                  }else{
+                    joinedEntry['description'] = ""
+                  }
+                  if(!(productJson['translation'] == undefined)) {
+                    joinedEntry['translation'] = productJson['translation']
+                  }else{
+                    joinedEntry['translation'] = ""
+                  }
+                  indexToRemove = i
+                  break
+                }
+              }
+          })
+          next(vm => {
+            vm.stockItems = joinedEntry
+          })
         })
     })
   }
