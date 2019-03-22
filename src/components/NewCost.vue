@@ -204,15 +204,15 @@
       <v-layout row wrap>
         <v-flex xs12>
           <v-tooltip top>
-            <v-btn @click.native="loadDraft" slot="activator" color="warning" large>{{$t('loaddraft')}}</v-btn> 
+            <v-btn @click.native="loadDraft" v-bind:disabled="viewMode" slot="activator" color="warning" large>{{$t('loaddraft')}}</v-btn> 
             <span>{{$t('loaddraft')}}</span>
           </v-tooltip>
           <v-tooltip top>
-            <v-btn @click.native="saveAsDraft" slot="activator" color="warning" large>{{$t('saveasdraft')}}</v-btn> 
+            <v-btn @click.native="saveInvoice('Draft')" v-bind:disabled="viewMode" slot="activator" color="warning" large>{{$t('saveasdraft')}}</v-btn> 
             <span>{{$t('save')}}</span>
           </v-tooltip>
           <v-tooltip top>
-            <v-btn @click.native="bookInvoice" slot="activator" color="success" large>{{$t('bookinvoice')}}</v-btn> 
+            <v-btn @click.native="bookCost" v-bind:disabled="viewMode" slot="activator" color="success" large>{{$t('bookinvoice')}}</v-btn> 
             <span>{{$t('bookinvoice')}}</span>
           </v-tooltip>
           <v-tooltip top>
@@ -306,6 +306,7 @@
                           v-bind:label="$t('name')"
                           v-model="newin_name"
                           ref="productname"
+                          v-bind:disabled="newin_name_disabled"
                         >
                         </v-text-field>
                       </v-flex>
@@ -396,11 +397,14 @@
           <span class="headline">{{$t('newCostItem')}}</span>
         </v-card-title-->
         <v-card-text>
-          <v-list two-line>
+          <v-container>
+            <v-layout row wrap>
+              <v-flex xs12>
+                <v-list two-line>
                           <template v-for="(item, index) in availabledrafts">
                             <v-list-tile
                               :key="index + '_draft'"
-                              @click="openDraft(item.draftid)"
+                              @click="loadDataFromDraft(item.draftid)"
                               >
                               <v-list-tile-action>
                                 <!--v-icon color="indigo">add</v-icon-->
@@ -408,7 +412,7 @@
                               </v-list-tile-action>
 
                               <v-list-tile-content>
-                                <v-list-tile-title>{{ item.invoicenumber }} - {{ item.supplier }}</v-list-tile-title>
+                                <v-list-tile-title>{{ item.invoiceNumber }} - {{ item.supplierName }}</v-list-tile-title>
                                 <v-list-tile-sub-title>{{ item.systemdate }}</v-list-tile-sub-title>
                               </v-list-tile-content>
 
@@ -421,18 +425,41 @@
                               :key="index + '_draft_divider'"
                             ></v-divider>
                           </template>
-            </v-list>
-          <!--v-container>
-            <v-layout row wrap>
-              <v-flex xs12>
-
+                </v-list>
               </v-flex>
             </v-layout>
-          </v-container-->
+            <v-layout row wrap>
+              <v-flex xs12>
+                <v-tooltip top>
+                  <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                  <span>{{$t('cancel')}}</span>
+                </v-tooltip>
+              </v-flex>
+            </v-layout>
+          </v-container>
         </v-card-text>
       </v-card>
     </v-dialog>
 <!-- END Modal Load Draft -->
+    
+<!-- START Modal Warning -->
+    <v-dialog 
+      v-model="modalWarning"
+      lazy
+      persistent max-width="800px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{warningText}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-tooltip top>
+            <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+            <span>{{$t('cancel')}}</span>
+          </v-tooltip>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+<!-- END Modal Warning -->
   </div>
 </template>
 
@@ -443,8 +470,11 @@ export default {
   name: "newcost",
   data() {
     return {
+      viewMode: false,
       modalAddCostItem: false,
       modalOpenDraft: false,
+      modalWarning: false,
+      warningText: null,
       active_tab: 1,
       costtypes: [],
       availableSuppliers: [],
@@ -454,6 +484,7 @@ export default {
       newin_costcomment: null,
       newin_barcode: null,
       newin_name: null,
+      newin_name_disabled: false,
       newin_amount: null,
       newin_quantity: 1,
       invoiceUstNr: null,
@@ -536,13 +567,13 @@ export default {
     checkBarcode() {
       var db = firebaseApp.firestore()
       var vm = this
-      this.$refs.productname.disabled = false
+      this.newin_name_disabled = false
       this.newin_name = ""
       db.collection("products").where('barcode', '==', this.newin_barcode).get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           vm.newin_name = doc.data().name
-          vm.$refs.productname.disabled = true
+          vm.newin_name_disabled = true
         })
       })
     },
@@ -580,6 +611,8 @@ export default {
     closeDialog() {
       this.resetDialog()
       this.modalAddCostItem = false
+      this.modalOpenDraft = false
+      this.modalWarning = false
     },
     editCostItem (index) {
       this.active_tab = 2
@@ -593,29 +626,30 @@ export default {
     editGoodsReceipt (index) {
       this.active_tab = 1
       var data = this.goodsReceipt[index]
-      console.log(data)
       this.newin_barcode = data.barcode
       this.newin_amount = data.amount
       this.newin_quantity = data.quantity
       this.newin_name = data.name
       this.modalAddCostItem = true
     },
-    saveFirstTime() {
+    saveFirstTime(_status) {
       var db = firebaseApp.firestore()
-      var tempAllAccountingEntries = this.otherAccountingEntries
-      if(this.atLeastOneGoodsReceipt) {
-        tempAllAccountingEntries.push(this.sumedGoodsReceipt)
-        tempAllAccountingEntries.push(this.sumedGoodsUmst)
-      }
       const data = {
+        type: 'SupplierInvoice',
+        status: _status,
+        invoiceUstNr: this.invoiceUstNr,
         bookingDate: this.bookingDate,
         invoiceNumber: this.invoiceNumber,
         invoiceDate: this.invoiceDate,
-        invoiceSupplier: this.supplierName,
-        invoiceUstNr: this.invoiceUstNr,
-        invoiceEntries: tempAllAccountingEntries
+        selectedSupplier: this.selectedSupplier,
+        supplierName: this.supplierName,
+        usthandling: 'incl19',
+        atLeastOneGoodsReceipt: this.atLeastOneGoodsReceipt,
+        sumedGoodsReceipt: this.sumedGoodsReceipt,
+        sumedGoodsUmst: this.sumedGoodsUmst,
+        goodsReceipt: this.goodsReceipt,
+        otherAccountingEntries: this.otherAccountingEntries
       }
-      console.log(data)
       var vm = this
       db.collection("invoices")
         .add(data)
@@ -626,17 +660,42 @@ export default {
           console.log(error)
         })  
     },
+    updateInvoice(_status) {
+      var db = firebaseApp.firestore()
+      const data = {
+        type: 'SupplierInvoice',
+        status: _status,
+        invoiceUstNr: this.invoiceUstNr,
+        bookingDate: this.bookingDate,
+        invoiceNumber: this.invoiceNumber,
+        invoiceDate: this.invoiceDate,
+        selectedSupplier: this.selectedSupplier,
+        supplierName: this.supplierName,
+        usthandling: 'incl19',
+        atLeastOneGoodsReceipt: this.atLeastOneGoodsReceipt,
+        sumedGoodsReceipt: this.sumedGoodsReceipt,
+        sumedGoodsUmst: this.sumedGoodsUmst,
+        goodsReceipt: this.goodsReceipt,
+        otherAccountingEntries: this.otherAccountingEntries
+      }
+      db.collection("invoices")
+        .update(this.invoiceRef)
+        .then()
+        .catch(error => {
+          console.log(error)
+        })  
+    },
     loadDraft() {
       var db = firebaseApp.firestore()
       var tempDrafts = []
       var vm = this
-      db.collection('drafts').where('type', '==', 'SupplierInvoice').get()
+      db.collection('invoices').where('type', '==', 'SupplierInvoice').where('status', '==', 'Draft').get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             var data = {
               'draftid': doc.id,
-              'invoicenumber': doc.data().invoicenumber,
-              'supplier': doc.data().supplier,
+              'invoiceNumber': doc.data().invoiceNumber,
+              'supplierName': doc.data().supplierName,
               'systemdate': doc.data().bookingDate
             }
             console.log(data)
@@ -650,50 +709,94 @@ export default {
       var db = firebaseApp.firestore()
       var vm = this
       // get this id somehow
-      db.collection('drafts').get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            var data = {
-              'draftid': doc.id,
-              'invoicenumber': doc.data().invoicenumber,
-              'supplier': doc.data().supplier,
-              'systemdate': doc.data().bookingDate
-            }
-            console.log(data)
-            tempDrafts.push(data)
-          })
-          vm.availabledrafts = tempDrafts
-          vm.modalOpenDraft = true
-      })
+      console.log(draftid)
+      db.collection('invoices').doc(draftid).get()
+        .then(doc => {
+            vm.internalRef = doc.id
+            vm.invoiceUstNr = doc.data().invoiceUstNr
+            vm.bookingDate = doc.data().bookingDate
+            vm.invoiceNumber = doc.data().invoicenumber
+            vm.invoiceDate = doc.data().invoiceDate
+            vm.selectedSupplier = doc.data().selectedSupplier
+            vm.supplierName = doc.data().supplierName
+            vm.usthandling = doc.data().usthandling
+            vm.atLeastOneGoodsReceipt = doc.data().atLeastOneGoodsReceipt
+            vm.sumedGoodsReceipt = doc.data().sumedGoodsReceipt
+            vm.sumedGoodsUmst = doc.data().sumedGoodsUmst
+            vm.goodsReceipt = doc.data().goodsReceipt
+            vm.otherAccountingEntries = doc.data().otherAccountingEntries
+          vm.modalOpenDraft = false
+        })
     },
-    saveAsDraft() {
-      if(this.internalRef === null) {
-        this.saveFirstTime()
+    saveInvoice(status) {
+      if(this.invoiceNumber === null || this.invoiDate === null || this.supplierName === null) 
+      {
+        this.warningText = "Please fill in general invoice information first"
+        this.modalWarning = true
       }else{
-        this.updateDraft()
+        if(this.internalRef === null) {
+          this.saveFirstTime(status)
+        }else{
+          this.updateInvoice(status)
+        }
       }
     },
     bookCost() {
-      if(this.internalRef === null) {
-        this.saveFirstTime()
-      }
-      /*if(this.file === null) {
-        console.log("you cannot book without receipt")
-      }
-      
-      // book the invoice
-      var data = {
-            'internalRef': doc.id,
-            'invoiceNumber': doc.data().invoiceNumber,
-            'bookingDate': doc.data().bookingDate,
-            'supplier': doc.data().supplier,
-            'totalBookedAmount': doc.data().totalBookedAmount
-          }
-      
+      // this will save the invoice itsself
+      this.saveInvoice("Booked")
+
       // store goods received to stock
       // determine average costs and quantity
-      */
+      this.goodsReceipt.forEach(item => {
+        this.addOneGoodsReceipt(item.barcode, item.name, item.amount, item.quantity)
+      })
+      
+      // store accounting entries
+      var tempAllAccountingEntries = this.otherAccountingEntries
+      if(this.atLeastOneGoodsReceipt) {
+        tempAllAccountingEntries.push(this.sumedGoodsReceipt)
+        tempAllAccountingEntries.push(this.sumedGoodsUmst)
+      }
+      tempAllAccountingEntries.forEach(item => {
+        // store one accouting entry
+        this.addOneAccountEntry(item.type, item.amount, item.comment)
+      })
 
+      // close or at least disable this one
+      this.viewMode = true
+    },
+    addOneAccountEntry(_type, _amount, _comment) {
+      var db = firebaseApp.firestore()
+      const data = {
+        invoiceRef: this.internalRef,
+        invoiceDate: this.invoiDate,
+        bookingDate: this.bookingDate,
+        type: _type,
+        comment: _comment,
+        amount: _amount
+      }
+      db.collection("stock")
+        .add(data)
+        .then()
+        .catch(error => {
+          console.log(error)
+        }) 
+    },
+    addOneGoodsReceipt(_barcode, _name, _amount, _quantity) {
+      var db = firebaseApp.firestore()
+      const data = {
+        invoiceRef: this.internalRef,
+        barcode: _barcode,
+        name: _name,
+        amount: _amount,
+        quantity: _quantity
+      }
+      db.collection("stock")
+        .add(data)
+        .then()
+        .catch(error => {
+          console.log(error)
+        }) 
     },
     changeSupplier() {
       var selectedId = this.selectedSupplier
