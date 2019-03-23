@@ -161,7 +161,15 @@ export default {
             }
             allProducts.push(data)
           })
-          console.log(allProducts)
+
+          var dataByBarcode = tempStock.reduce(function(dataByBarcode, item){
+            var value = item.quantity
+            var group = item.barcode
+            dataByBarcode[group] = (dataByBarcode[group] || 0) + value
+            return dataByBarcode
+          }, {})
+          console.log("data by barcode : " + dataByBarcode)
+          /*
           var stockByBarcode =
             _(tempStock)
             .groupBy('barcode')
@@ -170,12 +178,12 @@ export default {
               'quantity': _.sumBy(objs, 'quantity'),
               'intake_price': _.sumBy(objs, 'amount') }))
             .value()
+          */
           // 'intake_price': _.sumBy(objs, 'amount') / _.sumBy(objs, 'quantity') }))
-          console.log("stockbybarcode: " + stockByBarcode)
-          var joinedEntry = []
+          var joinedArray = []
           var found = false
-          stockByBarcode.forEach(stockJson => {
-            joinedEntry = stockJson
+          tempStock.forEach(stockJson => {
+            var joinedEntry = stockJson
             var barcode = stockJson['barcode']
               found = false
               var indexToRemove = 0
@@ -207,9 +215,11 @@ export default {
               if(found) {
                 allProducts.splice(indexToRemove, 1)
               }
+              joinedArray.push(joinedEntry)
           })
+          console.log("joined: " + joinedArray)
           next(vm => {
-            vm.stockItems = joinedEntry
+            vm.stockItems = joinedArray
           })
         })
     })
