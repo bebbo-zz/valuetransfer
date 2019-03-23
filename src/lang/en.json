@@ -95,5 +95,7 @@
   "name": "Name",
   "ustnr": "Umsatzsteuer-Nummer",
   "address": "Address",
-  "bptype": "Type of Business Partner"
+  "bptype": "Type of Business Partner",
+  "fillin": "Fill in",
+  "translation": "Translation"
 }

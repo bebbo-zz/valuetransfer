@@ -106,7 +106,7 @@
 
 <script>
 import firebaseApp from './firebaseInit'
-import _ from 'lodash';
+import _ from 'lodash'
 
 export default {
   name: 'charts',

@@ -264,6 +264,11 @@
               <v-icon>feedback</v-icon>
             </v-tab>
 
+            <v-tab href="#tab-3">
+              Search Product
+              <v-icon>search</v-icon>
+            </v-tab>
+
             <v-tab-item
               key="1"
               value="tab-1"
@@ -381,6 +386,62 @@
                 </v-card-text>
               </v-card>
             </v-tab-item>
+
+            <v-tab-item
+              key="3"
+              value="tab-3"
+            >
+              <v-card flat>
+                <v-card-text>
+                  <v-container>
+                    <v-layout row wrap>
+                      <v-flex xs5>
+                        <v-text-field
+                          v-bind:label="$t('barcode')"
+                          v-model="search_barcode"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex xs5 offset-xs1>
+                        <v-text-field
+                          v-bind:label="$t('name')"
+                          v-model="search_name"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs5>
+                        <v-text-field
+                          v-bind:label="$t('articlenumber')"
+                          v-model="search_article_number"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex xs5 offset-xs1>
+                        <v-text-field
+                          v-bind:label="$t('translation')"
+                          v-model="search_translation"
+                        >
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-tooltip top>
+                          <v-btn @click.native="takeItem" slot="activator" color="success" large>{{$t('fillin')}}</v-btn> 
+                          <span>{{$t('fillin')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                          <span>{{$t('cancel')}}</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
           </v-tabs>
         </v-card-text>
       </v-card>
@@ -465,7 +526,6 @@
 
 <script>
 import firebaseApp from './firebaseInit'
-import { constants } from 'fs';
 
 export default {
   name: "newcost",
@@ -514,7 +574,11 @@ export default {
       fileName: null,
       fileUrl: null,
       fileFile: null,
-      numberOfInvoicePages: 0
+      numberOfInvoicePages: 0,
+      search_barcode: null,
+      search_name: null,
+      search_article_number: null,
+      search_translation: null
       // type, amount, comment (MwSt always separate)
       // when enter amount select if gross or net
     }
@@ -594,9 +658,12 @@ export default {
       }
       this.goodsReceipt.push(data)
       this.atLeastOneGoodsReceipt = true
-      
-      this.sumedGoodsReceipt.amount = this.formatAmount(this.sumedGoodsReceipt.amount + (this.newin_amount * 0.81))
-      this.sumedGoodsUmst.amount = this.formatAmount(this.sumedGoodsUmst.amount + (this.newin_amount * 0.19))
+      console.log(this.sumedGoodsUmst)
+      console.log(this.sumedGoodsReceipt)
+      console.log(this.newin_amount)
+      console.log(this.newin_quantity)
+      this.sumedGoodsReceipt.amount = this.formatAmount(this.sumedGoodsReceipt.amount + (this.newin_quantity * this.newin_amount * 0.81))
+      this.sumedGoodsUmst.amount = this.formatAmount(this.sumedGoodsUmst.amount + (this.newin_quantity * this.newin_amount * 0.19))
     },
     resetDialog() {
       this.newin_barcode = null
@@ -689,13 +756,6 @@ export default {
       .catch(error => {
           console.log(error)
       })
-
-   /*   db.collection("invoices").doc(this.internalRef)
-        .update(data)
-        .then()
-        .catch(error => {
-          console.log(error)
-        })   */
     },
     loadDraft() {
       var db = firebaseApp.firestore()
