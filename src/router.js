@@ -18,6 +18,7 @@ import AccoutingEntries from './components/AccoutingEntries.vue'
 import BusinessPartner from './components/BusinessPartner.vue'
 import WriteInvoice from './components/WriteInvoice.vue'
 import Stock from './components/Stock.vue'
+import ProfitChart from './components/ProfitChart.vue'
 import MobileCashier from './components/MobileCashier.vue'
 
 Vue.use(Router)
@@ -53,6 +54,11 @@ export default new Router({
       path: '/writeinvoice',
       name: 'writeinvoice',
       component: WriteInvoice
+    },
+    {
+      path: '/profitchart',
+      name: 'profitchart',
+      component: ProfitChart
     },
     {
       path: '/businesspartner',

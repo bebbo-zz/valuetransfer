@@ -608,9 +608,9 @@ export default {
     formatAmount(amount) {
       if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
         amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
-        return amount
+        return parseFloat(amount)
       } else {
-        return amount
+        return parseFloat(amount)
       }
     },
     addCostItem() {
@@ -658,10 +658,8 @@ export default {
       }
       this.goodsReceipt.push(data)
       this.atLeastOneGoodsReceipt = true
-      console.log(this.sumedGoodsUmst)
-      console.log(this.sumedGoodsReceipt)
-      console.log(this.newin_amount)
-      console.log(this.newin_quantity)
+      console.log(this.newin_quantity * this.newin_amount * 0.81)
+      console.log(this.formatAmount(this.newin_quantity * this.newin_amount * 0.81))
       this.sumedGoodsReceipt.amount = this.formatAmount(this.sumedGoodsReceipt.amount + (this.newin_quantity * this.newin_amount * 0.81))
       this.sumedGoodsUmst.amount = this.formatAmount(this.sumedGoodsUmst.amount + (this.newin_quantity * this.newin_amount * 0.19))
     },
@@ -743,10 +741,7 @@ export default {
         goodsReceipt: this.goodsReceipt,
         otherAccountingEntries: this.otherAccountingEntries
       }
-      console.log(data)
-      console.log(this.internalRef)
       var invoiceToUpdate = db.collection("invoices").doc(this.internalRef)
-      console.log(invoiceToUpdate)
       invoiceToUpdate.set({
           data
       })
@@ -826,10 +821,10 @@ export default {
       tempAllAccountingEntries.push(this.otherAccountingEntries)
       tempAllAccountingEntries.push(this.sumedGoodsReceipt)
       tempAllAccountingEntries.push(this.sumedGoodsUmst)
-    //  tempAllAccountingEntries.forEach(item => {
+      tempAllAccountingEntries.forEach(item => {
         // store one accouting entry
-    //    this.addOneAccountEntry(item.type, item.amount, item.comment)
-    //  })
+        this.addOneAccountEntry(item.type, item.amount, item.comment)
+      })
 
       // close or at least disable this one
       this.viewMode = true
@@ -837,9 +832,10 @@ export default {
     addOneAccountEntry(_type, _amount, _comment) {
       var db = firebaseApp.firestore()
       const data = {
-        internalRef: this.internalRef,
+        invoiceRef: this.internalRef,
         invoiceDate: this.invoiceDate,
         bookingDate: this.bookingDate,
+        sign: -1,
         type: _type,
         comment: _comment,
         amount: _amount

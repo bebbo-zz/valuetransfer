@@ -38,12 +38,12 @@
           <v-container>
             <v-layout row wrap>
               <v-flex xs5>
-                        <v-text-field
-                          v-bind:label="$t('barcode')"
-                          v-model="display_barcode"
-                          disabled
-                        >
-                        </v-text-field>
+                <v-text-field
+                  v-bind:label="$t('barcode')"
+                  v-model="display_barcode"
+                  disabled
+                >
+                </v-text-field>
               </v-flex>
               <v-flex xs5 offset-xs1>
                         <v-text-field
@@ -58,7 +58,6 @@
                 <v-text-field
                   v-bind:label="$t('name')"
                   v-model="update_name"
-                 disabled
                 >
                 </v-text-field>
               </v-flex>
@@ -68,7 +67,6 @@
                 <v-text-field
                   v-bind:label="$t('translation')"
                   v-model="update_translation"
-                 disabled
                 >
                 </v-text-field>
               </v-flex>
@@ -78,7 +76,6 @@
                 <v-text-field
                   v-bind:label="$t('description')"
                   v-model="update_description"
-                 disabled
                 >
                 </v-text-field>
               </v-flex>
@@ -147,7 +144,7 @@ export default {
           }
           tempStock.push(data)
         })
-        console.log("tempstock " + tempStock)
+
         db.collection('products').get()
           .then(querySnapshot => {
           querySnapshot.forEach(doc => {
@@ -162,14 +159,15 @@ export default {
             allProducts.push(data)
           })
 
-          var dataByBarcode = tempStock.reduce(function(dataByBarcode, item){
+          /*var dataByBarcode = tempStock.reduce(function(dataByBarcode, item){
             var value = item.quantity
             var group = item.barcode
             dataByBarcode[group] = (dataByBarcode[group] || 0) + value
             return dataByBarcode
           }, {})
-          console.log("data by barcode : " + dataByBarcode)
-          /*
+          console.log("data by barcode : ")
+          console.log(dataByBarcode)*/
+          
           var stockByBarcode =
             _(tempStock)
             .groupBy('barcode')
@@ -178,11 +176,10 @@ export default {
               'quantity': _.sumBy(objs, 'quantity'),
               'intake_price': _.sumBy(objs, 'amount') }))
             .value()
-          */
           // 'intake_price': _.sumBy(objs, 'amount') / _.sumBy(objs, 'quantity') }))
           var joinedArray = []
           var found = false
-          tempStock.forEach(stockJson => {
+          stockByBarcode.forEach(stockJson => {
             var joinedEntry = stockJson
             var barcode = stockJson['barcode']
               found = false
@@ -217,7 +214,6 @@ export default {
               }
               joinedArray.push(joinedEntry)
           })
-          console.log("joined: " + joinedArray)
           next(vm => {
             vm.stockItems = joinedArray
           })
@@ -236,22 +232,19 @@ export default {
     },
     updateItem() {
       var db = firebaseApp.firestore()
+      var vm = this
       const data = {
         article_number: this.update_article_number,
         name: this.update_name,
         translation: this.update_translation,
         description: this.update_description
       }
-      console.log(data)
-      console.log(this.selectedItem.productref)
       var productToUpdate = db.collection("products").doc(this.selectedItem.productref)
-      console.log(productToUpdate)
       productToUpdate.set({
         data
       })
       .then(function() {
-        console.log("Document successfully updated!");
-        this.closeDialog()
+        vm.closeDialog()
       })
       .catch(error => {
         console.log(error)

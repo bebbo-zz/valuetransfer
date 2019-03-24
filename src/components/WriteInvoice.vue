@@ -7,9 +7,11 @@
           <v-subheader>{{$t('selectcustomer')}}</v-subheader>
           <v-select
             :items="availableCustomers"
-                          box
-                          v-bind:label="$t('selectcustomer')"
-                          v-model="selectedCustomer" 
+            item-text="cust_name"
+            item-value="cust_id"
+            box
+            v-bind:label="$t('selectcustomer')"
+            v-model="selectedCustomer" 
           ></v-select>
         </v-flex>
       </v-layout>
@@ -146,17 +148,18 @@ export default {
         sortBy: 'name'
       },
       selected: [],
-      availablePercentages: [ 0.05, 0.1, 0.15, 0.2 ],
+      availablePercentages: [ 5, 10, 15, 20 ],
       selectedPercentage: null,
       previewItemCost: 0,
       previewServiceCost: 0,
-      previewTotalCost: 0
+      previewTotalCost: 0,
+      internalRef: null
     }
   },
   beforeRouteEnter(to, from, next) {
     var db = firebaseApp.firestore()
     var tempCustomers = []
-    db.collection('businesspartners').where('type', '==', 'Customer').get()
+    db.collection('businesspartner').where('type', '==', 'Customer').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           var data = {
@@ -164,10 +167,11 @@ export default {
             'cust_name': doc.data().name,
             'cust_address': doc.data().address
           }
+          console.log(data)
           tempCustomers.push(data)
         })
         next(vm => {
-          vm.avaialableCustomers = tempCustomers
+          vm.availableCustomers = tempCustomers
         })
     })
   },
@@ -203,7 +207,7 @@ export default {
     },
     toggleAll () {
       if (this.selected.length) this.selected = []
-      else this.selected = this.desserts.slice()
+      else this.selected = this.availableStockItems.slice()
     },
     changeSort (column) {
       if (this.pagination.sortBy === column) {
@@ -223,18 +227,24 @@ export default {
       this.previewServiceCost = tempItemCost * (parseFloat(this.selectedPercentage) / 100)
       this.previewTotalCost = this.previewItemCost + this.previewServiceCost
       console.log("total cost " + this.previewTotalCost)
+
+      this.generateInvoice()
     },
     generateInvoice()
     {
       // save invoice
+      this.saveInvoice()
 
       // book cost items
+     // this.saveAccountingEntryGoods()
+     // this.saveAccountingEntryProfit()
 
       // remove items from stock
 
     },
     saveInvoice() {
       var db = firebaseApp.firestore()
+      var vm = this
       const data = {
         type: 'CustomerInvoice',
         status: 'Booked',
@@ -244,13 +254,50 @@ export default {
         serviceCost: this.previewServiceCost,
         totalCost: this.previewTotalCost
       }
-      var vm = this
       db.collection("invoices")
+        .add(data)
+        .then(docRef => {
+          vm.internalRef = docRef.id
+          vm.saveAccountingEntryGoods()
+          vm.saveAccountingEntryProfit()
+        })
+        .catch(error => {
+          console.log(error)
+        })  
+    },
+    saveAccountingEntryGoods() {
+      var db = firebaseApp.firestore()
+      const data = {
+        invoiceRef: this.internalRef,
+        bookingDate: new Date().toISOString().substr(0, 10),
+        sign: 1,
+        type: 'Warenausgang',
+        comment: 'goods paid',
+        amount: this.previewItemCost
+      }
+      db.collection("accoutingentries")
         .add(data)
         .then()
         .catch(error => {
           console.log(error)
         })  
+    },
+    saveAccountingEntryProfit() {
+      var db = firebaseApp.firestore()
+      const data = {
+        invoiceRef: this.internalRef,
+        bookingDate: new Date().toISOString().substr(0, 10),
+        sign: 1,
+        type: 'Ertrag',
+        comment: this.selectedPercentage + '% of goods amount',
+        amount: this.previewServiceCost
+      }
+      db.collection("accoutingentries")
+        .add(data)
+        .then()
+        .catch(error => {
+          console.log(error)
+        }) 
     }
   }
 }

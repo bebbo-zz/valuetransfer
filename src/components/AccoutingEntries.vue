@@ -25,12 +25,14 @@
                 @click="editCostItem(index)"
                 >
                 <v-list-tile-action>
-                  <!--v-icon color="indigo">add</v-icon-->
-                  <v-icon color="indigo">remove</v-icon>
+                  <v-icon v-if="item.sign == 1" color="indigo">add</v-icon>
+                  <v-icon v-if="item.sign == -1" color="indigo">remove</v-icon>
                 </v-list-tile-action>
 
                 <v-list-tile-content>
-                  <v-list-tile-title>{{ item.type }} - {{ item.amount }}</v-list-tile-title>
+                  <v-list-tile-title>
+                    {{ item.bookingDate }} - {{ item.type }} - {{ item.amount }}
+                  </v-list-tile-title>
                   <v-list-tile-sub-title>{{ item.comment }}</v-list-tile-sub-title>
                 </v-list-tile-content>
 
@@ -65,8 +67,10 @@
                 </v-list-tile-action>
 
                 <v-list-tile-content>
-                  <v-list-tile-title>{{ item.type }} - {{ item.amount }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ item.comment }}</v-list-tile-sub-title>
+                  <v-list-tile-title>
+                    {{ item.bookingDate }} - {{ item.invoiceNumber }}
+                  </v-list-tile-title>
+                  <v-list-tile-sub-title>{{ item.selectedSupplier.supplierName }}</v-list-tile-sub-title>
                 </v-list-tile-content>
 
                 <v-list-tile-action>
@@ -175,7 +179,7 @@ export default {
     var db = firebaseApp.firestore()
     var tempInvoices = []
     var tempAccoutingEntries = []
-    db.collection('invoices').get()
+    db.collection('invoices').where('status', '==', 'Booked').get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           var data = {
@@ -183,7 +187,6 @@ export default {
             'invoiceNumber': doc.data().invoiceNumber,
             'bookingDate': doc.data().bookingDate,
             'supplier': doc.data().supplier,
-            'totalBookedAmount': doc.data().totalBookedAmount
           }
           tempInvoices.push(data)
         })
@@ -192,11 +195,12 @@ export default {
             querySnapshot.forEach(doc => {
               var data = {
                 'internalRef': doc.id,
-                'basedOnInvoice': doc.data().basedOnInvoice,
+                'invoiceRef': doc.data().invoiceRef,
                 'bookingDate': doc.data().bookingDate,
                 'sign': doc.data().sign,
                 'amount': doc.data().amount,
-                'type': doc.data().type
+                'type': doc.data().type,
+                'comment': doc.data().comment
               }
               tempAccoutingEntries.push(data)
             })

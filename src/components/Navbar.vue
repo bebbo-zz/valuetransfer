@@ -136,7 +136,7 @@
                 <v-list-tile-title>Sales Overview</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile @click="costsection('/profitandloss')">
+            <v-list-tile @click="costsection('/profitchart')">
               <v-list-tile-action>
                 <v-icon>timeline</v-icon>
               </v-list-tile-action>
