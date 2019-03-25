@@ -11,6 +11,17 @@
           </v-btn-toggle>
         </v-flex>
       </v-layout>
+      <v-btn
+            color="pink"
+            dark
+            fixed
+            bottom
+            right
+            fab
+            @click='addAccoutingEntry'
+          >
+            <v-icon>add</v-icon>
+          </v-btn>
     </v-container>
     <!-- END View Selection -->
 
@@ -21,7 +32,7 @@
           <v-list two-line>
             <template v-for="(item, index) in accountingEntries">
               <v-list-tile
-                :key="index"
+                :key="index + '_entry'"
                 @click="editCostItem(index)"
                 >
                 <v-list-tile-action>
@@ -42,7 +53,7 @@
               </v-list-tile>
               <v-divider
                 v-if="index + 1 < accountingEntries.length"
-                :key="index"
+                :key="index + '_entry_divider'"
               ></v-divider>
             </template>
           </v-list>
@@ -58,7 +69,7 @@
           <v-list two-line>
             <template v-for="(item, index) in invoices">
               <v-list-tile
-                :key="index"
+                :key="index + '_invoice'"
                 @click="editCostItem(index)"
                 >
                 <v-list-tile-action>
@@ -70,7 +81,7 @@
                   <v-list-tile-title>
                     {{ item.bookingDate }} - {{ item.invoiceNumber }}
                   </v-list-tile-title>
-                  <v-list-tile-sub-title>{{ item.selectedSupplier.supplierName }}</v-list-tile-sub-title>
+                  <v-list-tile-sub-title>{{ item.supplierName }}</v-list-tile-sub-title>
                 </v-list-tile-content>
 
                 <v-list-tile-action>
@@ -79,7 +90,7 @@
               </v-list-tile>
               <v-divider
                 v-if="index + 1 < invoices.length"
-                :key="index"
+                :key="index + '_invoice_divider'"
               ></v-divider>
             </template>
           </v-list>
@@ -104,13 +115,13 @@
                             :items="profittypes"
                             box
                             v-bind:label="$t('profittype')"
-                            v-model="type" 
+                            v-model="newtype" 
                           ></v-select>
                         </v-flex>
                         <v-flex xs5 offset-xs1>
                           <v-text-field
                             v-bind:label="$t('costamount')"
-                            v-model="amount"
+                            v-model="newamount"
                           >
                           </v-text-field>
                         </v-flex>
@@ -125,11 +136,35 @@
                           ></v-select>
                         </v-flex>
                         <v-flex xs5 offset-xs1>
-                          <v-text-field
+                          <v-dialog
+                            ref="dialog"
+                            v-model="modal"
+                            :return-value.sync="paymentDate"
+                            persistent
+                            lazy
+                            full-width
+                            width="290px"
+                          >
+                            <template v-slot:activator="{ on }">
+                              <v-text-field
+                                v-model="paymentDate"
+                                v-bind:label="$t('paymentreceived')"
+                                prepend-icon="event"
+                                readonly
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="paymentDate" scrollable>
+                              <v-spacer></v-spacer>
+                              <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
+                              <v-btn flat color="primary" @click="$refs.dialog.save(paymentDate)">OK</v-btn>
+                            </v-date-picker>
+                          </v-dialog>
+                          <!--v-text-field
                             v-bind:label="$t('paymentreceived')"
                             v-model="paymentDate"
                           >
-                          </v-text-field>
+                          </v-text-field-->
                         </v-flex>
               </v-layout>
               <v-layout row wrap>
@@ -169,10 +204,18 @@ export default {
   name: "accoutingentries",
   data() {
     return {
+      modal: false,
       modalAddAccoutingEntry: false,
       accountingView: true,
       invoices: [],
-      accountingEntries: []
+      accountingEntries: [],
+      profittypes: ['Invoice Paid', 'Other Income'],
+      newtype: null,
+      newamount: 0,
+      availableInvoices: [],
+      refInvoice: null,
+      paymentDate: new Date().toISOString().substr(0, 10),
+      comment: null
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -186,7 +229,7 @@ export default {
             'internalRef': doc.id,
             'invoiceNumber': doc.data().invoiceNumber,
             'bookingDate': doc.data().bookingDate,
-            'supplier': doc.data().supplier,
+            'supplierName': 'need to fix',
           }
           tempInvoices.push(data)
         })
@@ -218,14 +261,34 @@ export default {
       this.accountingView = showAccountingBool
     },
     addAccoutingEntry() {
+      this.getCustomerInvoices()
       this.modalAddAccoutingEntry = true
     },
     saveAccoutingEntry() {
       // add to DB
       this.closeDialog()
     },
+    getCustomerInvoices() {
+      var db = firebaseApp.firestore()
+      var tempInvoices = []
+      db.collection('invoices').where('type', '==', 'CustomerInvoice').get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            var data = {
+              'internalRef': doc.id,
+              'invoiceNumber': doc.data().invoiceNumber,
+              'bookingDate': doc.data().bookingDate
+            }
+            tempInvoices.push(data)
+          })
+          next(vm => {
+            vm.availableInvoices = tempInvoices
+          })
+      })
+    },
     closeDialog() {
       this.accountingView = false
+      this.modalAddAccoutingEntry = true
     }
   }
 }

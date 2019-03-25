@@ -98,5 +98,6 @@
   "address": "Address",
   "bptype": "Type of Business Partner",
   "fillin": "Fill in",
-  "translation": "Translation"
+  "translation": "Translation",
+  "confirm": "Confirm"
 }

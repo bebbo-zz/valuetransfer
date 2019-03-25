@@ -109,30 +109,66 @@
         </v-flex>
       </v-layout>
       <v-layout row wrap>
-        <v-flex xs12>
-          <v-tooltip top>
-            <v-btn @click.native="back" slot="activator" color="error" large>{{$t('back')}}</v-btn>    
-            <span>{{$t('back')}}</span>
-          </v-tooltip>
-          <v-tooltip top>
-            <v-btn @click.native="previewInvoice" slot="activator" color="success" large>{{$t('generateinvoice')}}</v-btn> 
-            <span>{{$t('generateinvoice')}}</span>
-          </v-tooltip>
-        </v-flex>
-      </v-layout>
+                      <v-flex xs12>
+                        <v-tooltip top>
+                          <v-btn @click.native="takeItem" slot="activator" color="success" large>{{$t('fillin')}}</v-btn> 
+                          <span>{{$t('fillin')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                          <span>{{$t('cancel')}}</span>
+                        </v-tooltip>
+                      </v-flex>
+        </v-layout>
     </v-container>
 <!-- END Step 3 -->
+
+<!-- START Modal Preview -->
+    <v-dialog 
+      v-model="modalConfirm"
+      lazy
+      persistent max-width="800px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{$t('confirm')}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-layout row wrap>
+              <p>Total Cost for Items: {{ previewItemCost }}</p>
+              <p>Total Service Cost: {{ previewServiceCost }}</p>
+              <p>Total Amount: {{ previewTotalCost }}</p>
+            </v-layout>
+            <v-layout row wrap>
+                      <v-flex xs12>
+                        <v-tooltip top>
+                          <v-btn @click.native="generateInvoice" slot="activator" color="success" large>{{$t('ok')}}</v-btn> 
+                          <span>{{$t('ok')}}</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                          <v-btn @click.native="closeDialog" slot="activator" color="error" large>{{$t('cancel')}}</v-btn>    
+                          <span>{{$t('cancel')}}</span>
+                        </v-tooltip>
+                      </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+<!-- END Modal Preview -->
 
   </div>
 </template>
 
 <script>
 import firebaseApp from './firebaseInit'
+import jsPDF from 'jspdf'
 
 export default {
   name: "writeinvoice",
   data() {
     return {
+      modalConfirm: false,
       step: 1,
       stockItemsFilled: false,
       availableCustomers: [],
@@ -176,6 +212,14 @@ export default {
     })
   },
   methods: {
+    formatAmount(amount) {
+      if (amount !== '' || amount !== undefined || amount !== 0 || amount !== '0' || amount !== null) {
+        amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2)
+        return parseFloat(amount)
+      } else {
+        return parseFloat(amount)
+      }
+    },
     back() {
       this.step = this.step - 1
     },
@@ -226,21 +270,85 @@ export default {
       this.previewItemCost = tempItemCost
       this.previewServiceCost = tempItemCost * (parseFloat(this.selectedPercentage) / 100)
       this.previewTotalCost = this.previewItemCost + this.previewServiceCost
-      console.log("total cost " + this.previewTotalCost)
 
-      this.generateInvoice()
+      this.modalConfirm = true
     },
     generateInvoice()
     {
-      // save invoice
+      // save invoice which also books items
       this.saveInvoice()
 
-      // book cost items
-     // this.saveAccountingEntryGoods()
-     // this.saveAccountingEntryProfit()
+      // generate pdf
+      this.generatePdf()
 
       // remove items from stock
 
+    },
+    generatePdf() {
+      var doc = new jsPDF()
+
+      var counter = 1
+      var y = 10
+      doc.text('Van Logistics Services', 10, y)
+      this.selected.forEach(goodItem => {
+      /*  'id': doc.id,
+              'barcode': doc.data().barcode,
+              'name': doc.data().name,
+              'amount': doc.data().amount,
+              'quantity': doc.data().quantity */
+        y = (counter * 10) + 10
+        if(y > 500) {
+          doc.addPage()
+          y = 10
+        }
+        doc.text(goodItem.barcode + " - " + goodItem.name, 10, y)
+        doc.text(goodItem.amount + " EUR per item", 30, y + 5)
+        doc.text(goodItem.quantity + " x", 60, y + 5)
+        doc.text(this.formatAmount(goodItem.amount * goodItem.quantity) + " EUR", 80, y + 5)
+        counter = counter + 1
+      })
+      y = (counter * 10) + 10
+      if(y > 500) {
+        doc.addPage()
+        y = 10
+      }
+      doc.line(10, 100, y, y)
+      counter = counter + 1
+      y = (counter * 10) + 10
+      if(y > 500) {
+        doc.addPage()
+        y = 10
+      }
+      doc.text("Total Cost of Goods ", 10, y)
+      doc.text(this.previewItemCost + " EUR", 80, y + 5)
+
+      counter = counter + 1
+      y = (counter * 10) + 10
+      if(y > 500) {
+        doc.addPage()
+        y = 10
+      }
+      doc.text("Service Fee " + this.selectedPercentage + "% of costs of goods", 10, y)
+      doc.text(this.previewServiceCost + " EUR", 80, y + 5)
+
+      counter = counter + 1
+      y = (counter * 10) + 10
+      if(y > 500) {
+        doc.addPage()
+        y = 10
+      }
+      doc.text("Total Costs", 10, y)
+      doc.text(this.previewTotalCost + " EUR", 80, y + 5)
+
+      counter = counter + 1
+      y = (counter * 10) + 10
+      if(y > 500) {
+        doc.addPage()
+        y = 10
+      }
+      doc.line(10, 100, y, y)
+
+      doc.save('new_invoice.pdf')
     },
     saveInvoice() {
       var db = firebaseApp.firestore()
@@ -298,6 +406,9 @@ export default {
         .catch(error => {
           console.log(error)
         }) 
+    },
+    closeDialog() {
+      this.modalConfirm = false
     }
   }
 }
